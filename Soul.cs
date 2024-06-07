@@ -122,85 +122,91 @@ namespace fire_ash_server
 
         public void GeneratePossibleMoves()
         {
-            if (Character != null)
+            if (Character.SpeakingTo != null && Character.SpeakingTo.DialogueManager != null && Character.SpeakingTo.DialogueManager.Initiater == Character)
             {
-                if (Character.SpeakingTo != null && Character.SpeakingTo.DialogueManager != null && Character.SpeakingTo.DialogueManager.Initiater == Character)
+                DialogueManager dialogueManager = Character.SpeakingTo.DialogueManager;
+                DialogueNode currentNode = dialogueManager.CurrentNode;
+                for (int i = 0; i < currentNode.Choices.Count(); i++)
                 {
-                    DialogueManager dialogueManager = Character.SpeakingTo.DialogueManager;
-                    DialogueNode currentNode = dialogueManager.CurrentNode;
-                    for (int i = 0; i < currentNode.Choices.Count(); i++)
+                    DialogueChoice choice = currentNode.Choices[i];
+                    if (dialogueManager.ChoiceIsValid(choice))
                     {
-                        DialogueChoice choice = currentNode.Choices[i];
-                        if (dialogueManager.ChoiceIsValid(choice))
-                        {
-                            AddPossibleSpeakChoice(i, choice, dialogueManager);
-                        }
-                    }
-                    return;
-                }
-                AddPossibleHiddenLookAtMove(Character);
-
-                foreach (string featKey in Character.Feats)
-                {
-                    Feat? feat = FeatCreater.Get(featKey, this, Character.LookAt);
-                    if (feat == null) continue;
-
-                    foreach (Move move in feat.Moves)
-                    {
-                        if (move.IsValid(this))
-                            AddPossibleMove(move);
+                        AddPossibleSpeakChoice(i, choice, dialogueManager);
                     }
                 }
+                return;
+            }
+            AddPossibleHiddenLookAtMove(Character);
 
-                if (Character.LookAt != null)
+            foreach (string featKey in Character.Feats)
+            {
+                Feat? feat = FeatCreater.Get(featKey, this, Character.LookAt);
+                if (feat == null) continue;
+
+                foreach (Move move in feat.Moves)
                 {
-                    AddPossibleMove(new LookAt(this));
+                    if (move.IsValid(this))
+                        AddPossibleMove(move);
+                }
+            }
 
-                    if (Character.LookAt is Character && !Character.IsHidden())
-                    {                     
-                        Character lookAtCharacter = (Character)Character.LookAt;
+            if (Character.LookAt != null)
+            {
+                AddPossibleMove(new LookAt(this));
 
-                        if (Character.IsInGroupWith(Character.LookAt) == false)
-                            AddPossibleMove(new MoveTo(this, lookAtCharacter));
+                if (Character.LookAt is Character && !Character.IsHidden())
+                {                     
+                    Character lookAtCharacter = (Character)Character.LookAt;
 
-                        if (lookAtCharacter.DialogueManager != null)
-                        {
-                            AddPossibleMove(new Move(
-                                "sp",
-                                $"Speak to {lookAtCharacter.Name}",
-                                () =>
-                                {
-                                    lookAtCharacter.DialogueManager.InitSpeakWith(Character);
-                                }));
-                        }
-                    }
-                    else if (Character.LookAt.GetType() == typeof(Room))
+                    if (Character.IsInGroupWith(Character.LookAt) == false)
+                        AddPossibleMove(new MoveTo(this, lookAtCharacter));
+
+                    if (lookAtCharacter.DialogueManager != null)
                     {
-                        Room lookAtRoom = (Room)Character.LookAt;
-                        AddPossibleInvestigationOrLookMove(lookAtRoom);
-                        foreach (Character otherChar in lookAtRoom.Characters.Where(character => character != Character && !character.IsHidden()))
-                        {
-                            AddPossibleMove(new LookAt(this, otherChar));
-                        }
+                        AddPossibleMove(new Move(
+                            "sp",
+                            $"Speak to {lookAtCharacter.Name}",
+                            () =>
+                            {
+                                lookAtCharacter.DialogueManager.InitSpeakWith(Character);
+                            }));
                     }
-
-                    if (Character.LookAt.IsPickupable())
+                }
+                else if (Character.LookAt.GetType() == typeof(Room))
+                {
+                    Room lookAtRoom = (Room)Character.LookAt;
+                    AddPossibleInvestigationOrLookMove(lookAtRoom);
+                    foreach (Character otherChar in lookAtRoom.Characters.Where(character => character != Character && !character.IsHidden()))
                     {
-                        Item item = (Item)Character.LookAt;
-
-                        if (item.HeldByCharacter() != Character)
-                            AddPossibleMove(new Grab(this, (Item)Character.LookAt)); //But you can pickup Props??
-
-                        if (item.HeldByCharacter() == Character)
-                            foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
-                                AddPossibleMove(new Equip(this, item, inventorySlot));
+                        AddPossibleMove(new LookAt(this, otherChar));
                     }
-                    foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
+                }
+
+                if (Character.LookAt.IsPickupable())
+                {
+                    Item item = (Item)Character.LookAt;
+
+                    if (item.HeldByCharacter() != Character)
+                        AddPossibleMove(new Grab(this, (Item)Character.LookAt)); //But you can pickup Props??
+
+                    if (item.HeldByCharacter() == Character)
+                        foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
+                            AddPossibleMove(new Equip(this, item, inventorySlot));
+                }
+                foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
+                {
+                    AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, (Item)Character.LookAt));
+                }
+
+                foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
+                {
+                    bool isClose = true;
+                    if (item.HeldBy == character.CurrentRoom)
                     {
-                        AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, (Item)Character.LookAt));
+                        isClose = Character.IsInGroupWith(item) != false;
                     }
 
-                    foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
+                    if (isClose)
                     {
                         AddPossibleInvestigationOrLookMove(item);
 
@@ -211,14 +217,18 @@ namespace fire_ash_server
                             AddPossibleMove(grabMove);
                         }
                     }
+                    else
+                        AddPossibleMove(new MoveTo(this, item));
                 }
+            }
 
-                //Exits in current room
-                if (ReferenceEquals(Character.LookAt, Character.CurrentRoom))
+            //Exits in current room
+            if (ReferenceEquals(Character.LookAt, Character.CurrentRoom))
+            {
+                foreach (Exit exit in Character.CurrentRoom.Exits.Where(exit => !exit.IsHidden()))
                 {
-                    foreach (Exit exit in Character.CurrentRoom.Exits.Where(item => !item.IsHidden()))
+                    if (Character.IsInGroupWith(exit) == true)
                     {
-                        
                         if (!Character.InCombat)
                             AddPossibleMove(new RoomChange(this, exit.GoToRoom));
                         else
@@ -244,14 +254,18 @@ namespace fire_ash_server
                                 }));
                         }
                     }
+                    else
+                    {                       
+                        AddPossibleMove(new MoveTo(this, exit));
+                    }
                 }
-
-                //Back..
-                AddPossibleBackMove();
-
-                //inventory
-                AddPossibleMove(new LookInventory(this));
             }
+
+            //Back..
+            AddPossibleBackMove();
+
+            //inventory
+            AddPossibleMove(new LookInventory(this));
         }
 
         public void AddPossibleHiddenLookAtMove(Character character)

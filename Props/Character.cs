@@ -385,6 +385,11 @@ namespace fire_ash_server.Props
             LeaveCurrentRoom();
             CurrentRoom = room;
             CurrentRoom.Characters.Add(this);
+
+            Exit exitInNewRoom = CurrentRoom.Exits.Where(exit => exit.GoToRoom == xRoom).FirstOrDefault();
+            if (exitInNewRoom != null)
+                MoveToGroup(exitInNewRoom);
+
             ResetLookAt();
             xRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
             room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {xRoom.Name}.", this);
@@ -429,6 +434,7 @@ namespace fire_ash_server.Props
         {
             if (CurrentRoom != null)
             {
+                RemoveFromCurrentGrouping();
                 CurrentRoom.Characters.Remove(this);
             }
         }
