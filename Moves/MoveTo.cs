@@ -10,14 +10,22 @@ namespace fire_ash_server.Moves
 {
     internal class MoveTo : Move
     {
-        public MoveTo(Soul soul, Prop targetProp) : base("m", $"Move to {targetProp.Name}", targetProp)
+        public MoveTo(Soul soul, Prop targetProp) : base("m", $"Move to {CreateName(targetProp)}", targetProp)
         {
             Action = () =>
             {
-                soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves towards {targetProp.Name}");
+                soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
                 soul.Character.MoveToGroup(targetProp);
             };
         }
 
+        public static string CreateName(Prop prop)
+        {
+
+            if (prop is Exit)
+                return ((Exit)prop).GoToRoom.Name + " Entrance";
+
+            return prop.Name;
+        }
     }
 }

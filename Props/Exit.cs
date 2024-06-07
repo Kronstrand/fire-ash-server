@@ -16,7 +16,7 @@ namespace fire_ash_server.Props
         }
         private static string CreateName(Room room)
         {
-            return $"Goto {room.Name}.";
+            return $"Exit to {room.Name}.";
         }
     }
 }
