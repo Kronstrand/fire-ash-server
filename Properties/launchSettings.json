@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "fire-ash-server": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
