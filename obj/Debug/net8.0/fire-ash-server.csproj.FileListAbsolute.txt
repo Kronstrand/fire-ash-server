@@ -12,3 +12,4 @@ C:\Users\jkkn\Documents\C#\fire-ash-server\obj\Debug\net8.0\refint\fire-ash-serv
 C:\Users\jkkn\Documents\C#\fire-ash-server\obj\Debug\net8.0\fire-ash-server.pdb
 C:\Users\jkkn\Documents\C#\fire-ash-server\obj\Debug\net8.0\fire-ash-server.genruntimeconfig.cache
 C:\Users\jkkn\Documents\C#\fire-ash-server\obj\Debug\net8.0\ref\fire-ash-server.dll
+C:\Users\jkkn\Documents\C#\fire-ash-server\obj\Debug\net8.0\fire-ash-server.sourcelink.json
