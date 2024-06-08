@@ -138,18 +138,6 @@ namespace fire_ash_server
             }
             AddPossibleHiddenLookAtMove(Character);
 
-            foreach (string featKey in Character.Feats)
-            {
-                Feat? feat = FeatCreater.Get(featKey, this, Character.LookAt);
-                if (feat == null) continue;
-
-                foreach (Move move in feat.Moves)
-                {
-                    if (move.IsValid(this))
-                        AddPossibleMove(move);
-                }
-            }
-
             if (Character.LookAt != null)
             {
                 AddPossibleMove(new LookAt(this));
@@ -172,6 +160,10 @@ namespace fire_ash_server
                             }));
                     }
                 }
+                else if (Character.LookAt is Item)
+                {
+                    AddPossibleInvestigationOrLookMove(Character.LookAt);
+                }
                 else if (Character.LookAt.GetType() == typeof(Room))
                 {
                     Room lookAtRoom = (Room)Character.LookAt;
@@ -193,6 +185,7 @@ namespace fire_ash_server
                         foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
                             AddPossibleMove(new Equip(this, item, inventorySlot));
                 }
+
                 foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
                 {
                     AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, (Item)Character.LookAt));
@@ -201,13 +194,13 @@ namespace fire_ash_server
                 foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
                 {
                     bool isClose = true;
-                    if (item.HeldBy == character.CurrentRoom)
+                    if (item.HeldBy == Character.CurrentRoom)
                     {
                         isClose = Character.IsInGroupWith(item) != false;
                     }
 
                     if (isClose)
-                    {
+                    {            
                         AddPossibleInvestigationOrLookMove(item);
 
                         if (item.HeldByCharacter() == null)
@@ -222,12 +215,27 @@ namespace fire_ash_server
                 }
             }
 
-            //Exits in current room
-            if (ReferenceEquals(Character.LookAt, Character.CurrentRoom))
+            foreach (string featKey in Character.Feats)
             {
-                foreach (Exit exit in Character.CurrentRoom.Exits.Where(exit => !exit.IsHidden()))
+                Feat? feat = FeatCreater.Get(featKey, this, Character.LookAt);
+                if (feat == null) continue;
+
+                foreach (Move move in feat.Moves)
                 {
-                    if (Character.IsInGroupWith(exit) == true)
+                    if (move.IsValid(this))
+                        AddPossibleMove(move);
+                }
+            }
+
+            //Exits in current room
+            foreach (Exit exit in Character.CurrentRoom.Exits.Where(exit => !exit.IsHidden()))
+            {                           
+                if (Character.IsInGroupWith(exit) == true)
+                {
+                    if (Character.LookAt == Character.CurrentRoom)
+                        AddPossibleMove(new LookAt(this, exit));
+
+                    if (ReferenceEquals(Character.LookAt, exit))
                     {
                         if (!Character.InCombat)
                             AddPossibleMove(new RoomChange(this, exit.GoToRoom));
@@ -254,12 +262,12 @@ namespace fire_ash_server
                                 }));
                         }
                     }
-                    else
-                    {                       
-                        AddPossibleMove(new MoveTo(this, exit));
-                    }
                 }
-            }
+                else if (ReferenceEquals(Character.LookAt, Character.CurrentRoom))
+                {                       
+                    AddPossibleMove(new MoveTo(this, exit));
+                }
+            }           
 
             //Back..
             AddPossibleBackMove();
@@ -315,6 +323,8 @@ namespace fire_ash_server
         {
             if (prop.HasHiddenItems() && AddPossibleUnusedMove(new Investigate(this, prop)))
                 return;
+
+
 
             if (prop != Character.LookAt)
                 AddPossibleMove(new LookAt(this, prop));

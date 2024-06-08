@@ -16,6 +16,10 @@ namespace fire_ash_server.Moves
             {
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
                 soul.Character.MoveToGroup(targetProp);
+                if (soul.Character.LookAt != targetProp)
+                {
+                    new LookAt(soul, targetProp).Action();
+                }                   
             };
         }
 
