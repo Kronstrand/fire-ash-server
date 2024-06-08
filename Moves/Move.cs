@@ -20,7 +20,7 @@ namespace fire_ash_server.Moves
         public bool Hidden;
         public MoveType Type = MoveType.Action;
         public bool EnablesCombat;
-        public bool Ranged = false;
+        public bool IsRanged = false;
 
         public Move(string key, string description, Action action)
         {
@@ -36,7 +36,6 @@ namespace fire_ash_server.Moves
             Prop = prop;
             PropPosition = prop.GetPropPosition();
             Action = action;
-
         }
 
         public Move(string key, string description)

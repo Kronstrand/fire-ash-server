@@ -82,6 +82,7 @@ namespace fire_ash_server.World
                 soul.Character.AddFeat(FeatKey.Stealth);
                 soul.Character.AddFeat(FeatKey.MeleeAttack);
                 soul.Character.AddFeat(FeatKey.DualWield);
+                soul.Character.AddFeat(FeatKey.RangedAttack);
                 soul.Character.AddFeat(FeatKey.PickPocket);
 
                 string messageToSoul =

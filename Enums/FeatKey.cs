@@ -10,6 +10,7 @@ namespace fire_ash_server.Enums
     {
         Stealth,
         MeleeAttack,
+        RangedAttack,
         DualWield,
         PickPocket
     }

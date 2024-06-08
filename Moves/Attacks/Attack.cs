@@ -13,7 +13,7 @@ namespace fire_ash_server.Moves.Attacks
     {
         public Attack(string key, string description, Character characterToAttack, bool isRanged) : base(key, description, characterToAttack)
         {
-            Ranged = isRanged;
+            IsRanged = isRanged;
             EnablesCombat = true;
         }
 
@@ -22,10 +22,12 @@ namespace fire_ash_server.Moves.Attacks
             if (soul.Character.LookAt == null)
                 return false;
 
-            if (soul.Character.LookAt.GetType() == typeof(Character))
+            if (soul.Character.LookAt is Character)
             {
                 Character characterToAttack = (Character)soul.Character.LookAt;
-                if (!Ranged && soul.Character.IsInGroupWith(characterToAttack) != true)
+                if (!IsRanged && soul.Character.IsInGroupWith(characterToAttack) != true)
+                    return false;
+                if (IsRanged && soul.Character.GetRangedWeapon() == null)
                     return false;
 
                 if (!characterToAttack.Dead && !characterToAttack.IsHidden())
@@ -36,7 +38,7 @@ namespace fire_ash_server.Moves.Attacks
 
         public bool TryAttack(Character character, Character characterToAttack, Action<Character> attackAction)
         {
-            if (!character.AttackTargetIsWithinReach(characterToAttack))
+            if (!character.AttackTargetIsWithinReach(characterToAttack, IsRanged))
             {
                 EnablesCombat = false;
                 return false;

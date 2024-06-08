@@ -12,8 +12,11 @@ namespace fire_ash_server.Moves
     {
         public MoveTo(Soul soul, Prop targetProp) : base("m", $"Move to {CreateName(targetProp)}", targetProp)
         {
+            IsRanged = true;
+
             Action = () =>
             {
+                
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
                 soul.Character.MoveToGroup(targetProp);
                 if (soul.Character.LookAt != targetProp)

@@ -278,6 +278,9 @@ namespace fire_ash_server.Props
 
         public bool? IsInGroupWith(Prop prop)
         {
+            if (prop is Room)
+                return null;
+
             Room? currentRoom = GetEmidiateRoomLocation();
             if (currentRoom == null)
                 return null;

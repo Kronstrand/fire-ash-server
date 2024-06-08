@@ -537,7 +537,9 @@ namespace fire_ash_server
                 return null;
             }
 
-            Dictionary<string, Move> relevantAttackMoves = AllPossibleMoves.Where(x => x.Value is MeleeAttack).ToDictionary();
+            Dictionary<string, Move> relevantAttackMoves = AllPossibleMoves.Where(x => 
+                                                                x.Value is Attack || 
+                                                                (x.Value is MoveTo && x.Value.Prop is Character && Character.IsInHostileCombatWith((Character)x.Value.Prop))).ToDictionary();
 
             //add all feat moves from character
             foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)

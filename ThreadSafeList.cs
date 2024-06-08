@@ -45,9 +45,13 @@ namespace fire_ash_server
             _lock.EnterReadLock();
             try
             {
-                T item = _list[_list.Count - 2];
-                _list.RemoveAt(_list.Count - 1);
-                return item;
+                if (_list.Count > 1)
+                {
+                    T item = _list[_list.Count - 2];
+                    _list.RemoveAt(_list.Count - 1);
+                    return item;
+                }
+                return _list[0];
             }
             finally
             {

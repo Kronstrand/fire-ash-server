@@ -193,6 +193,15 @@ namespace fire_ash_server.Props
             return 10 + GetModifer(Ability.Dexterity);
         }
 
+        public string? GetRangedAttackDescription(Prop prop)
+        {
+            Weapon? weapon = GetRangedWeapon();
+            if (weapon == null)
+                return null;
+
+            return weapon.GetAttackDescription(Name, prop.Name);
+        }
+
         public string? GetMainHandAttackDescription(Prop prop)
         {
             return GetMainHand().GetAttackDescription(Name, prop.Name);
@@ -206,6 +215,13 @@ namespace fire_ash_server.Props
         public Roll GetAttackRoll()
         {
            return new Roll(GetModifer(Skill.CloseCombat), RollType.AttackRoll, this);
+        }
+
+        public Damage GetRangedDamageRoll(Weapon rangedWeapon)
+        {
+            return new Damage(
+                new Roll(rangedWeapon.DamageDie, GetModifer(Ability.Dexterity), RollType.DamageRoll, this),
+                rangedWeapon.DamageType);
         }
 
         public Damage GetMainHandDamageRoll()
@@ -224,6 +240,15 @@ namespace fire_ash_server.Props
             return new Damage(
                 new Roll(offHandWeapon.DamageDie, 0, RollType.DamageRoll, this),
                 offHandWeapon.DamageType);
+        }
+
+        public Weapon? GetRangedWeapon()
+        {
+            if (EquippedItems.TryGetValue(InventorySlot.Ranged, out Item? rangedWeapon))
+                if (rangedWeapon is Weapon)
+                    return (Weapon)rangedWeapon;
+
+            return null;
         }
 
         public Weapon GetMainHand()
@@ -254,6 +279,30 @@ namespace fire_ash_server.Props
                 return true;
             }
             return false;
+        }
+
+        public void AttackWithRanged(Character characterToAttack)
+        {
+            Weapon? weapon = GetRangedWeapon();
+            if (weapon == null) 
+                return;
+            string? attack = GetRangedAttackDescription(characterToAttack);
+            Roll roll = GetAttackRoll();
+            if (roll.GetSum() >= characterToAttack.GetAC())
+            {
+                Damage damage = GetRangedDamageRoll(weapon);
+
+                characterToAttack.TakeDamage(
+                    damage,
+                    this,
+                    weapon.Name,
+                    attack + SingleHitMessage(roll),
+                    true);
+            }
+            else
+            {
+                BroadcastToSoulsInRoom(attack + SingleMissMessage(roll));
+            }
         }
 
         public void AttackWithMainHand(Character characterToAttack)
@@ -288,9 +337,6 @@ namespace fire_ash_server.Props
 
         public void AttackWithOffhand(Character characterToAttack)
         {
-            if (!AttackTargetIsWithinReach(characterToAttack))
-                return;
-
             string? attack = GetOffHandAttackDescription(characterToAttack);
             Roll roll = GetAttackRoll();
             if (roll.GetSum() >= characterToAttack.GetAC())
@@ -386,7 +432,7 @@ namespace fire_ash_server.Props
             CurrentRoom = room;
             CurrentRoom.Characters.Add(this);
 
-            Exit exitInNewRoom = CurrentRoom.Exits.Where(exit => exit.GoToRoom == xRoom).FirstOrDefault();
+            Exit? exitInNewRoom = CurrentRoom.Exits.Where(exit => exit.GoToRoom == xRoom).FirstOrDefault();
             if (exitInNewRoom != null)
                 MoveToGroup(exitInNewRoom);
 
@@ -539,9 +585,6 @@ namespace fire_ash_server.Props
         {
             Relationship relationship = GetRelationShipTo(enemy);
 
-            //if (relationship == null)
-                //relationship = new Relationship(this.Faction, enemy.Faction, -1);
-
             if (!CurrentRoom.RelationshipsInHostileCombat.Contains(relationship))
                 CurrentRoom.RelationshipsInHostileCombat.Add(relationship);
         }
@@ -581,7 +624,7 @@ namespace fire_ash_server.Props
                 return Gender.DualSoul;
             }
         }
-        public bool PropIsWithinReach(Prop prop)
+        /*public bool PropIsWithinReach(Prop prop)
         {
 
             if (prop.IsInRoomOrIsRoom(CurrentRoom) || prop.IsHidden())
@@ -590,7 +633,7 @@ namespace fire_ash_server.Props
                 return false;
             }
             return true;
-        }
+        }*/
 
         public bool PropTargetIsValid(Move move)
         {
@@ -612,11 +655,14 @@ namespace fire_ash_server.Props
                 return true;
 
             bool outOfReach = false;
-            if (move.PropPosition != null && move.PropPosition != target.GetPropPosition())
-                outOfReach = true;
-            if (!target.IsInRoomOrIsRoom(CurrentRoom))
-                outOfReach = true;
+
             if (target.IsHidden())
+                outOfReach = true;
+            else if (move.PropPosition != null && move.PropPosition != target.GetPropPosition())
+                outOfReach = true;
+            else if (!target.IsInRoomOrIsRoom(CurrentRoom))
+                outOfReach = true;
+            else if (move.IsRanged == false && IsInGroupWith(target) != true)
                 outOfReach = true;
 
             if (outOfReach)
@@ -637,14 +683,26 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public bool AttackTargetIsWithinReach(Character characterToAttack)
+        public bool AttackTargetIsWithinReach(Character characterToAttack, bool ranged)
         {
-            if (characterToAttack.CurrentRoom != CurrentRoom || characterToAttack.IsHidden())
+            bool withinReach = true;
+            if (characterToAttack.IsHidden())
+            {
+                _ = Soul.SendAsync($"{characterToAttack.Name} is nowhere to be seen.");
+                withinReach = false;
+            }
+            else if (ranged && characterToAttack.CurrentRoom != CurrentRoom)
+            {
+                _ = Soul.SendAsync($"{characterToAttack.Name} is nowhere to be seen.");
+                withinReach = false;
+            }
+            else if (!ranged && IsInGroupWith(characterToAttack) != true)
             {
                 _ = Soul.SendAsync($"{characterToAttack.Name} has slipped out of reach...");
-                return false;
+                withinReach = false;
             }
-            return true;
+
+            return withinReach;
         }
 
         public void AddFeat(FeatKey featKey)

@@ -42,6 +42,15 @@ namespace fire_ash_server.World
                 "The profound silence is almost tangible, broken only occasionally by the distant, " +
                 "muffled sound of dripping water, reinforcing the cave's desolate, forgotten atmosphere.");
 
+            Item coltRifle = new AssaultRifle(
+                "Colt AR-15",
+                "A classic semi-automatic rifle, " +
+                "renowned for its reliability and precision, " +
+                "equipped with a robust barrel and a sleek, ergonomic design, " +
+                "exuding a sense of timeless power and modern efficiency.");
+
+            wolfCave.AddItem(coltRifle);
+
             Room abandonedShrine = new Room(
                 RoomKey.AbandonedWolfShrine,
                 "Abandoned Shrine",

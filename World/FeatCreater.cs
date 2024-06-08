@@ -53,6 +53,16 @@ namespace fire_ash_server.World
                 }
                 return null;
             }
+            else if (key == Description(FeatKey.RangedAttack))
+            {
+                if (target is Character)
+                {
+                    feat = new Feat(Description(FeatKey.RangedAttack));
+                    feat.Moves.Add(new RangedAttack(soul, (Character)target));
+                    return feat;
+                }
+                return null;
+            }
             throw new Exception("no feat was found for key " +  key);        
         }
     }
