@@ -27,8 +27,6 @@ namespace fire_ash_server.World
                     worldSoul.GetFaction(FactionKey.Wilders), 
                     -10));
 
-            new Room(RoomKey.Void,"Void", "This is the void");
-
             Room wolfCave = new Room(
                 RoomKey.WolfCave,
                 "Wolf Cave",

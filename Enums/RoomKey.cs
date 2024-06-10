@@ -15,6 +15,8 @@ namespace fire_ash_server.Enums
         CyberVoid,
         NeonAlley,
         AbandonedArcade,
-        NeonPlaza
+        NeonPlaza,
+        MainCorridor,
+        CreationChamber
     }
 }

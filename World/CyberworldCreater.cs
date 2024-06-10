@@ -17,10 +17,7 @@ namespace fire_ash_server.World
     {
         public CyberworldCreater(WorldSoul worldSoul)
         {
-            foreach (Enum factionKey in Enum.GetValues(typeof(FactionKey)))
-            {
-                worldSoul.Factions.Add(new Faction(Description(factionKey)));
-            }
+
 
             worldSoul.Relationships.Add(
                 new Relationship(
@@ -33,8 +30,6 @@ namespace fire_ash_server.World
                     worldSoul.GetFaction(FactionKey.Players),
                     worldSoul.GetFaction(FactionKey.Resistance),
                     1));
-
-            new Room(RoomKey.Void, "Cyber Void", "This is the Cyber Void.");
 
             Room neonAlley = new Room(
                 RoomKey.NeonAlley,

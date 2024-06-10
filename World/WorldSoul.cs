@@ -22,8 +22,10 @@ namespace fire_ash_server.World
         {
             PrintLogo();
 
-            new WorldCreator(this);
+            GenerateGenericContent();
+            //new WorldCreator(this);
             //new CyberworldCreater(this);
+            new BioMechWorld(this);
 
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -33,6 +35,16 @@ namespace fire_ash_server.World
             while (true)
             {
                 NewSoul(await listener.AcceptAsync());
+            }
+        }
+
+        private void GenerateGenericContent()
+        {
+            new Room(RoomKey.Void, "Void", "This is the Void.");
+
+            foreach (Enum factionKey in Enum.GetValues(typeof(FactionKey)))
+            {
+                Factions.Add(new Faction(Description(factionKey)));
             }
         }
 
@@ -91,8 +103,9 @@ namespace fire_ash_server.World
                 soul.Character.StatsToString();
                 await soul.SendAsync(messageToSoul);
 
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.WolfCave);
+                //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.WolfCave);
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.CreationChamber);
 
                 while (!soul.Character.Dead)
                 {

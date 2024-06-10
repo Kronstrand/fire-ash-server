@@ -3,36 +3,48 @@
   "WorkspaceRootPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\soul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:soul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\attacks\\attack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\attacks\\attack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\attacks\\meleeattack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\attacks\\meleeattack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\cyberworldcreater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\cyberworldcreater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\lookat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\lookat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\factionkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\factionkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\attacks\\duelwieldattack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\attacks\\duelwieldattack.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\roomkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\roomkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\relationshipstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\relationshipstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\featkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\featkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\worldcreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\worldcreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\featcreater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\featcreater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\race.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\race.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,110 +54,149 @@
       "DocumentGroups": [
         {
           "DockedWidth": 232,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "DuelWieldAttack.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\DuelWieldAttack.cs",
-              "RelativeDocumentMoniker": "Moves\\Attacks\\DuelWieldAttack.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\DuelWieldAttack.cs",
-              "RelativeToolTip": "Moves\\Attacks\\DuelWieldAttack.cs",
-              "ViewState": "AQIAAAsAAAAAAAAAAAAqwBcAAAAVAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:46:33.048Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Character.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
-              "RelativeDocumentMoniker": "Props\\Character.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
-              "RelativeToolTip": "Props\\Character.cs",
-              "ViewState": "AQIAAEYCAAAAAAAAAAAhwFkCAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:42:20.864Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Attack.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\Attack.cs",
-              "RelativeDocumentMoniker": "Moves\\Attacks\\Attack.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\Attack.cs",
-              "RelativeToolTip": "Moves\\Attacks\\Attack.cs",
-              "ViewState": "AQIAABsAAAAAAAAAAAASwCgAAABSAAAA",
+              "Title": "FactionKey.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\FactionKey.cs",
+              "RelativeDocumentMoniker": "Enums\\FactionKey.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\FactionKey.cs",
+              "RelativeToolTip": "Enums\\FactionKey.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:41:40.742Z",
+              "WhenOpened": "2024-06-10T19:50:39.515Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "MeleeAttack.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\MeleeAttack.cs",
-              "RelativeDocumentMoniker": "Moves\\Attacks\\MeleeAttack.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Attacks\\MeleeAttack.cs",
-              "RelativeToolTip": "Moves\\Attacks\\MeleeAttack.cs",
-              "ViewState": "AQIAAAcAAAAAAAAAAAAmwBIAAAAaAAAA",
+              "Title": "RoomKey.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\RoomKey.cs",
+              "RelativeDocumentMoniker": "Enums\\RoomKey.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\RoomKey.cs",
+              "RelativeToolTip": "Enums\\RoomKey.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:28:52.994Z",
+              "WhenOpened": "2024-06-10T19:50:34.633Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "WorldSoul.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
-              "RelativeDocumentMoniker": "World\\WorldSoul.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
-              "RelativeToolTip": "World\\WorldSoul.cs",
-              "ViewState": "AQIAAFQAAAAAAAAAAAApwGoAAAAcAAAA",
+              "Title": "RelationshipStatus.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\RelationshipStatus.cs",
+              "RelativeDocumentMoniker": "Enums\\RelationshipStatus.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\RelationshipStatus.cs",
+              "RelativeToolTip": "Enums\\RelationshipStatus.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:26:20.091Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Room.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Room.cs",
-              "RelativeDocumentMoniker": "Props\\Room.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Room.cs",
-              "RelativeToolTip": "Props\\Room.cs",
-              "ViewState": "AQIAAEwBAAAAAAAAAAApwFgBAABCAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T16:25:00.307Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Soul.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Soul.cs",
-              "RelativeDocumentMoniker": "Soul.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Soul.cs",
-              "RelativeToolTip": "Soul.cs",
-              "ViewState": "AQIAABMCAAAAAAAAAAApwCICAABzAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T13:34:05.758Z",
+              "WhenOpened": "2024-06-10T19:50:31.135Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "LookAt.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookAt.cs",
-              "RelativeDocumentMoniker": "Moves\\LookAt.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookAt.cs",
-              "RelativeToolTip": "Moves\\LookAt.cs",
-              "ViewState": "AQIAABAAAAAAAAAAAAAQwCEAAABXAAAA",
+              "Title": "FeatKey.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\FeatKey.cs",
+              "RelativeDocumentMoniker": "Enums\\FeatKey.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\FeatKey.cs",
+              "RelativeToolTip": "Enums\\FeatKey.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-08T13:31:32.239Z",
+              "WhenOpened": "2024-06-10T19:50:23.485Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WorldSoul.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
+              "RelativeDocumentMoniker": "World\\WorldSoul.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
+              "RelativeToolTip": "World\\WorldSoul.cs",
+              "ViewState": "AQIAABMAAAAAAAAAAAAlwBgAAAAlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:44:39.923Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Character.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
+              "RelativeDocumentMoniker": "Props\\Character.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
+              "RelativeToolTip": "Props\\Character.cs",
+              "ViewState": "AQIAAHAAAAAAAAAAAAAtwD8AAABCAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:22:03.775Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Race.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\Race.cs",
+              "RelativeDocumentMoniker": "Enums\\Race.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\Race.cs",
+              "RelativeToolTip": "Enums\\Race.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:23:35.22Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BioMechWorld.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld.cs",
+              "RelativeDocumentMoniker": "World\\BioMechWorld.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld.cs",
+              "RelativeToolTip": "World\\BioMechWorld.cs",
+              "ViewState": "AQIAACAAAAAAAAAAAAAAACgAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:19:30.082Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "WorldCreator.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldCreator.cs",
+              "RelativeDocumentMoniker": "World\\WorldCreator.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldCreator.cs",
+              "RelativeToolTip": "World\\WorldCreator.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAApwBsAAAAaAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:00:39.19Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CyberworldCreater.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\CyberworldCreater.cs",
+              "RelativeDocumentMoniker": "World\\CyberworldCreater.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\CyberworldCreater.cs",
+              "RelativeToolTip": "World\\CyberworldCreater.cs",
+              "ViewState": "AQIAABMAAAAAAAAAAAAAABMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:00:30.826Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "FeatCreater.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\FeatCreater.cs",
+              "RelativeDocumentMoniker": "World\\FeatCreater.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\FeatCreater.cs",
+              "RelativeToolTip": "World\\FeatCreater.cs",
+              "ViewState": "AQIAABYAAAAAAAAAAAAQwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T19:00:27.157Z",
               "EditorCaption": ""
             }
           ]

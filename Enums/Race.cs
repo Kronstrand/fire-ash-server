@@ -11,6 +11,7 @@ namespace fire_ash_server.Enums
     {
         Human,
         Elf,
+        Mecharion,
         Cyborg
     }
 }

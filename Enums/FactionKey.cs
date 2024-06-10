@@ -14,6 +14,7 @@ namespace fire_ash_server.Enums
         [Description("Light Shades")]
         LightShades,
         Corporates,
-        Resistance
+        Resistance,
+        Technomancers
     }
 }
