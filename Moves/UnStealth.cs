@@ -12,6 +12,8 @@ namespace fire_ash_server.Moves
     {
         public UnStealth(Soul soul) : base ("sh", "Leave shadows.")
         {
+            Range = RangeType.None;
+
             Character character = soul.Character;
             Action = () =>
             {

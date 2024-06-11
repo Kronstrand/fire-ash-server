@@ -78,10 +78,10 @@ namespace fire_ash_server.World
                 "Its presence is unsettling, as it exudes a sense of ancient wisdom and an impending sense of cosmic dread.")
                 .Hide(3)
                 .AddMove(new SkillCheck(
-                    "r",
+                    null,
                     "Recall lore about the Celestial Wolf Idol.",
                     new SkillNumber(Skill.Religion, 8), 
-                    () => { return
+                    (Soul s) => { return
                         "This idol depicts Lunaris, a celestial entity deeply intertwined with the moon's mystique. " +
                         "Resonating with the lunar spirit, its essence mirrors the cosmic ebb and flow. Lunaris, " +
                         "known as the Void Howler, embodies the moon's silent command over the night sky, " +
@@ -91,7 +91,7 @@ namespace fire_ash_server.World
                         "unveiling hidden truths and altering the course of celestial events. The idol, " +
                         "crafted from luminescent stone, glows softly, a testament to the deep connection Lunaris shares with the nocturnal cosmos, " +
                         "promising enlightenment to those who decipher its celestial whispers."; },
-                    () => { return 
+                    (Soul s) => { return 
                         "Despite your efforts, the mysteries of the idol remain elusive. Its silent, " +
                         "inscrutable gaze offers no insights, " +
                         "leaving you with more questions than answers."; }

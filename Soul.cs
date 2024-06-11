@@ -149,7 +149,7 @@ namespace fire_ash_server
                     if (Character.IsInGroupWith(Character.LookAt) == false)
                         AddPossibleMove(new MoveTo(this, lookAtCharacter));
 
-                    if (lookAtCharacter.DialogueManager != null)
+                    if (lookAtCharacter.DialogueManager != null && Character.IsInGroupWith(Character.LookAt) == true)
                     {
                         AddPossibleMove(new Move(
                             "sp",
@@ -188,7 +188,7 @@ namespace fire_ash_server
 
                 foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
                 {
-                    AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, (Item)Character.LookAt));
+                    AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, Character.LookAt));
                 }
 
                 foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
@@ -222,7 +222,7 @@ namespace fire_ash_server
 
                 foreach (Move move in feat.Moves)
                 {
-                    if (move.IsValid(this))
+                    if (move.IsValid(this) && IsValidCloseSingleTargetMove(move))
                         AddPossibleMove(move);
                 }
             }
@@ -250,13 +250,13 @@ namespace fire_ash_server
                                 "fl",
                                 $"Flee combat and enter {exit.GoToRoom.Name}.",
                                 new SkillNumber(Skill.Acrobatics, DC),
-                                () =>
+                                (Soul s) =>
                                 {
                                     RoomChange roomChange = new RoomChange(this, exit.GoToRoom);
                                     roomChange.Action();
                                     return null;
                                 },
-                                () =>
+                                (Soul s) =>
                                 {
                                     return $"{Character.Name} failed to flee combat...";
                                 }));
@@ -341,6 +341,18 @@ namespace fire_ash_server
                 actionsAsStr += kvp.Key.ToUpper() + ") " + kvp.Value.Description;
             }
             return actionsAsStr;
+        }
+
+        public bool IsValidCloseSingleTargetMove(Move move)
+        {
+            if (move.Range == RangeType.CloseSingleTarget)
+            {
+                if (Character.LookAt == null)
+                    return false;
+                if (Character.IsInGroupWith(Character.LookAt) != true)
+                    return false;
+            }
+            return true;
         }
 
         public async Task<Move?> ReceiveAndHandleMoveAsync(bool execute)

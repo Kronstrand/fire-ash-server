@@ -12,7 +12,7 @@ namespace fire_ash_server.Moves.Attacks
 {
     internal class RangedAttack : Attack
     {
-        public RangedAttack(Soul soul, Character characterToAttack) : base("ra", GetName(soul.Character, characterToAttack), characterToAttack, true)
+        public RangedAttack(Soul soul, Character characterToAttack) : base("ra", GetName(soul.Character, characterToAttack), characterToAttack, RangeType.RangeSingleTarget)
         {
             Character character = soul.Character;
 

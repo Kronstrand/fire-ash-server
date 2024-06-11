@@ -56,7 +56,7 @@ namespace fire_ash_server.Props
                 if (character.Dead)
                     return character.DeathDescription;
             }
-            return Description + Img(Name.ToLower().Replace(" ", ""));
+            return Img(Name.ToLower().Replace(" ", "")) + Description;
         }
 
         public void AddItem(Item item)

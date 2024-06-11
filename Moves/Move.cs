@@ -20,7 +20,7 @@ namespace fire_ash_server.Moves
         public bool Hidden;
         public MoveType Type = MoveType.Action;
         public bool EnablesCombat;
-        public bool IsRanged = false;
+        public RangeType Range = RangeType.CloseSingleTarget;
 
         public Move(string key, string description, Action action)
         {

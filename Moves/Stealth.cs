@@ -13,6 +13,7 @@ namespace fire_ash_server.Moves
     {
         public Stealth(Soul soul) : base ("sh", SkillCheck.CreateDescription("Hide.", Skill.Stealth))
         {
+            Range = RangeType.None;
             Character character = soul.Character;
             Action = () =>
             {

@@ -7,11 +7,11 @@ using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
+using fire_ash_server.Moves;
 
 namespace fire_ash_server.World
 {
@@ -34,7 +34,7 @@ namespace fire_ash_server.World
                 "The air is thick with the smell of antiseptic and the underlying scent of decay, " +
                 "a constant reminder of the unnatural processes at work. " +
                 "Soft, rhythmic humming fills the room, punctuated by the occasional hiss of escaping steam and the mechanical whirring of the Mother-Machine. " +
-                "This chamber is both a birthplace and a factory, a grotesque testament to the blending of technology and biology in this dystopian world."
+                "This chamber is both a birthplace and a factory, a grotesque testament to the blending of technology and biology."
             );
 
             Item motherMachine = new Item(
@@ -51,8 +51,6 @@ namespace fire_ash_server.World
             motherMachine.MakeUnpickupable();
 
             creationChamber.AddItem(motherMachine);
-
-
 
             // Main Corridor Room
             Room mainCorridor = new Room(
@@ -80,15 +78,13 @@ namespace fire_ash_server.World
 
             // Adding a unique character in the Main Corridor
             Character ezekielTheMechanomancer = new Character(
-                "Ezekiel the Mechanomancer",
-                "Ezekiel the Mechanomancer is a twisted fusion of man and machine, a high priest of the cult of the Machine God. " +
+                "Ezekiel",
+                "Ezekiel is a twisted fusion of man and machine, a high priest of the cult of the Machine God. " +
                 "Standing at an imposing seven feet tall, his body is a grotesque amalgamation of cybernetic implants and organic tissue. " +
                 "His left arm is a massive, multi-functional appendage equipped with surgical tools, weapons, and strange, arcane devices. " +
-                "Ezekiel's face is a patchwork of metal plates and organic skin, with one eye replaced by a multi-lensed optic that glows with an ominous red light. " +
-                "His other eye is a cold, piercing blue, hinting at the remnants of his humanity. " +
-                "He wears a long, tattered robe adorned with glowing runes and circuitry, and his deep, gravelly voice echoes with a mechanical timbre. " +
-                "Ezekiel is both revered and feared by his followers, known for his ruthless pursuit of knowledge and power. " +
-                "He seeks to merge the divine and the mechanical, creating a new form of life that transcends both.",
+                "Ezekiel's face is a patchwork of metal plates and organic skin, with only a single eye gazing into meatspace. " +
+                "His other eyes? Only God and Ezekiel himself know in which dimensions these are prying." +
+                "He wears a long, tattered robe adorned with glowing runes and circuitry, and his deep, gravelly voice echoes with a mechanical timbre.",
             Race.Mecharion,
             14, //strenght
             10, //dexterity
@@ -97,10 +93,10 @@ namespace fire_ash_server.World
             13, //wisdom
             9,  //charisma
                 "Ezekiel's imposing seven-foot frame lies still, " +
-                "his body a grotesque amalgamation of cybernetic implants and organic tissue. His massive, " +
+                "his massive, " +
                 "multi-functional left arm, equipped with surgical tools, weapons, and arcane devices, " +
-                "rests lifelessly. His face, a patchwork of metal plates and organic skin, is frozen in death, " +
-                "one eye a dimly glowing red optic, the other a cold, lifeless blue. His long, tattered robe, " +
+                "rests lifelessly. His face, a patchwork of metal plates and organic skin, is frozen in death. " +
+                "His long, tattered robe, " +
                 "adorned with dimmed runes and circuitry, drapes over his form. Once revered and feared, " +
                 "Ezekiel now lies silent, a testament to his ruthless pursuit of knowledge and power."
             );
@@ -110,30 +106,72 @@ namespace fire_ash_server.World
             ezekielTheMechanomancer.GoToRoom(mainCorridor);
             ezekielTheMechanomancer.Faction = worldSoul.GetFaction(FactionKey.Technomancers);
 
-            // Create dialogue nodes for Ezekiel the Mechanomancer
-            DialogueNode startNode = new DialogueNode("Welcome to the new dawn, creations of the Mother-Machine. What do you seek?");
-            DialogueNode helpNode = new DialogueNode("I can guide you through the darkness. What do you need help with?");
-            DialogueNode infoNode = new DialogueNode("The city is a labyrinth of neon and shadow, filled with ancient terrors and secrets. Stay vigilant.");
-            DialogueNode goodbyeNode = new DialogueNode("Farewell. May the light of the Machine God guide you.");
-            DialogueNode motherMachineNode = new DialogueNode("The Mother-Machine is the divine womb, merging flesh and steel to create life. It is both our creator and protector.");
-            DialogueNode dangersNode = new DialogueNode("The city is rife with dangers: rogue AI, eldritch entities lurking in the shadows, and cults vying for power. Trust no one.");
+            ezekielTheMechanomancer.AddMove(new SkillCheck(
+                    null,
+                    "Recall lore about Ezekiel.",
+                    new SkillNumber(Skill.Religion, 8),
+                    (Soul s) => {
+                        return
+                        "Ezekiel the Mechanomancer, a high priest of the cult of the Machine God, " +
+                        "stands tall and imposing. He is both revered and feared by his followers. " +
+                        "Known for his ruthless pursuit of knowledge and power, " +
+                        "Ezekiel seeks to merge the divine and the mechanical, " +
+                        "creating a new form of life that transcends both. His cult, " +
+                        "known as the Cult of Technomancers, is dedicated to worshiping the Machine God, " +
+                        "believing in the ultimate union of flesh and technology. " +
+                        "Ezekiel's position as a leader is cemented by his formidable presence " +
+                        "and unwavering dedication to this singular vision.";
+                    },
+                    (Soul s) => {
+                        if (s.Character.Race == Race.Mecharion)
+                        {
+                            return "Your newborn memory is failing you, " +
+                            "the details of this strange and ominous figure slipping through the cracks " +
+                            "of your freshly hatched mind. The knowledge remains just out of reach.";
+                        }
+                        return "Your mind draws a blank, the details of this particular religion eluding your memory. " +
+                        "You struggle to recall any relevant information about him.";
+                    }
+                    ));
 
-            // Add choices to nodes
+            // Create dialogue nodes for Ezekiel the Mechanomancer
+            DialogueNode startNode = new DialogueNode("Ah, a fresh cog in the grand machine! What conundrum twists your gears?");
+            DialogueNode helpNode = new DialogueNode("Assistance from me, a mere whisperer in the void? What vexation plagues you?");
+            DialogueNode infoNode = new DialogueNode("This facility is a labyrinthine enigma, filled with whispers of the past and shadows of the future. Step lightly.");
+            DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path.");
+            DialogueNode motherMachineNode = new DialogueNode("The Mother-Machine, she who melds sinew and steel, the primordial artificer of our kind. Behold her majesty!");
+            DialogueNode dangersNode = new DialogueNode("Beware the lurking phantoms: rogue AIs, eldritch specters, and the ceaseless machinations of power-hungry cultists. Trust not the shadows.");
+            DialogueNode unknownForceNode = new DialogueNode("An unknown force besieges us, an echo from the void. Can you unravel this cryptic menace?");
+            DialogueNode visionNode = new DialogueNode("Through my vision device, I have glimpsed them. Shadows incarnate, flitting just beyond the veil. We must act with alacrity and stealth.");
+            DialogueNode identityNode = new DialogueNode("You, reborn in the crucible of the Mother-Machine. Your past, a mere prologue to this mechanized rebirth. Focus on your newfound purpose.");
+
             startNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
-            startNode.AddChoice("What dangers await in the city?", dangersNode);
+            startNode.AddChoice("What dangers await in the facility?", dangersNode);
             startNode.AddChoice("I need help.", helpNode);
+            startNode.AddChoice("Who am I? Why am I here?", identityNode);
             startNode.AddChoice("Goodbye.", goodbyeNode);
 
-            helpNode.AddChoice("Tell me more about the city.", infoNode);
+            helpNode.AddChoice("The facility is under attack by an unknown force. I need to find out who it is.", unknownForceNode);
+            helpNode.AddChoice("Tell me more about the facility.", infoNode);
             helpNode.AddChoice("Goodbye.", goodbyeNode);
+
+            unknownForceNode.AddChoice("What do you know about the attackers?", visionNode);
+            unknownForceNode.AddChoice("Goodbye.", goodbyeNode);
+
+            visionNode.AddChoice("Thank you. Goodbye.", goodbyeNode);
 
             infoNode.AddChoice("Thank you. Goodbye.", goodbyeNode);
 
-            motherMachineNode.AddChoice("What dangers await in the city?", dangersNode);
+            motherMachineNode.AddChoice("What dangers await in the facility?", dangersNode);
             motherMachineNode.AddChoice("Goodbye.", goodbyeNode);
 
             dangersNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
             dangersNode.AddChoice("Goodbye.", goodbyeNode);
+
+            identityNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
+            identityNode.AddChoice("What dangers await in the facility?", dangersNode);
+            identityNode.AddChoice("I need help.", helpNode);
+            identityNode.AddChoice("Goodbye.", goodbyeNode);
 
             // Assign dialogue to Ezekiel the Mechanomancer
             ezekielTheMechanomancer.CreateDialogueManager(startNode);

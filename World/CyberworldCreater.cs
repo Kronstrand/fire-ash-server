@@ -70,16 +70,16 @@ namespace fire_ash_server.World
                 );
             dataCrystal.Hide(3);
             dataCrystal.AddMove(new SkillCheck(
-                    "h",
+                    null,
                     "Hack into the Data Crystal to extract its secrets.",
                     new SkillNumber(Skill.Hacking, 10),
-                    () => {
+                    (Soul s) => {
                         return
                         "You successfully decrypt the data, revealing hidden schematics for a powerful piece of cyberware. " +
                         "These plans could give you a significant edge in the technological arms race of the city, " +
                         "or fetch a high price on the black market.";
                     },
-                    () => {
+                    (Soul s) => {
                         return
                         "Despite your efforts, the encryption holds firm. The secrets within the crystal remain locked away, " +
                         "leaving you with nothing but frustration and curiosity.";

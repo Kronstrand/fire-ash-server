@@ -12,19 +12,33 @@ namespace fire_ash_server.Moves
     internal class SkillCheck : Move
     {
         public SkillNumber SkillNumber { get; set; }
-        private Func<string?> successFunc;
-        private Func<string?>? failFunc;
+        private Func<Soul, string?> successFunc;
+        private Func<Soul, string?>? failFunc;
 
-        public SkillCheck(string key, string description, SkillNumber skillNumber, Func<string?> successFunc, Func<string?>? failFunc) : base(key, description)
+        public SkillCheck(string? key, string description,  SkillNumber skillNumber, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), description)
         {
+            Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
             Repeatable = false;
             this.successFunc = successFunc;
             this.failFunc = failFunc;
         }
 
-        public SkillCheck(Soul soul, Prop prop, string key, string description, SkillNumber skillNumber, Func<string?> successFunc, Func<string?>? failFunc) : base(key, CreateDescription(description, skillNumber.Skill))
+        private static string GetKey(string? key, Skill skill)
         {
+            if (key != null)
+                return key;
+
+            if (skill == Skill.Religion)
+                return "r";
+            else if (skill == Skill.Hacking)
+                return "h";
+            else return "s";
+        }
+
+        public SkillCheck(Soul soul, Prop prop, string? key, string description, SkillNumber skillNumber, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), CreateDescription(description, skillNumber.Skill))
+        {
+            Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
             Repeatable = true;
             this.successFunc = successFunc;
@@ -36,7 +50,7 @@ namespace fire_ash_server.Moves
 
         public SkillCheck CreatePossibleMove(Soul soul, Prop prop)
         {
-            SkillCheck possibleMove = new SkillCheck(Key, CreateDescription(Description, SkillNumber.Skill), SkillNumber, successFunc, failFunc);
+            SkillCheck possibleMove = new SkillCheck(Key,CreateDescription(Description, SkillNumber.Skill), SkillNumber, successFunc, failFunc);
             possibleMove.Prop = prop;
             PropPosition = prop.GetPropPosition();
             possibleMove.Action = CreateAction(soul);
@@ -56,13 +70,13 @@ namespace fire_ash_server.Moves
                 Roll roll = new Roll(soul.Character.GetModifer(SkillNumber.Skill), RollType.SkillCheck, soul.Character);
 
                 if (roll.GetSum() >= SkillNumber.number)
-                        await MessageHandler(successFunc(), soul, roll);
+                        await MessageHandler(successFunc(soul), soul, roll);
                 else
                 {
                     if (failFunc == null)
                         await soul.SendAsync($"{soul.Character.Name} rolled {roll} and failed the {SkillNumber.Skill} check...");
                     else
-                            await MessageHandler(failFunc(), soul, roll);
+                            await MessageHandler(failFunc(soul), soul, roll);
                 }          
             };
         }

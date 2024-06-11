@@ -11,9 +11,9 @@ namespace fire_ash_server.Moves.Attacks
 {
     internal class Attack : Move
     {
-        public Attack(string key, string description, Character characterToAttack, bool isRanged) : base(key, description, characterToAttack)
+        public Attack(string key, string description, Character characterToAttack, RangeType rangeType) : base(key, description, characterToAttack)
         {
-            IsRanged = isRanged;
+            Range = rangeType;
             EnablesCombat = true;
         }
 
@@ -25,9 +25,9 @@ namespace fire_ash_server.Moves.Attacks
             if (soul.Character.LookAt is Character)
             {
                 Character characterToAttack = (Character)soul.Character.LookAt;
-                if (!IsRanged && soul.Character.IsInGroupWith(characterToAttack) != true)
+                if (Range == RangeType.CloseSingleTarget && soul.Character.IsInGroupWith(characterToAttack) != true)
                     return false;
-                if (IsRanged && soul.Character.GetRangedWeapon() == null)
+                if (Range == RangeType.RangeSingleTarget && soul.Character.GetRangedWeapon() == null)
                     return false;
 
                 if (!characterToAttack.Dead && !characterToAttack.IsHidden())
@@ -38,7 +38,7 @@ namespace fire_ash_server.Moves.Attacks
 
         public bool TryAttack(Character character, Character characterToAttack, Action<Character> attackAction)
         {
-            if (!character.AttackTargetIsWithinReach(characterToAttack, IsRanged))
+            if (!character.AttackTargetIsWithinReach(characterToAttack, Range))
             {
                 EnablesCombat = false;
                 return false;

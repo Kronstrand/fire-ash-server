@@ -12,7 +12,7 @@ namespace fire_ash_server.Moves
     {
         public MoveTo(Soul soul, Prop targetProp) : base("m", $"Move to {CreateName(targetProp)}", targetProp)
         {
-            IsRanged = true;
+            Range = RangeType.RangeSingleTarget;
 
             Action = () =>
             {

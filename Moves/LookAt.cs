@@ -54,7 +54,7 @@ namespace fire_ash_server.Moves
         private void InitValues()
         {
             Type = MoveType.MinorAction;
-            IsRanged = true;
+            Range = RangeType.None;
         }
 
         public async Task LookAtAction(Soul soul, Prop? prop)

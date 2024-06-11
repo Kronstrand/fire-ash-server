@@ -662,7 +662,7 @@ namespace fire_ash_server.Props
                 outOfReach = true;
             else if (!target.IsInRoomOrIsRoom(CurrentRoom))
                 outOfReach = true;
-            else if (move.IsRanged == false && IsInGroupWith(target) != true)
+            else if (move.Range == RangeType.CloseSingleTarget && IsInGroupWith(target) != true)
                 outOfReach = true;
 
             if (outOfReach)
@@ -683,7 +683,7 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public bool AttackTargetIsWithinReach(Character characterToAttack, bool ranged)
+        public bool AttackTargetIsWithinReach(Character characterToAttack, RangeType rangeType)
         {
             bool withinReach = true;
             if (characterToAttack.IsHidden())
@@ -691,12 +691,12 @@ namespace fire_ash_server.Props
                 _ = Soul.SendAsync($"{characterToAttack.Name} is nowhere to be seen.");
                 withinReach = false;
             }
-            else if (ranged && characterToAttack.CurrentRoom != CurrentRoom)
+            else if (rangeType == RangeType.RangeSingleTarget && characterToAttack.CurrentRoom != CurrentRoom)
             {
                 _ = Soul.SendAsync($"{characterToAttack.Name} is nowhere to be seen.");
                 withinReach = false;
             }
-            else if (!ranged && IsInGroupWith(characterToAttack) != true)
+            else if (rangeType == RangeType.CloseSingleTarget && IsInGroupWith(characterToAttack) != true)
             {
                 _ = Soul.SendAsync($"{characterToAttack.Name} has slipped out of reach...");
                 withinReach = false;
