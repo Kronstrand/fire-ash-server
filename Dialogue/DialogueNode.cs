@@ -9,6 +9,7 @@ namespace fire_ash_server.Dialogue
     internal class DialogueNode
     {
         private Func<DialogueManager, string> Text { get; set; }
+        public  Action<DialogueManager>? OnAfterEvent { private get; set; }
         public List<DialogueChoice> Choices { get; set; } = new List<DialogueChoice>();
 
         public DialogueNode(string text)
@@ -37,6 +38,12 @@ namespace fire_ash_server.Dialogue
 
         {
             return Text.Invoke(dialogueManager);
+        }
+
+        public void RunOnAfterEvent(DialogueManager dialogueManager)
+        { 
+            if (OnAfterEvent != null)
+                OnAfterEvent.Invoke(dialogueManager);
         }
     }
 }

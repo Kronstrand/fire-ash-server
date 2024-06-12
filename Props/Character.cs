@@ -111,8 +111,11 @@ namespace fire_ash_server.Props
             Inventory.HeldBy = this;
         }
 
-        public void ModifyRelationshipTo(Character character, int modifyer)
+        public void ModifyRelationshipTo(Character? character, int modifyer)
         {
+            if (character == null)
+                return;
+
             Relationship rel = GetRelationShipTo(character);
             rel.Value += modifyer;
         }

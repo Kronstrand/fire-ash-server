@@ -35,6 +35,7 @@ namespace fire_ash_server.Dialogue
         public void SpeakCurrentNode()
         {
             SpeakingCharacter.Speak(CurrentNode.GetText(this));
+            CurrentNode.RunOnAfterEvent(this);
         }
 
         public void EndSpeakWith()
@@ -62,6 +63,22 @@ namespace fire_ash_server.Dialogue
         public bool CurrentNodeHasChoices()
         {
             return CurrentNode.Choices.Where(choice => ChoiceIsValid(choice)).Count() > 0;
+        }
+        public void ImproveRelationship()
+        {
+            if (SpeakingCharacter.SpeakingTo == null)
+                return;
+            SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, 1);
+            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.Name} approves. {SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is increased.");
+        }
+
+
+        public void  DecreaseRelationship()
+        {
+            if (SpeakingCharacter.SpeakingTo == null)
+                return;
+            SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, -1);
+            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.Name} disapproves. {SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is decreased.");
         }
     }
 }

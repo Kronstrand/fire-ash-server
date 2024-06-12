@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("fire-ash-server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+895155442692449152d819e15fc4c568bc50dc87")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7aa5e4b8466d205c8afd93e06a53a36e35e29c8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("fire-ash-server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("fire-ash-server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

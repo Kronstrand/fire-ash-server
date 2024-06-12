@@ -135,43 +135,95 @@ namespace fire_ash_server.World
                     ));
 
             // Create dialogue nodes for Ezekiel the Mechanomancer
-            DialogueNode startNode = new DialogueNode("Ah, a fresh cog in the grand machine! What conundrum twists your gears?");
-            DialogueNode helpNode = new DialogueNode("Assistance from me, a mere whisperer in the void? What vexation plagues you?");
-            DialogueNode infoNode = new DialogueNode("This facility is a labyrinthine enigma, filled with whispers of the past and shadows of the future. Step lightly.");
-            DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path.");
-            DialogueNode motherMachineNode = new DialogueNode("The Mother-Machine, she who melds sinew and steel, the primordial artificer of our kind. Behold her majesty!");
-            DialogueNode dangersNode = new DialogueNode("Beware the lurking phantoms: rogue AIs, eldritch specters, and the ceaseless machinations of power-hungry cultists. Trust not the shadows.");
-            DialogueNode unknownForceNode = new DialogueNode("An unknown force besieges us, an echo from the void. Can you unravel this cryptic menace?");
-            DialogueNode visionNode = new DialogueNode("Through my vision device, I have glimpsed them. Shadows incarnate, flitting just beyond the veil. We must act with alacrity and stealth.");
-            DialogueNode identityNode = new DialogueNode("You, reborn in the crucible of the Mother-Machine. Your past, a mere prologue to this mechanized rebirth. Focus on your newfound purpose.");
+            DialogueNode startNode = new DialogueNode("Ah, fresh from the Mother Machine's embrace! Welcome, welcome! I've been waiting for you. We have much to do, and little time!");
+            DialogueNode whoAreYouNode = new DialogueNode("I am Ezekiel, the ever-watchful, the Mechanomancer extraordinaire! I've seen countless like you emerge, reborn from the machine's womb. Fascinating, isn't it?");
+            DialogueNode motherMachineNode = new DialogueNode("Ah, the Mother Machine, a marvel of sinew and steel! She takes us, reshapes us. Some were sold, some were prisoners, but all are reborn here. Now, you're a Mecharion, part of this grand design!");
+            DialogueNode attackNode = new DialogueNode("The facility is under siege! The Purists have come, a fanatical group that condemns our beautiful union of flesh and technology. They seek to destroy the Mother Machine and all her creations!");
+            DialogueNode puristsNode = new DialogueNode("The Purists, zealots who believe our existence is an abomination. They think they can 'cleanse' us by tearing down everything we've become. Fools, the lot of them!");
+            DialogueNode identityNode = new DialogueNode("Your story? Ha! Each of us has a unique tale, a reason we ended up here. But the Mother Machine doesn’t care for our pasts, only for what we become.");
+            DialogueNode missionNode = new DialogueNode("I need your help, dear one! The Purists must be stopped. Find the core and shut it down if you can. The risks are immense, but so are the rewards!");
+            DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path. We will meet again!");
+            DialogueNode smallTalkNode1 = new DialogueNode("This place, it's more than just metal and circuits. It's alive, a sanctuary for those like us. The bond we share with the machine is profound.");
+            DialogueNode smallTalkNode2 = new DialogueNode("I've been here for what feels like an eternity. The transformations, the experiments... they've changed me in ways I can't fully explain. But there's beauty in this evolution.");
+            DialogueNode smallTalkNode3 = new DialogueNode("Ah, you want to know about me? I was a scholar once, fascinated by the merger of flesh and technology. Now, I am a part of that merger. Strange how destiny works, isn't it?");
+            DialogueNode smallTalkNode4 = new DialogueNode("The Purists think they can save us by destroying us. They don't understand the harmony we've found here. Their ignorance is their greatest weapon and our greatest threat.");
 
-            startNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
-            startNode.AddChoice("What dangers await in the facility?", dangersNode);
-            startNode.AddChoice("I need help.", helpNode);
-            startNode.AddChoice("Who am I? Why am I here?", identityNode);
-            startNode.AddChoice("Goodbye.", goodbyeNode);
+            // Main dialogue choices
+            startNode.AddChoice("Who are you?", whoAreYouNode);
+            startNode.AddChoice("What happened to me?", motherMachineNode);
+            startNode.AddChoice("Why do I feel like something's wrong?", attackNode);
+            startNode.AddChoice("What's the mission?", missionNode);
+            startNode.AddChoice("Tell me about this place.", smallTalkNode1);
 
-            helpNode.AddChoice("The facility is under attack by an unknown force. I need to find out who it is.", unknownForceNode);
-            helpNode.AddChoice("Tell me more about the facility.", infoNode);
-            helpNode.AddChoice("Goodbye.", goodbyeNode);
+            whoAreYouNode.AddChoice("What happened to me?", motherMachineNode);
+            whoAreYouNode.AddChoice("Why do I feel like something's wrong?", attackNode);
+            whoAreYouNode.AddChoice("What's the mission?", missionNode);
+            whoAreYouNode.AddChoice("Tell me more about you.", smallTalkNode3);
 
-            unknownForceNode.AddChoice("What do you know about the attackers?", visionNode);
-            unknownForceNode.AddChoice("Goodbye.", goodbyeNode);
+            motherMachineNode.AddChoice("Was I sold or convicted?", identityNode);
 
-            visionNode.AddChoice("Thank you. Goodbye.", goodbyeNode);
+            attackNode.AddChoice("Who are the Purists?", puristsNode);
+            attackNode.AddChoice("What's the mission?", missionNode);
 
-            infoNode.AddChoice("Thank you. Goodbye.", goodbyeNode);
+            identityNode.AddChoice("What dangers await in the facility?", attackNode);
+            identityNode.AddChoice("I need help.", missionNode);
 
-            motherMachineNode.AddChoice("What dangers await in the facility?", dangersNode);
-            motherMachineNode.AddChoice("Goodbye.", goodbyeNode);
+            // Small talk choices indicating alignment with Ezekiel's values
+            DialogueNode smallTalkResponse1 = new DialogueNode("Ah, you understand! Yes, it's a magnificent evolution. We are part of something greater.");
+            smallTalkNode1.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };                     
+            DialogueNode smallTalkResponse2 = new DialogueNode("Exactly! Embrace the change. We are stronger together in this new form.");
+            smallTalkResponse2.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };                    
+            DialogueNode smallTalkResponse3 = new DialogueNode("Thank you! It's a destiny we all share and must protect.");
+            smallTalkResponse3.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };
+            DialogueNode smallTalkResponse4 = new DialogueNode("Indeed, their ignorance is dangerous. Our harmony is our strength.");
+            smallTalkResponse4.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };            
+            DialogueNode smallTalkResponse5 = new DialogueNode("You grasp the essence of our transformation. It's a dance of metal and flesh.");
+            smallTalkResponse5.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };           
+            DialogueNode smallTalkResponse6 = new DialogueNode("Precisely, our evolution is a testament to the beauty of progress.");
+            smallTalkResponse6.OnAfterEvent = (dm) => { dm.ImproveRelationship(); };           
+            DialogueNode smallTalkResponseNegative1 = new DialogueNode("Oh, I see. Not everyone can appreciate the magnificence of our transformation.");
+            smallTalkResponseNegative1.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };           
+            DialogueNode smallTalkResponseNegative2 = new DialogueNode("It's a shame you don't see the beauty in what we've become.");
+            smallTalkResponseNegative2.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };           
+            DialogueNode smallTalkResponseNegative3 = new DialogueNode("Pity, I thought you'd understand the significance of our evolution.");
+            smallTalkResponseNegative3.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };
+            DialogueNode smallTalkResponseNegative4 = new DialogueNode("How disappointing. The harmony we've achieved is beyond mere understanding.");
+            smallTalkResponseNegative4.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };         
+            DialogueNode smallTalkResponseNegative5 = new DialogueNode("Skepticism is natural, but it hinders true comprehension.");
+            smallTalkResponseNegative5.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };           
+            DialogueNode smallTalkResponseNegative6 = new DialogueNode("Such a view is limiting, but I won't force you to see beyond it.");
+            smallTalkResponseNegative6.OnAfterEvent = (dm) => { dm.DecreaseRelationship(); };
 
-            dangersNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
-            dangersNode.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkNode1.AddChoice("I see the beauty in our transformation. The bond with the machine is indeed profound.", smallTalkResponse1); // Relationship Improves
+            smallTalkNode1.AddChoice("This place feels cold and uninviting, more like a prison.", smallTalkResponseNegative1); // Relationship Decreases
 
-            identityNode.AddChoice("Tell me about the Mother-Machine.", motherMachineNode);
-            identityNode.AddChoice("What dangers await in the facility?", dangersNode);
-            identityNode.AddChoice("I need help.", helpNode);
-            identityNode.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkNode2.AddChoice("There's beauty in our evolution. Our changes make us stronger.", smallTalkResponse2); // Relationship Improves
+            smallTalkNode2.AddChoice("These changes feel unnatural. We're losing ourselves.", smallTalkResponseNegative2); // Relationship Decreases
+
+            smallTalkNode3.AddChoice("Your journey is inspiring. The merger of flesh and technology is a fascinating destiny.", smallTalkResponse3); // Relationship Improves
+            smallTalkNode3.AddChoice("You sacrificed your humanity for this? It doesn't seem worth it.", smallTalkResponseNegative3); // Relationship Decreases
+
+            smallTalkNode4.AddChoice("The Purists are misguided. They can't see the harmony we've achieved.", smallTalkResponse4); // Relationship Improves
+            smallTalkNode4.AddChoice("Maybe the Purists are right. This doesn't feel like harmony.", smallTalkResponseNegative4); // Relationship Decreases
+
+            // Continuation after small talk
+            smallTalkResponse1.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponse2.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponse3.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponse4.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponse5.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponse6.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative1.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative2.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative3.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative4.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative5.AddChoice("Goodbye.", goodbyeNode);
+            smallTalkResponseNegative6.AddChoice("Goodbye.", goodbyeNode);
+
+            puristsNode.AddChoice("What's the mission?", missionNode);
+
+            // Only allow the player to say goodbye after learning about the mission
+            missionNode.AddChoice("Goodbye.", goodbyeNode);
 
             // Assign dialogue to Ezekiel the Mechanomancer
             ezekielTheMechanomancer.CreateDialogueManager(startNode);
