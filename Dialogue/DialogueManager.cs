@@ -14,6 +14,7 @@ namespace fire_ash_server.Dialogue
         public DialogueNode StartingNode { get; private set; }
         public Character SpeakingCharacter;
         public Character? Initiater;
+        public List<DialogueChoice> UsedChoices = new List<DialogueChoice>();
         
         public DialogueManager(Character speakingCharacter, DialogueNode startingNode)
         {
@@ -24,6 +25,7 @@ namespace fire_ash_server.Dialogue
 
         public void InitSpeakWith(Character SpeakToCharacter)
         {
+            UsedChoices.Clear();
             Initiater = SpeakToCharacter;
             SpeakingCharacter.SpeakingTo = SpeakToCharacter;        
             SpeakToCharacter.SpeakingTo = SpeakingCharacter;
@@ -48,11 +50,15 @@ namespace fire_ash_server.Dialogue
 
         public void SetCurrentNodeBasedOnChoice(DialogueChoice choice)
         {
+            UsedChoices.Add(choice);
             CurrentNode = choice.GetNextDialogueNode(this);
         }
 
         public bool ChoiceIsValid(DialogueChoice choice)
         {
+            if (UsedChoices.Contains(choice))
+                return false;
+
             return choice.IsValid(this);
         }
         public DialogueNode GetNextDialogueNode(DialogueChoice choice)
@@ -69,7 +75,7 @@ namespace fire_ash_server.Dialogue
             if (SpeakingCharacter.SpeakingTo == null)
                 return;
             SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, 1);
-            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.Name} approves. {SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is increased.");
+            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is increased.");
         }
 
 
@@ -78,7 +84,7 @@ namespace fire_ash_server.Dialogue
             if (SpeakingCharacter.SpeakingTo == null)
                 return;
             SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, -1);
-            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.Name} disapproves. {SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is decreased.");
+            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is decreased.");
         }
     }
 }

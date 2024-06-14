@@ -23,11 +23,22 @@ namespace fire_ash_server.Dialogue
 
         public void AddChoice(string choiceText, DialogueNode nextNode)
         {
-            Choices.Add(
-                new DialogueChoice(
-                    choiceText, 
-                    (DialogueManager dm) => { return nextNode; })
-                );
+            AddChoice(choiceText, nextNode, false);
+        }
+        public void AddChoice(string choiceText, DialogueNode nextNode, bool asLastChoice)
+        {
+            if (Choices.Where(choice => choice.Text == choiceText).Any())
+                return;
+
+            DialogueChoice choice = new DialogueChoice(
+                    choiceText,
+                    (DialogueManager dm) => { return nextNode; });
+
+            if (asLastChoice)
+                Choices.Insert(0, choice); //the choices are loop through backwards
+            else
+                Choices.Add(choice);
+            
         }
         public void AddChoice(string choiceText, Func<DialogueManager,DialogueNode> result)
         {

@@ -126,7 +126,7 @@ namespace fire_ash_server
             {
                 DialogueManager dialogueManager = Character.SpeakingTo.DialogueManager;
                 DialogueNode currentNode = dialogueManager.CurrentNode;
-                for (int i = 0; i < currentNode.Choices.Count(); i++)
+                for (int i = currentNode.Choices.Count() - 1; i >= 0; i--)
                 {
                     DialogueChoice choice = currentNode.Choices[i];
                     if (dialogueManager.ChoiceIsValid(choice))

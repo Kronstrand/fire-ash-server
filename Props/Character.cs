@@ -627,16 +627,6 @@ namespace fire_ash_server.Props
                 return Gender.DualSoul;
             }
         }
-        /*public bool PropIsWithinReach(Prop prop)
-        {
-
-            if (prop.IsInRoomOrIsRoom(CurrentRoom) || prop.IsHidden())
-            {
-                _ = Soul.SendAsync($"{prop.Name} has become out of reach...");
-                return false;
-            }
-            return true;
-        }*/
 
         public bool PropTargetIsValid(Move move)
         {
