@@ -17,6 +17,7 @@ namespace fire_ash_server.Enums
         AbandonedArcade,
         NeonPlaza,
         MainCorridor,
-        CreationChamber
+        CreationChamber,
+        Incubator
     }
 }

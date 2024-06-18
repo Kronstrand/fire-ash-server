@@ -518,6 +518,9 @@ namespace fire_ash_server
 
             await SendAsync(goToRoom.GetFullRoomDescription(Character));
 
+            if (goToRoom.OnEnterEvent != null)
+                goToRoom.OnEnterEvent(this);
+
             if (goToRoom.InCombat)
                 goToRoom.EnableOrUpdateCombat(Character, null);
         }

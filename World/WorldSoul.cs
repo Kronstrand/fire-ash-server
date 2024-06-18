@@ -105,7 +105,7 @@ namespace fire_ash_server.World
 
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.WolfCave);
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.CreationChamber);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.Incubator);
 
                 while (!soul.Character.Dead)
                 {

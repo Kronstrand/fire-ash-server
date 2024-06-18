@@ -24,6 +24,7 @@ namespace fire_ash_server.Props
         public ThreadSafeList<Grouping> Groupings = new ThreadSafeList<Grouping>();
         public ThreadSafeList<Relationship> RelationshipsInHostileCombat = new ThreadSafeList<Relationship>();
         public ThreadSafeList<Exit> Exits = new ThreadSafeList<Exit>();
+        public Action<Soul>? OnEnterEvent;
         public bool InCombat;
         private bool testCombatResolved;
         public bool AddCombatantsInCombatLoop;

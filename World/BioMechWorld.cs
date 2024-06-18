@@ -7,10 +7,6 @@ using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Net.NetworkInformation;
-using System.Text.RegularExpressions;
 using fire_ash_server.Moves;
 
 namespace fire_ash_server.World
@@ -37,6 +33,20 @@ namespace fire_ash_server.World
                 "This chamber is both a birthplace and a factory, a grotesque testament to the blending of technology and biology."
             );
 
+            Item emptyIncubatorPod = new Item(
+                "Incubator Pod",
+                "The incubator pod stands vacant, a fusion of organic and mechanical elements. " +
+                "Its translucent, flesh-like walls glisten with a faint, greenish residue from the drained amniotic fluid. " +
+                "Smooth, metallic surfaces interlace with the organic material, giving the pod an otherworldly appearance. " +
+                "Mechanical arms and cables still snake from the ceiling and walls, connected to the pod and twitching slightly, " +
+                "as if confused by the sudden absence of their occupant. The pod pulses gently, mimicking the rhythm of a heartbeat, " +
+                "and emits a soft, rhythmic hum. The interior bears the impression of a recent occupant, a stark reminder of your escape."
+            );
+            emptyIncubatorPod.MakeUnpickupable();
+
+            // Add the empty incubator pod to the creation chamber
+            creationChamber.AddItem(emptyIncubatorPod);
+
             Item motherMachine = new Item(
                 "Mother-Machine",
                 "The Mother-Machine is an awe-inspiring yet terrifying fusion of advanced technology and organic matter. " +
@@ -51,6 +61,101 @@ namespace fire_ash_server.World
             motherMachine.MakeUnpickupable();
 
             creationChamber.AddItem(motherMachine);
+
+            //Incubator Pod
+            Action<Soul> incubatorRelease = (Soul s) =>
+            {
+                s.SendAsync("Suddenly, the floor beneath you begins to shift and open. " +
+                    "The membrane tears away, and you are flushed out of the enclosed space in a rush of fluids, " +
+                    "tumbling into the larger chamber beyond. The fluid is warm and viscous, carrying you with surprising force. " +
+                    "As you emerge, the cold air of the chamber hits your skin, and you find yourself lying on a slick, metallic surface, " +
+                    "surrounded by the eerie, mechanical environment of the larger chamber.");
+                s.Character.GoToRoom(creationChamber);
+                s.Character.MoveToGroup(emptyIncubatorPod);
+            };
+
+            Room incubator = new Room(
+                RoomKey.Incubator,
+                "Incubator",
+                "You awaken in the confines of a small, enclosed space. The interior is soft and warm, " +
+                "lined with a flesh-like material that pulsates gently, mimicking the rhythm of a heartbeat. " +
+                "The walls are covered with a translucent membrane, through which you can see the shadowy outlines " +
+                "of mechanical arms tending to other enclosures. The air inside is humid " +
+                "and carries the faint scent of antiseptic mixed with a more organic, almost comforting aroma. " +
+                "Soft, rhythmic humming fills the space, blending with the distant, muffled sounds of the larger chamber beyond. " +
+                "You feel both cradled and imprisoned, as the walls seem to respond to your slightest movement, " +
+                "constricting slightly before relaxing again. It's time to find a way out."
+            );            
+
+            Item umbilicalTube = new Item(
+                "Umbilical Tube",
+                "The umbilical tube is a disturbing blend of technology and organic matter, connecting you to the enclosure. " +
+                "It is a long, flexible tube that pulses with a faint, rhythmic energy, as if it has a life of its own. " +
+                "The tube's surface is slick and slightly translucent, allowing you to see the fluids and tiny mechanical components " +
+                "flowing through it. One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
+                "The other end disappears into the wall of the enclosure, merging seamlessly with the surrounding membrane. " +
+                "This tube not only provides nourishment and sustenance, but also seems to monitor your vital signs, " +
+                "with occasional pulses indicating a transfer of information."
+            );
+            umbilicalTube.MakeUnpickupable();
+
+            incubator.AddItem(umbilicalTube);
+            incubator.OnEnterEvent = (Soul s) => {
+                s.Character.MoveToGroup(umbilicalTube);
+            };
+
+
+            int tubeMoveUsed = 0; 
+
+            umbilicalTube.AddMove(new SkillCheck(
+                null,
+                "Attempt to remove the umbilical tube.",
+                new SkillNumber(Skill.Intelligence, 12),
+                (Soul s) => {
+                    s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
+                    $"{s.Character.Name} notices the intricate blend of organic and mechanical elements, " +
+                    "and with precise understanding, manages to disconnect it without causing harm. " +
+                    "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");
+                    incubatorRelease(s);
+                    return "";
+
+                },
+                (Soul s) => {
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
+                        $"The blend of organic and mechanical elements is too complex to decipher, " +
+                        $"and {s.Character.Name} are unable to remove it.");
+                    tubeMoveUsed++;
+                    return "";
+                }
+            ));
+            umbilicalTube.AddMove(new SkillCheck(
+                null,
+                "Attempt to remove the umbilical tube by force.",
+                new SkillNumber(Skill.Strength, 5),
+                (Soul s) => {
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1,1), 0, RollType.DamageRoll,s.Character),DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
+                    return
+                    "With a surge of brute strength, you grip the tube firmly and yank it away from your abdomen. " +
+                    "The connection resists at first, but your sheer force overpowers it. " +
+                    "The tube tears free with a violent jerk, and you feel a brief sting of pain before a rush of relief as it detaches. " +
+                    "Blood trickles from the wound left behind.";
+                },
+                (Soul s) => {
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of failure
+                    return
+                    "You grasp the tube and pull with all your might, but the connection holds firm. " +
+                    "The blend of organic and mechanical elements proves too resilient, " +
+                    "and your efforts leave you exhausted and the tube still firmly attached. " +
+                    "A sharp pain shoots through your abdomen, and blood trickles from where the tube meets your skin.";
+                    tubeMoveUsed++;
+                }
+            ));
+
+            
+
+
+            
 
             // Main Corridor Room
             Room mainCorridor = new Room(
@@ -89,7 +194,7 @@ namespace fire_ash_server.World
             14, //strenght
             10, //dexterity
             11, //constitution
-            15, //intelligence
+            16, //intelligence
             13, //wisdom
             9,  //charisma
                 "Ezekiel's imposing seven-foot frame lies still, " +

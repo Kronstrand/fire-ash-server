@@ -174,7 +174,25 @@ namespace fire_ash_server.Props
             }
 
             BroadcastToSoulsInRoom(message);
+            TestDeath();
+        }
+        public void TakeDamage(Damage damage, string sourceName)
+        {
+            
+            HP -= damage.DmgRoll.GetSum();
 
+            string message = "";
+            if (IsHidden())
+            {
+                message = $"In the shadows {Name} takes {damage} from {sourceName} and is revealed.";
+                Unhide();
+            }
+            else
+            {
+                message = $"{Name} takes {damage} from {sourceName}.";
+            }
+
+            BroadcastToSoulsInRoom(message);
             TestDeath();
         }
 

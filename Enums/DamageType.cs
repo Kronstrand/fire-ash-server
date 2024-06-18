@@ -20,6 +20,7 @@ namespace fire_ash_server.Enums
         Psychic,
         Radiant,
         Slashing,
-        Thunder
+        Thunder,
+        None
     }
 }

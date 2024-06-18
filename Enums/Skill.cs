@@ -9,6 +9,12 @@ namespace fire_ash_server.Enums
 {
     internal enum Skill
     {
+        Strength,
+        Dexterity,
+        Constitution,
+        Wisdom,
+        Intelligence,
+        Charisma,
         Acrobatics,
         [Description("Animal Handling")]
         AnimalHandling,
