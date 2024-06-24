@@ -19,17 +19,19 @@ namespace fire_ash_server.Props
 {
     internal class Room : Prop
     {
-        public RoomKey RoomKey;
+        public string RoomKey;
         public ThreadSafeList<Character> Characters = new ThreadSafeList<Character>();
         public ThreadSafeList<Grouping> Groupings = new ThreadSafeList<Grouping>();
         public ThreadSafeList<Relationship> RelationshipsInHostileCombat = new ThreadSafeList<Relationship>();
         public ThreadSafeList<Exit> Exits = new ThreadSafeList<Exit>();
         public Action<Soul>? OnEnterEvent;
+        private List<Action> onCombatEvents = new List<Action>();
+        private List<Action> onCombatEventsToBeRemoved = new List<Action>();
         public bool InCombat;
         private bool testCombatResolved;
         public bool AddCombatantsInCombatLoop;
 
-        public Room(RoomKey roomKey,string name, string description) : base(name, description)
+        public Room(string roomKey,string name, string description) : base(name, description)
         {   
             RoomKey = roomKey;
             Program.WorldSoul.AddRoom(this);
@@ -353,16 +355,32 @@ namespace fire_ash_server.Props
                     if (TestCombatReslovedIsFlagged())
                         if (CombatIsResolved())
                         {
-                            DisableCombat(true);                           
+                            DisableCombat(true);
+                            OnAfterCombat();
                             return;
                         }
                 }
                 round++;
             }
         }
-        private bool ExecuteCombatAction(Character character, Move? move)
+
+        private void OnAfterCombat()
         {
-            
+            foreach (Action afterCombatEvent in onCombatEvents)
+                afterCombatEvent();
+
+            onCombatEvents.RemoveAll(e => onCombatEventsToBeRemoved.Contains(e));
+            onCombatEventsToBeRemoved.Clear();
+        }
+
+        public void AddOnAfterCombatEvent(Action action)
+        {
+            onCombatEvents.Add(action);
+            onCombatEventsToBeRemoved.Add(action);
+        }
+
+        private bool ExecuteCombatAction(Character character, Move? move)
+        {          
             if (move == null)
                 return true;
 
@@ -388,7 +406,7 @@ namespace fire_ash_server.Props
             if (character != null)
                 if (character.IsHidden())
                 {
-                        _ = character.Soul.SendAsync(message);
+                    _ = character.Soul.SendAsync(message);
                     return;
                 }
 

@@ -12,6 +12,7 @@ namespace fire_ash_server
 {
     internal static class Helpers
     {
+        private static int randomIdentifer = 0;
         public static Dictionary<string, string> irregularNouns = new Dictionary<string, string>();
 
         static Dictionary<int, string> numberWords = new Dictionary<int, string>
@@ -46,6 +47,11 @@ namespace fire_ash_server
             {96, "ninety-six"}, {97, "ninety-seven"}, {98, "ninety-eight"},
             {99, "ninety-nine"}, {100, "one hundred"}
         };
+
+        public static int GetNextId()
+        {
+            return randomIdentifer++;
+        }
 
         public static string Description(Enum value)
         {

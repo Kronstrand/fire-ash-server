@@ -22,6 +22,8 @@ namespace fire_ash_server.Moves.Attacks
             Action = () =>
             {
                 if (!TryAttack(character, characterToAttack, character.AttackWithMainHand)) return;
+                if (characterToAttack.Dead)
+                    return;
                 if (!TryAttack(character, characterToAttack, character.AttackWithOffhand)) return;
             };
         }

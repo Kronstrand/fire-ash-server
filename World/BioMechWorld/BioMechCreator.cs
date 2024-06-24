@@ -8,16 +8,21 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
 using fire_ash_server.Moves;
+using static fire_ash_server.Helpers;
 
-namespace fire_ash_server.World
+namespace fire_ash_server.World.BioMechWorld
 {
-    internal class BioMechWorld
+    internal class BioMechCreator
     {
-        public BioMechWorld(WorldSoul worldSoul)
+        private WorldSoul worldSoul;
+        private Item emptyIncubatorPod;
+        public BioMechCreator(WorldSoul worldSoul)
         {
+            this.worldSoul = worldSoul;
+
             // Creation Chamber Room
             Room creationChamber = new Room(
-                RoomKey.CreationChamber,
+                Description(RoomKey.CreationChamber),
                 "Creation Chamber",
                 "The Creation Chamber is a sprawling, biomechanical womb, pulsating with an eerie, otherworldly energy. " +
                 "The walls are a grotesque fusion of metal and flesh, with organic tubes and cables snaking across the surface, " +
@@ -33,7 +38,7 @@ namespace fire_ash_server.World
                 "This chamber is both a birthplace and a factory, a grotesque testament to the blending of technology and biology."
             );
 
-            Item emptyIncubatorPod = new Item(
+            emptyIncubatorPod = new Item(
                 "Incubator Pod",
                 "The incubator pod stands vacant, a fusion of organic and mechanical elements. " +
                 "Its translucent, flesh-like walls glisten with a faint, greenish residue from the drained amniotic fluid. " +
@@ -62,104 +67,9 @@ namespace fire_ash_server.World
 
             creationChamber.AddItem(motherMachine);
 
-            //Incubator Pod
-            Action<Soul> incubatorRelease = (Soul s) =>
-            {
-                s.SendAsync("Suddenly, the floor beneath you begins to shift and open. " +
-                    "The membrane tears away, and you are flushed out of the enclosed space in a rush of fluids, " +
-                    "tumbling into the larger chamber beyond. The fluid is warm and viscous, carrying you with surprising force. " +
-                    "As you emerge, the cold air of the chamber hits your skin, and you find yourself lying on a slick, metallic surface, " +
-                    "surrounded by the eerie, mechanical environment of the larger chamber.");
-                s.Character.GoToRoom(creationChamber);
-                s.Character.MoveToGroup(emptyIncubatorPod);
-            };
-
-            Room incubator = new Room(
-                RoomKey.Incubator,
-                "Incubator",
-                "You awaken in the confines of a small, enclosed space. The interior is soft and warm, " +
-                "lined with a flesh-like material that pulsates gently, mimicking the rhythm of a heartbeat. " +
-                "The walls are covered with a translucent membrane, through which you can see the shadowy outlines " +
-                "of mechanical arms tending to other enclosures. The air inside is humid " +
-                "and carries the faint scent of antiseptic mixed with a more organic, almost comforting aroma. " +
-                "Soft, rhythmic humming fills the space, blending with the distant, muffled sounds of the larger chamber beyond. " +
-                "You feel both cradled and imprisoned, as the walls seem to respond to your slightest movement, " +
-                "constricting slightly before relaxing again. It's time to find a way out."
-            );            
-
-            Item umbilicalTube = new Item(
-                "Umbilical Tube",
-                "The umbilical tube is a disturbing blend of technology and organic matter, connecting you to the enclosure. " +
-                "It is a long, flexible tube that pulses with a faint, rhythmic energy, as if it has a life of its own. " +
-                "The tube's surface is slick and slightly translucent, allowing you to see the fluids and tiny mechanical components " +
-                "flowing through it. One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
-                "The other end disappears into the wall of the enclosure, merging seamlessly with the surrounding membrane. " +
-                "This tube not only provides nourishment and sustenance, but also seems to monitor your vital signs, " +
-                "with occasional pulses indicating a transfer of information."
-            );
-            umbilicalTube.MakeUnpickupable();
-
-            incubator.AddItem(umbilicalTube);
-            incubator.OnEnterEvent = (Soul s) => {
-                s.Character.MoveToGroup(umbilicalTube);
-            };
-
-
-            int tubeMoveUsed = 0; 
-
-            umbilicalTube.AddMove(new SkillCheck(
-                null,
-                "Attempt to remove the umbilical tube.",
-                new SkillNumber(Skill.Intelligence, 12),
-                (Soul s) => {
-                    s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
-                    $"{s.Character.Name} notices the intricate blend of organic and mechanical elements, " +
-                    "and with precise understanding, manages to disconnect it without causing harm. " +
-                    "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");
-                    incubatorRelease(s);
-                    return "";
-
-                },
-                (Soul s) => {
-                    s.Character.BroadcastToSoulsInRoom(
-                        $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
-                        $"The blend of organic and mechanical elements is too complex to decipher, " +
-                        $"and {s.Character.Name} are unable to remove it.");
-                    tubeMoveUsed++;
-                    return "";
-                }
-            ));
-            umbilicalTube.AddMove(new SkillCheck(
-                null,
-                "Attempt to remove the umbilical tube by force.",
-                new SkillNumber(Skill.Strength, 5),
-                (Soul s) => {
-                    s.Character.TakeDamage(new Damage(new Roll(new Die(1,1), 0, RollType.DamageRoll,s.Character),DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
-                    return
-                    "With a surge of brute strength, you grip the tube firmly and yank it away from your abdomen. " +
-                    "The connection resists at first, but your sheer force overpowers it. " +
-                    "The tube tears free with a violent jerk, and you feel a brief sting of pain before a rush of relief as it detaches. " +
-                    "Blood trickles from the wound left behind.";
-                },
-                (Soul s) => {
-                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of failure
-                    return
-                    "You grasp the tube and pull with all your might, but the connection holds firm. " +
-                    "The blend of organic and mechanical elements proves too resilient, " +
-                    "and your efforts leave you exhausted and the tube still firmly attached. " +
-                    "A sharp pain shoots through your abdomen, and blood trickles from where the tube meets your skin.";
-                    tubeMoveUsed++;
-                }
-            ));
-
-            
-
-
-            
-
             // Main Corridor Room
             Room mainCorridor = new Room(
-                roomKey: RoomKey.MainCorridor,
+                Description(RoomKey.MainCorridor),
                 "Main Corridor",
                 "The Main Corridor is a long, dimly lit passage that stretches into darkness. " +
                 "The walls are covered with a lattice of exposed pipes and cables, some of which ooze a viscous, black fluid. " +
@@ -215,7 +125,9 @@ namespace fire_ash_server.World
                     null,
                     "Recall lore about Ezekiel.",
                     new SkillNumber(Skill.Religion, 8),
-                    (Soul s) => {
+                    true,
+                    (s) =>
+                    {
                         return
                         "Ezekiel the Mechanomancer, a high priest of the cult of the Machine God, " +
                         "stands tall and imposing. He is both revered and feared by his followers. " +
@@ -227,7 +139,8 @@ namespace fire_ash_server.World
                         "Ezekiel's position as a leader is cemented by his formidable presence " +
                         "and unwavering dedication to this singular vision.";
                     },
-                    (Soul s) => {
+                    (s) =>
+                    {
                         if (s.Character.Race == Race.Mecharion)
                         {
                             return "Your newborn memory is failing you, " +
@@ -257,26 +170,30 @@ namespace fire_ash_server.World
             startNode.AddChoice("Who are you?", whoAreYouNode);
             startNode.AddChoice("What happened to me?", whatHappenedNode1);
             startNode.AddChoice("Why do I feel like something's wrong?", attackNode);
-            startNode.AddChoice("Tell me about this place.", smallTalkNode1);        
+            startNode.AddChoice("Tell me about this place.", smallTalkNode1);
 
-            whoAreYouNode.OnAfterEvent = (dm) => {
+            whoAreYouNode.OnAfterEvent = (dm) =>
+            {
                 startNode.AddChoice("Tell me more about you.", smallTalkNode2);
                 dm.CurrentNode = startNode;
             };
 
-            whatHappenedNode1.OnAfterEvent = (dm) => {
+            whatHappenedNode1.OnAfterEvent = (dm) =>
+            {
                 startNode.AddChoice("The Mother Machine?", motherMachineNode);
                 dm.CurrentNode = startNode;
             };
 
-            motherMachineNode.OnAfterEvent = (dm) => { 
-                startNode.AddChoice("Was I sold or convicted?", identityNode); 
-                dm.CurrentNode = startNode; 
+            motherMachineNode.OnAfterEvent = (dm) =>
+            {
+                startNode.AddChoice("Was I sold or convicted?", identityNode);
+                dm.CurrentNode = startNode;
             };
-            
+
             identityNode.OnAfterEvent = (dm) => { dm.CurrentNode = startNode; };
 
-            attackNode.OnAfterEvent = (dm) => {
+            attackNode.OnAfterEvent = (dm) =>
+            {
                 startNode.AddChoice("Who are the Purists?", puristsNode);
                 startNode.AddChoice("The Mother Machine?", motherMachineNode);
                 dm.CurrentNode = startNode;
@@ -318,7 +235,158 @@ namespace fire_ash_server.World
 
             // Assign dialogue to Ezekiel the Mechanomancer
             ezekielTheMechanomancer.CreateDialogueManager(startNode);
+        }
 
+        public Room CreateIncubator()
+        {
+            //Incubator Pod
+            Action<Soul> incubatorRelease = (s) =>
+            {
+                _ = s.SendAsync($"Suddenly, the floor beneath {s.Character.Name} begins to shift and open. " +
+                    $"The membrane tears away, and {s.Character.Name} is flushed out of the enclosed space in a rush of fluids, " +
+                    $"tumbling into the larger chamber beyond. The fluid is warm and viscous, carrying {s.Character.Name} with surprising force. " +
+                    $"As {s.Character.Name} emerges, they find themselves lying on a slick, metallic surface, " +
+                    $"surrounded by the eerie, mechanical environment of the larger chamber.");
+                s.Character.GoToRoom(worldSoul.GetRoom(RoomKey.CreationChamber));
+                s.Character.MoveToGroup(emptyIncubatorPod);
+            };
+
+            Room incubator = new Room(
+                Description(RoomKey.Incubator) + GetNextId(),
+                "Incubator",
+                "You awaken in the confines of a small, enclosed space. The interior is soft and warm, " +
+                "lined with a flesh-like material that pulsates gently, mimicking the rhythm of a heartbeat. " +
+                "The walls are covered with a translucent membrane, through which you can see the shadowy outlines " +
+                "of mechanical arms tending to other enclosures. The air inside is humid " +
+                "and carries the faint scent of antiseptic mixed with a more organic, almost comforting aroma. " +
+                "Soft, rhythmic humming fills the space, blending with the distant, muffled sounds of the larger chamber beyond. " +
+                "You feel both cradled and imprisoned, as the walls seem to respond to your slightest movement, " +
+                "constricting slightly before relaxing again. It's time to find a way out."
+            );
+
+            Item umbilicalTube = new Item(
+                "Umbilical Tube",
+                "The umbilical tube is a disturbing blend of technology and organic matter, connecting you to the enclosure. " +
+                "It is a long, flexible tube that pulses with a faint, rhythmic energy, as if it has a life of its own. " +
+                "The tube's surface is slick and slightly translucent, allowing you to see the fluids and tiny mechanical components " +
+                "flowing through it. One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
+                "The other end disappears into the wall of the enclosure, merging seamlessly with the surrounding membrane. " +
+                "This tube not only provides nourishment and sustenance, but also seems to monitor your vital signs, " +
+                "with occasional pulses indicating a transfer of information."
+            );
+            umbilicalTube.MakeUnpickupable();
+
+            incubator.AddItem(umbilicalTube);
+            incubator.OnEnterEvent = (s) =>
+            {
+                s.Character.MoveToGroup(umbilicalTube);
+            };
+
+            Character sentryOculotube = new Character(
+                 "Sentry Oculotube",
+                 "The Sentry Oculotube is a long, sinuous tube of pulsating, living flesh intertwined with mechanical components. " +
+                 "At one end of the tube is a single, large, unblinking eye that constantly scans its surroundings with a menacing red glow. " +
+                 "The tube itself moves with a disturbing, serpentine grace, and is capable of lashing out with surprising speed and precision. " +
+                 "The probe is covered in a mix of organic tendrils and metallic wires, making it both resilient and flexible. " +
+                 "It emits a low, droning hum, adding to its eerie presence.",
+                 Race.Mecharion,
+                 8,  // strength
+                 10, // dexterity
+                 8, // constitution
+                 12, // intelligence
+                 10, // wisdom
+                 7,  // charisma
+                 "The Sentry Oculotube lies in a twisted heap, its pulsating, living flesh intertwined with mechanical components now motionless. " +
+                 "The single, large eye at one end of the tube is dim and lifeless, no longer scanning its surroundings. " +
+                 "The tube, once moving with serpentine grace, is now still, its organic tendrils and metallic wires lying limp. " +
+                 "The low, droning hum that once emanated from it has ceased, leaving only an eerie silence."
+ );
+            sentryOculotube.UniqueName = true;
+            sentryOculotube.HP = 2;
+            sentryOculotube.AddFeat(FeatKey.MeleeAttack);
+            sentryOculotube.Faction = worldSoul.GetFaction(FactionKey.Technomancers);
+
+            Action<Soul> releaseSentryOculotube = (s) =>
+            {
+                s.Character.BroadcastToSoulsInRoom(
+                $"As {s.Character.Name} struggles with the umbilical tube, an alarm sounds and a panel in the wall slides open. " +
+                $"From the darkness, a Sentry Oculotube emerges, its single, red eye locking onto {s.Character.Name}. " +
+                "The living tube moves with a disturbing, serpentine grace, ready to attack.");
+                sentryOculotube.GoToRoom(incubator); //makes weird text that it enters from the void...
+                sentryOculotube.MoveToGroup(s.Character);
+
+                incubator.AddOnAfterCombatEvent(() =>
+                {
+                    incubatorRelease(s);
+                });
+            };
+
+
+
+            int tubeMoveUsed = 0;
+
+            umbilicalTube.AddMove(new SkillCheck(
+                null,
+                "Attempt to remove the umbilical tube.",
+                new SkillNumber(Skill.Intelligence, 912),
+                false,
+                (s) =>
+                {
+                    s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
+                    $"{s.Character.Name} notices the intricate blend of organic and mechanical elements, " +
+                    "and with precise understanding, manages to disconnect it without causing harm. " +
+                    "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");
+                    incubatorRelease(s);
+                    return "";
+                },
+                (s) =>
+                {
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
+                        $"The blend of organic and mechanical elements is too complex to decipher, " +
+                        $"and {s.Character.Name} are unable to remove it.");
+
+                    tubeMoveUsed++;
+                    if (tubeMoveUsed == 2)
+                        releaseSentryOculotube(s);
+
+                    return "";
+                }
+            ));
+            umbilicalTube.AddMove(new SkillCheck(
+                null,
+                "Attempt to remove the umbilical tube by force.",
+                new SkillNumber(Skill.Strength, 95),
+                false,
+                (s) =>
+                {
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"{s.Character.Name} grips the tube firmly and yanks it away with a surge of brute strength. " +
+                        "The connection resists at first, but sheer force overpowers it. " +
+                        "The tube tears free with a violent jerk, and a brief sting of pain is felt before a rush of relief as it detaches. " +
+                        "Blood trickles from the wound left behind.");
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
+                    incubatorRelease(s);
+                    return "";
+                },
+                (s) =>
+                {
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"{s.Character.Name} grasps the tube and pulls with all their might, but the connection holds firm. " +
+                        "The blend of organic and mechanical elements proves too resilient, " +
+                        $"and the effort leaves {s.Character.Name} exhausted with the tube still firmly attached. " +
+                        "Blood trickles from where the tube meets the skin.");
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of failure
+                    tubeMoveUsed++;
+
+                    if (tubeMoveUsed == 2)
+                        releaseSentryOculotube(s);
+
+                    return "";
+                }
+            ));
+
+            return incubator;
         }
     }
 }

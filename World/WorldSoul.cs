@@ -7,16 +7,19 @@ using fire_ash_server.Props;
 using System.Text;
 using System.Linq;
 using System.Collections.Concurrent;
+using fire_ash_server.World.BioMechWorld;
+using System.Diagnostics.Metrics;
 
 namespace fire_ash_server.World
 {
     internal class WorldSoul
     {
         public ThreadSafeList<Soul> Souls = new ThreadSafeList<Soul>();
-        public Dictionary<RoomKey, Room> Rooms = new Dictionary<RoomKey, Room>();
+        public Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
         public List<Faction> Factions = new List<Faction>();
         public List<Relationship> Relationships = new List<Relationship>();
         public List<Feat> Features = new List<Feat>();
+        public BioMechCreator? World;
 
         public async Task Open(int port)
         {
@@ -25,7 +28,7 @@ namespace fire_ash_server.World
             GenerateGenericContent();
             //new WorldCreator(this);
             //new CyberworldCreater(this);
-            new BioMechWorld(this);
+            World = new BioMechCreator(this);
 
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -40,7 +43,7 @@ namespace fire_ash_server.World
 
         private void GenerateGenericContent()
         {
-            new Room(RoomKey.Void, "Void", "This is the Void.");
+            new Room(Description(RoomKey.Void), "Void", "This is the Void.");
 
             foreach (Enum factionKey in Enum.GetValues(typeof(FactionKey)))
             {
@@ -75,7 +78,7 @@ namespace fire_ash_server.World
 
         public Room GetRoom(RoomKey key)
         {
-            return Rooms[key];
+            return Rooms[Description(key)];
         }
 
         public void NewSoul(Socket soulSocket)
@@ -88,6 +91,7 @@ namespace fire_ash_server.World
         {
             try
             {
+                
                 Console.WriteLine("A soul entered the world.");
 
                 soul.Character = new Character(soul, "Player" + Souls.Count);
@@ -104,8 +108,10 @@ namespace fire_ash_server.World
                 await soul.SendAsync(messageToSoul);
 
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.WolfCave);
-                //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.Incubator);
+                //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);                
+                if (World == null)
+                    throw new Exception("World is not initiatited and is null");
+                await soul.MoveCharToRoomAndSendDescriptionAsync(World.CreateIncubator());
 
                 while (!soul.Character.Dead)
                 {
@@ -124,9 +130,7 @@ namespace fire_ash_server.World
                             await Task.Delay(100);                      
                     }
                     else
-                        await Task.Delay(400);
-                    
-                    
+                        await Task.Delay(400);              
                 }
             }
             catch (Exception ex)

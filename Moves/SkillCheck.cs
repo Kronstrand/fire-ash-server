@@ -14,8 +14,9 @@ namespace fire_ash_server.Moves
         public SkillNumber SkillNumber { get; set; }
         private Func<Soul, string?> successFunc;
         private Func<Soul, string?>? failFunc;
+        public bool IsPersonal = true;
 
-        public SkillCheck(string? key, string description,  SkillNumber skillNumber, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), description)
+        public SkillCheck(string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), description)
         {
             Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
@@ -36,7 +37,7 @@ namespace fire_ash_server.Moves
             else return "s";
         }
 
-        public SkillCheck(Soul soul, Prop prop, string? key, string description, SkillNumber skillNumber, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), CreateDescription(description, skillNumber.Skill))
+        public SkillCheck(Soul soul, Prop prop, string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), CreateDescription(description, skillNumber.Skill))
         {
             Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
@@ -50,7 +51,7 @@ namespace fire_ash_server.Moves
 
         public SkillCheck CreatePossibleMove(Soul soul, Prop prop)
         {
-            SkillCheck possibleMove = new SkillCheck(Key,CreateDescription(Description, SkillNumber.Skill), SkillNumber, successFunc, failFunc);
+            SkillCheck possibleMove = new SkillCheck(Key,CreateDescription(Description, SkillNumber.Skill), SkillNumber, IsPersonal, successFunc, failFunc);
             possibleMove.Prop = prop;
             PropPosition = prop.GetPropPosition();
             possibleMove.Action = CreateAction(soul);
@@ -69,28 +70,32 @@ namespace fire_ash_server.Moves
             {
                 Roll roll = new Roll(soul.Character.GetModifer(SkillNumber.Skill), RollType.SkillCheck, soul.Character);
 
-                if (roll.GetSum() >= SkillNumber.number)
-                        await MessageHandler(successFunc(soul), soul, roll);
-                else
-                {
-                    if (failFunc == null)
-                        await soul.SendAsync($"{soul.Character.Name} rolled {roll} and failed the {SkillNumber.Skill} check...");
-                    else
-                            await MessageHandler(failFunc(soul), soul, roll);
-                }          
+                bool sucess = roll.GetSum() >= SkillNumber.number;
+                await MessageHandler(sucess, soul, roll);         
             };
         }
 
-        private async Task MessageHandler(string? result, Soul soul, Roll roll)
+        private async Task MessageHandler(bool success, Soul soul, Roll roll)
         {
-            if (result == null) 
+            string rollMessage = "";
+            if (success)
+                rollMessage = $"{soul.Character.Name} rolls {roll} and succeeds.";
+            else
+                rollMessage = $"{soul.Character.Name} rolls {roll} and fails.";
+
+           await soul.SendAsync(rollMessage, IsPersonal);
+
+
+           string ? result = null;
+            if (success)
+                result = successFunc(soul);
+            else if (failFunc != null)
+                result = failFunc(soul);
+            else         
                 return;
 
-            string message = $"{soul.Character.Name} rolled {roll}.";
-            if (result != null)
-                message += " " + result;
-
-            await soul.SendAsync(message);
+            if (result != null && result != "")
+                await soul.SendAsync(result, IsPersonal);
         }
     }
 }

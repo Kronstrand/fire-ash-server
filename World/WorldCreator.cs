@@ -28,7 +28,7 @@ namespace fire_ash_server.World
                     -10));
 
             Room wolfCave = new Room(
-                RoomKey.WolfCave,
+                Description(RoomKey.WolfCave),
                 "Wolf Cave",
                 "In the shadowy confines of the cave, the distinct, " +
                 "earthy scent of wolves permeates the cool, stagnant air, " +
@@ -50,7 +50,7 @@ namespace fire_ash_server.World
             wolfCave.AddItem(coltRifle);
 
             Room abandonedShrine = new Room(
-                RoomKey.AbandonedWolfShrine,
+                Description(RoomKey.AbandonedWolfShrine),
                 "Abandoned Shrine",
                 "Veiled in a thick blanket of moss and ivy, the crumbling stone walls whisper tales of forgotten deities. " +
                 "Statues, eroded by time, stand as silent guardians over the long-deserted sanctum, their features worn away, " +
@@ -80,7 +80,8 @@ namespace fire_ash_server.World
                 .AddMove(new SkillCheck(
                     null,
                     "Recall lore about the Celestial Wolf Idol.",
-                    new SkillNumber(Skill.Religion, 8), 
+                    new SkillNumber(Skill.Religion, 8),
+                    true,
                     (Soul s) => { return
                         "This idol depicts Lunaris, a celestial entity deeply intertwined with the moon's mystique. " +
                         "Resonating with the lunar spirit, its essence mirrors the cosmic ebb and flow. Lunaris, " +
@@ -115,7 +116,7 @@ namespace fire_ash_server.World
                 wolfCave));
 
             Room whisperingForest = new Room(
-                RoomKey.WhisperingForest,
+                Description(RoomKey.WhisperingForest),
                 "Whispering Forest",
                 "The forest stands dense and ancient, a labyrinth of towering trees whose leaves whisper secrets of old. " +
                 "The light here is a dappled symphony, casting shadows that seem to dance with an ethereal quality. " +

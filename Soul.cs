@@ -58,6 +58,16 @@ namespace fire_ash_server
             Program.WorldSoul.Souls.Add(this);
         }
 
+        public async Task SendAsync(string messageToSend, bool isPersonal)
+        {
+            if (isPersonal)
+                await SendAsync(messageToSend);
+            else
+                Character.CurrentRoom.BroadcastToSoulsInRoom(messageToSend);
+        }
+
+        
+
         public async Task SendAsync(string messageToSend)
         {
             await SendAsync(messageToSend, SendOption.None);
@@ -250,6 +260,7 @@ namespace fire_ash_server
                                 "fl",
                                 $"Flee combat and enter {exit.GoToRoom.Name}.",
                                 new SkillNumber(Skill.Acrobatics, DC),
+                                true, //should be a nonpersonal process?
                                 (Soul s) =>
                                 {
                                     RoomChange roomChange = new RoomChange(this, exit.GoToRoom);
@@ -507,8 +518,11 @@ namespace fire_ash_server
 
         public async Task MoveCharToRoomAndSendDescriptionAsync(RoomKey roomKey)
         {
-            Room goToRoom = Program.WorldSoul.Rooms[roomKey];
-
+            Room goToRoom = Program.WorldSoul.Rooms[Description(roomKey)];
+            await MoveCharToRoomAndSendDescriptionAsync(goToRoom);
+        }
+        public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom)
+        {
             Character.InCombat = goToRoom.InCombat;
             Room xRoom = Character.CurrentRoom;
 

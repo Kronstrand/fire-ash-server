@@ -87,7 +87,7 @@ namespace fire_ash_server.Props
         public Character(string name, string description, Race race , int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
         {
 
-            CurrentRoom = Program.WorldSoul.Rooms[RoomKey.Void];
+            CurrentRoom = Program.WorldSoul.Rooms[Description(RoomKey.Void)];
             init();
 
             Race = race;
@@ -178,7 +178,6 @@ namespace fire_ash_server.Props
         }
         public void TakeDamage(Damage damage, string sourceName)
         {
-            
             HP -= damage.DmgRoll.GetSum();
 
             string message = "";
@@ -201,10 +200,11 @@ namespace fire_ash_server.Props
             if (HP > 0)
                 return;
 
-            Dead = true;
-            BroadcastToSoulsInRoom($"{Name} falls to the ground - dead.\n\n" +
-                DeathDescription);
-
+            if (!Dead)
+            {
+                Dead = true;
+                BroadcastToSoulsInRoom($"{Name} falls to the ground - dead.\n\n" + DeathDescription);
+            }           
 
             CurrentRoom.FlagCombatMightBeResolved();
         }
@@ -459,7 +459,10 @@ namespace fire_ash_server.Props
 
             ResetLookAt();
             xRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
-            room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {xRoom.Name}.", this);
+            if (xRoom.RoomKey == Description(RoomKey.Void))
+                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name}.", this);
+            else
+                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {xRoom.Name}.", this);
         }
 
         public void BroadcastToSoulsInRoom(string message)

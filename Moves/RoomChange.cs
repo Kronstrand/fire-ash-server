@@ -24,7 +24,7 @@ namespace fire_ash_server.Moves
             return async () =>
             {
                 Room xRoom = soul.Character.CurrentRoom;
-                await soul.MoveCharToRoomAndSendDescriptionAsync(goToRoom.RoomKey);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(goToRoom);
 
                 if (soul.Character.InCombat)
                     xRoom.FlagCombatMightBeResolved();

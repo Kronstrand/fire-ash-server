@@ -32,7 +32,7 @@ namespace fire_ash_server.World
                     1));
 
             Room neonAlley = new Room(
-                RoomKey.NeonAlley,
+                Description(RoomKey.NeonAlley),
                 "Neon Alley",
                 "The alley glows with the flickering light of neon signs, casting vibrant hues on the wet pavement. " +
                 "Graffiti adorns the walls, a chaotic blend of rebellion and art, while the distant hum of machinery " +
@@ -46,7 +46,7 @@ namespace fire_ash_server.World
                 .Hide(5));
 
             Room abandonedArcade = new Room(
-                RoomKey.AbandonedArcade,
+                Description(RoomKey.AbandonedArcade),
                 "Abandoned Arcade",
                 "Once a vibrant center of entertainment, the arcade now stands silent and forgotten. " +
                 "The machines, covered in dust and cobwebs, still glow faintly with the remnants of their last games. " +
@@ -73,6 +73,7 @@ namespace fire_ash_server.World
                     null,
                     "Hack into the Data Crystal to extract its secrets.",
                     new SkillNumber(Skill.Hacking, 10),
+                    true,
                     (Soul s) => {
                         return
                         "You successfully decrypt the data, revealing hidden schematics for a powerful piece of cyberware. " +
@@ -95,7 +96,7 @@ namespace fire_ash_server.World
                 neonAlley));
 
             Room neonPlaza = new Room(
-                RoomKey.NeonPlaza,
+                Description(RoomKey.NeonPlaza),
                 "Neon Plaza",
                 "The plaza is a bustling hub of activity, bathed in the glow of countless neon signs advertising everything from " +
                 "cybernetic enhancements to exotic foods. Street vendors shout their wares, while the crowd moves like a living entity, " +

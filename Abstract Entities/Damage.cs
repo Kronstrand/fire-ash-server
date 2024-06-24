@@ -20,7 +20,10 @@ namespace fire_ash_server
             DamageType = damageType;
         }
         public override string ToString() 
-        {            
+        {
+            if (DamageType == DamageType.None)
+                return $"{DmgRoll} damage";
+
             return $"{DmgRoll} {Description(DamageType).ToLower()} damage";
         }
     }
