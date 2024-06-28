@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using fire_ash_server.Enums;
+using static fire_ash_server.Helpers;
+
+namespace fire_ash_server.Props.Items.Weapons
+{
+    internal class SpiderClaw : Weapon
+    {
+        public SpiderClaw() : base("Spider Claw", "Spider Claw", new Die(1, 4), DamageType.Piercing)
+        {
+            CreateAttackDescriptions();
+            CreateOffHandAttackDescriptions();
+        }
+
+        public static void CreateAttackDescriptions()
+        {
+            if (!AttackDescriptionsForType.ContainsKey(typeof(SpiderClaw)))
+            {
+                List<Func<string, string, Weapon, string>> descriptions = new List<Func<string, string, Weapon, string>>();
+                descriptions.Add((a, r, w) => { return $"{a} thrusts their razor-sharp spider claw towards {FormatPossessive(r)} heart"; });
+                descriptions.Add((a, r, w) => { return $"{a} swiftly lashes out at {r} with their spider claw, seeking to tear through the chest"; });
+                descriptions.Add((a, r, w) => { return $"{a} lunges forward, driving their claw towards {FormatPossessive(r)} throat"; });
+                descriptions.Add((a, r, w) => { return $"{a} curls their leg and strikes, aiming to embed their claw into {FormatPossessive(r)} abdomen"; });
+                descriptions.Add((a, r, w) => { return $"{a} leaps at {r}, trying to stab their spider claw into the back"; });
+                descriptions.Add((a, r, w) => { return $"{a} swiftly slashes towards {FormatPossessive(r)} chest with their sharp claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} darts forward, claw bared, aiming for {FormatPossessive(r)} neck"; });
+                descriptions.Add((a, r, w) => { return $"{a} twists and drives their claw towards {FormatPossessive(r)} ribs"; });
+                descriptions.Add((a, r, w) => { return $"{a} lunges at {r}, attempting to pierce their chest with the spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} slashes their claw at {FormatPossessive(r)} side, trying to cause deep cuts"; });
+                descriptions.Add((a, r, w) => { return $"{a} quickly strikes at {FormatPossessive(r)} head with their sharp claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} lunges and strikes at {FormatPossessive(r)} chest with their spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} strikes at {FormatPossessive(r)} heart with their spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} darts in, aiming to stab {r} with their sharp claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} swiftly stabs at {FormatPossessive(r)} neck with their spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} lunges forward and drives their claw towards {FormatPossessive(r)} chest"; });
+                descriptions.Add((a, r, w) => { return $"{a} strikes at {r} with their spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} quickly slashes at {FormatPossessive(r)} chest with their sharp claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} twists and lunges, stabbing at {r} with their claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} strikes at {FormatPossessive(r)} heart with a quick jab of their spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} drives their claw towards {FormatPossessive(r)} chest with a quick thrust"; });
+                descriptions.Add((a, r, w) => { return $"{a} slashes at {FormatPossessive(r)} head with their sharp spider claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} leaps and strikes at {FormatPossessive(r)} chest with their claw"; });
+                descriptions.Add((a, r, w) => { return $"{a} darts in with a quick stab at {FormatPossessive(r)} ribs with their spider claw"; });
+
+                AttackDescriptionsForType.Add(typeof(SpiderClaw), descriptions);
+            }
+        }
+
+        public static void CreateOffHandAttackDescriptions()
+        {
+            if (!OffHandAttackDescriptionsForType.ContainsKey(typeof(SpiderClaw)))
+            {
+                List<Func<string, string, Weapon, string>> offhandDescriptions = new List<Func<string, string, Weapon, string>>();
+                offhandDescriptions.Add((a, r, w) => { return $"{a} quickly snaps an off-hand claw strike towards {FormatPossessive(r)} neck"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} unexpectedly lunges with an off-hand claw, aiming for {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} uses an off-hand claw to stab at {FormatPossessive(r)} throat"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} performs a swift off-hand claw strike at {FormatPossessive(r)} heart"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} rotates unexpectedly and strikes with an off-hand claw at {FormatPossessive(r)} ribs"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} flicks an off-hand claw quickly at {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} uses an unanticipated off-hand claw strike from a side stance at {FormatPossessive(r)} back"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} twists slightly and strikes with an off-hand claw from a lower posture towards {FormatPossessive(r)} abdomen"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} shifts their weight subtly and snaps a quick off-hand claw from the side towards {FormatPossessive(r)} throat"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} delivers an off-hand claw strike from an adjusted stance, targeting {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} generates an off-hand claw strike from an off-angle, aiming directly at {FormatPossessive(r)} head"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} leans slightly and delivers an off-hand claw strike from the side towards {FormatPossessive(r)} heart"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} sets their feet in a shifted stance and explodes with an off-hand claw strike towards {FormatPossessive(r)} throat"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} subtly clenches and snaps an off-hand claw from a side angle towards {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} quickly steps in from the opposite side and delivers an off-hand claw strike towards {FormatPossessive(r)} ribs"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} finds an opening and sends an off-hand claw strike from a less expected angle towards {FormatPossessive(r)} neck"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} advances with an off-hand claw strike from a lowered stance targeting {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} concentrates and lashes out with an off-hand claw from a side posture towards {FormatPossessive(r)} throat"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} primes and connects an off-hand claw strike from an unconventional angle towards {FormatPossessive(r)} heart"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} braces and launches an off-hand claw strike from the side towards {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} shifts weight and drives an off-hand claw strike from a lowered position towards {FormatPossessive(r)} ribs"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} advances with an off-hand claw strike from an off-angle towards {FormatPossessive(r)} chest"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} angles their body slightly and strikes with an off-hand claw from the side towards {FormatPossessive(r)} neck"; });
+
+                OffHandAttackDescriptionsForType.Add(typeof(SpiderClaw), offhandDescriptions);
+            }
+        }
+    }
+}

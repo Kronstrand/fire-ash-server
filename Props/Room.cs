@@ -25,8 +25,8 @@ namespace fire_ash_server.Props
         public ThreadSafeList<Relationship> RelationshipsInHostileCombat = new ThreadSafeList<Relationship>();
         public ThreadSafeList<Exit> Exits = new ThreadSafeList<Exit>();
         public Action<Soul>? OnEnterEvent;
-        private List<Action> onCombatEvents = new List<Action>();
-        private List<Action> onCombatEventsToBeRemoved = new List<Action>();
+        private List<Action> onCombatEndEvents = new List<Action>();
+        private List<Action> onCombatEndEventsToBeRemoved = new List<Action>();
         public bool InCombat;
         private bool testCombatResolved;
         public bool AddCombatantsInCombatLoop;
@@ -356,7 +356,7 @@ namespace fire_ash_server.Props
                         if (CombatIsResolved())
                         {
                             DisableCombat(true);
-                            OnAfterCombat();
+                            OnAfterCombatEvents();
                             return;
                         }
                 }
@@ -364,19 +364,19 @@ namespace fire_ash_server.Props
             }
         }
 
-        private void OnAfterCombat()
+        private void OnAfterCombatEvents()
         {
-            foreach (Action afterCombatEvent in onCombatEvents)
+            foreach (Action afterCombatEvent in onCombatEndEvents)
                 afterCombatEvent();
 
-            onCombatEvents.RemoveAll(e => onCombatEventsToBeRemoved.Contains(e));
-            onCombatEventsToBeRemoved.Clear();
+            onCombatEndEvents.RemoveAll(e => onCombatEndEventsToBeRemoved.Contains(e));
+            onCombatEndEventsToBeRemoved.Clear();
         }
 
         public void AddOnAfterCombatEvent(Action action)
         {
-            onCombatEvents.Add(action);
-            onCombatEventsToBeRemoved.Add(action);
+            onCombatEndEvents.Add(action);
+            onCombatEndEventsToBeRemoved.Add(action);
         }
 
         private bool ExecuteCombatAction(Character character, Move? move)

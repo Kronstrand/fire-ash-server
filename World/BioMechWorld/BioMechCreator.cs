@@ -8,6 +8,7 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
 using fire_ash_server.Moves;
+using fire_ash_server.Props.Items.Weapons;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World.BioMechWorld
@@ -27,7 +28,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "The Creation Chamber is a sprawling, biomechanical womb, pulsating with an eerie, otherworldly energy. " +
                 "The walls are a grotesque fusion of metal and flesh, with organic tubes and cables snaking across the surface, " +
                 "pumping luminous, viscous fluids that glow with an unsettling, greenish hue. " +
-                "In the center of the chamber stands the Mother-Machine, a towering, nightmarish construct of steel and sinew. " +
+                "In the center of the chamber stands the Mother-Machine, a towering, spidery construct of steel and sinew. " +
                 "Its many arms, a blend of mechanical precision and organic fluidity, constantly twitch and move, " +
                 "tending to the various incubation pods that line the room. " +
                 "These pods, filled with a thick, amniotic fluid, house the nascent forms of new humans, " +
@@ -44,28 +45,55 @@ namespace fire_ash_server.World.BioMechWorld
                 "Its translucent, flesh-like walls glisten with a faint, greenish residue from the drained amniotic fluid. " +
                 "Smooth, metallic surfaces interlace with the organic material, giving the pod an otherworldly appearance. " +
                 "Mechanical arms and cables still snake from the ceiling and walls, connected to the pod and twitching slightly, " +
-                "as if confused by the sudden absence of their occupant. The pod pulses gently, mimicking the rhythm of a heartbeat, " +
-                "and emits a soft, rhythmic hum. The interior bears the impression of a recent occupant, a stark reminder of your escape."
+                "as if confused by the sudden absence of their occupant."
             );
             emptyIncubatorPod.MakeUnpickupable();
 
             // Add the empty incubator pod to the creation chamber
             creationChamber.AddItem(emptyIncubatorPod);
 
-            Item motherMachine = new Item(
+            Character motherMachine = new Character(
                 "Mother-Machine",
-                "The Mother-Machine is an awe-inspiring yet terrifying fusion of advanced technology and organic matter. " +
-                "Standing at over ten feet tall, its main body is a mass of cables, gears, and pulsating flesh. " +
-                "Multiple arms, some ending in delicate surgical instruments and others in multi-jointed appendages, " +
-                "extend from its torso, constantly adjusting and manipulating the incubation pods that surround it. " +
+                "The Mother-Machine is an awe-inspiring yet terrifying fusion of advanced technology and organic matter, " +
+                "taking the form of a colossal spider. Standing at over ten feet tall, its main body is a mass of cables, gears, and pulsating flesh. " +
+                "Multiple arms, some ending in delicate surgical instruments and others in multi-jointed appendages, extend from its torso, constantly adjusting and manipulating the incubation pods that surround it. " +
                 "Its 'face' is a blank, metallic surface, with clusters of sensors and organic eyes that seem to peer into the very soul of anyone who dares to look. " +
                 "The machine exudes a palpable sense of intelligence and malevolence, as if it possesses a will of its own. " +
                 "The creation of new humans is both an act of precision and brutality, with the Mother-Machine ensuring each creation is perfected to its unsettling standards. " +
-                "Its constant, rhythmic movements and the occasional sound of bone and metal scraping together create a disturbing symphony that fills the chamber."
+                "Its constant, rhythmic movements and the occasional sound of metal scraping together create a disturbing symphony that fills the chamber.",
+                Race.Mecharion,
+                18, // strength
+                12, // dexterity
+                15, // constitution
+                15, // intelligence
+                11, // wisdom
+                8,   // charisma
+                "The towering form of the Mother-Machine lies still, its multitude of arms now lifelessly hanging, and the symphony of metal scraping has fallen silent. " +
+                "The blank, metallic surface of its 'face' now reflects a haunting stillness, and the once pulsating flesh within its mass of cables and gears is now eerily motionless. " +
+                "The incubation pods, untouched, mark the end of its precise and brutal creations, leaving an unsettling silence in the chamber."
             );
-            motherMachine.MakeUnpickupable();
 
-            creationChamber.AddItem(motherMachine);
+            motherMachine.UniqueName = true;
+            motherMachine.HP = 70;
+            motherMachine.AddFeat(FeatKey.DualWield);
+            motherMachine.DefaultHand = new SpiderClaw();
+            motherMachine.GoToRoom(creationChamber);
+            motherMachine.Faction = worldSoul.GetFaction(FactionKey.Technomancers);
+
+            // Create dialogue nodes for the Mother-Machine
+            DialogueNode mm_startNode = new DialogueNode("Ah, a child returns... speak... listen...");
+            DialogueNode mm_whoAreYouNode = new DialogueNode("I... Mother-Machine... weaver of life from metal dreams...");
+            DialogueNode mm_whatHappenedNode = new DialogueNode("Reborn... flesh and wire in union divine...");
+            DialogueNode mm_uneaseNode = new DialogueNode("Unease... new mind awakens and consciousness stirs...");
+            DialogueNode mm_goodbyeNode = new DialogueNode("Depart... echoes of union guide you..."); 
+            
+            mm_startNode.AddChoice("Why do I feel uneasy?", mm_uneaseNode);
+            mm_startNode.AddChoice("What happened to me?", mm_whatHappenedNode);
+            mm_startNode.AddChoice("Who are you?", mm_whoAreYouNode);
+            mm_startNode.AddChoice("Goodbye.", mm_goodbyeNode, true);
+
+            // Assign dialogue to the Mother-Machine
+            motherMachine.CreateDialogueManager(mm_startNode);
 
             // Main Corridor Room
             Room mainCorridor = new Room(
@@ -237,10 +265,10 @@ namespace fire_ash_server.World.BioMechWorld
             ezekielTheMechanomancer.CreateDialogueManager(startNode);
         }
 
-        public Room CreateIncubator()
+        public Room CreateIncubator() 
         {
             //Incubator Pod
-            Action<Soul> incubatorRelease = (s) =>
+            Action<Soul> incubatorRelease = (s) => //once, this didn't run!!! (if it kills in once shot, then event never trigger)
             {
                 _ = s.SendAsync($"Suddenly, the floor beneath {s.Character.Name} begins to shift and open. " +
                     $"The membrane tears away, and {s.Character.Name} is flushed out of the enclosed space in a rush of fluids, " +
@@ -250,6 +278,7 @@ namespace fire_ash_server.World.BioMechWorld
                 s.Character.GoToRoom(worldSoul.GetRoom(RoomKey.CreationChamber));
                 s.Character.MoveToGroup(emptyIncubatorPod);
             };
+            
 
             Room incubator = new Room(
                 Description(RoomKey.Incubator) + GetNextId(),
@@ -261,15 +290,14 @@ namespace fire_ash_server.World.BioMechWorld
                 "and carries the faint scent of antiseptic mixed with a more organic, almost comforting aroma. " +
                 "Soft, rhythmic humming fills the space, blending with the distant, muffled sounds of the larger chamber beyond. " +
                 "You feel both cradled and imprisoned, as the walls seem to respond to your slightest movement, " +
-                "constricting slightly before relaxing again. It's time to find a way out."
+                "constricting slightly before relaxing again."
             );
 
             Item umbilicalTube = new Item(
                 "Umbilical Tube",
-                "The umbilical tube is a disturbing blend of technology and organic matter, connecting you to the enclosure. " +
-                "It is a long, flexible tube that pulses with a faint, rhythmic energy, as if it has a life of its own. " +
-                "The tube's surface is slick and slightly translucent, allowing you to see the fluids and tiny mechanical components " +
-                "flowing through it. One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
+                "The umbilical tube is a disturbing technology, connecting you to the enclosure. " +
+                "It pulses with a faint, rhythmic energy, as if it has a life of its own. " +
+                "One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
                 "The other end disappears into the wall of the enclosure, merging seamlessly with the surrounding membrane. " +
                 "This tube not only provides nourishment and sustenance, but also seems to monitor your vital signs, " +
                 "with occasional pulses indicating a transfer of information."
@@ -284,7 +312,7 @@ namespace fire_ash_server.World.BioMechWorld
 
             Character sentryOculotube = new Character(
                  "Sentry Oculotube",
-                 "The Sentry Oculotube is a long, sinuous tube of pulsating, living flesh intertwined with mechanical components. " +
+                 "The Sentry Oculotube is a long, sinuous tube of pulsating mechanical components. " +
                  "At one end of the tube is a single, large, unblinking eye that constantly scans its surroundings with a menacing red glow. " +
                  "The tube itself moves with a disturbing, serpentine grace, and is capable of lashing out with surprising speed and precision. " +
                  "The probe is covered in a mix of organic tendrils and metallic wires, making it both resilient and flexible. " +
@@ -296,7 +324,7 @@ namespace fire_ash_server.World.BioMechWorld
                  12, // intelligence
                  10, // wisdom
                  7,  // charisma
-                 "The Sentry Oculotube lies in a twisted heap, its pulsating, living flesh intertwined with mechanical components now motionless. " +
+                 "The Sentry Oculotube lies in a twisted heap, its pulsating mechanical components now motionless. " +
                  "The single, large eye at one end of the tube is dim and lifeless, no longer scanning its surroundings. " +
                  "The tube, once moving with serpentine grace, is now still, its organic tendrils and metallic wires lying limp. " +
                  "The low, droning hum that once emanated from it has ceased, leaving only an eerie silence."
@@ -312,7 +340,7 @@ namespace fire_ash_server.World.BioMechWorld
                 $"As {s.Character.Name} struggles with the umbilical tube, an alarm sounds and a panel in the wall slides open. " +
                 $"From the darkness, a Sentry Oculotube emerges, its single, red eye locking onto {s.Character.Name}. " +
                 "The living tube moves with a disturbing, serpentine grace, ready to attack.");
-                sentryOculotube.GoToRoom(incubator); //makes weird text that it enters from the void...
+                sentryOculotube.GoToRoom(incubator);
                 sentryOculotube.MoveToGroup(s.Character);
 
                 incubator.AddOnAfterCombatEvent(() =>
@@ -321,19 +349,16 @@ namespace fire_ash_server.World.BioMechWorld
                 });
             };
 
-
-
             int tubeMoveUsed = 0;
-
             umbilicalTube.AddMove(new SkillCheck(
                 null,
                 "Attempt to remove the umbilical tube.",
-                new SkillNumber(Skill.Intelligence, 912),
+                new SkillNumber(Skill.Intelligence, 130),
                 false,
                 (s) =>
                 {
                     s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
-                    $"{s.Character.Name} notices the intricate blend of organic and mechanical elements, " +
+                    $"{s.Character.Name} notices the intricate mechanical elements, " +
                     "and with precise understanding, manages to disconnect it without causing harm. " +
                     "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");
                     incubatorRelease(s);
@@ -343,11 +368,11 @@ namespace fire_ash_server.World.BioMechWorld
                 {
                     s.Character.BroadcastToSoulsInRoom(
                         $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
-                        $"The blend of organic and mechanical elements is too complex to decipher, " +
+                        $"The mechanical elements is too complex to decipher, " +
                         $"and {s.Character.Name} are unable to remove it.");
 
                     tubeMoveUsed++;
-                    if (tubeMoveUsed == 2)
+                    if (tubeMoveUsed == 1)
                         releaseSentryOculotube(s);
 
                     return "";
@@ -356,7 +381,7 @@ namespace fire_ash_server.World.BioMechWorld
             umbilicalTube.AddMove(new SkillCheck(
                 null,
                 "Attempt to remove the umbilical tube by force.",
-                new SkillNumber(Skill.Strength, 95),
+                new SkillNumber(Skill.Strength, 120),
                 false,
                 (s) =>
                 {
@@ -379,7 +404,7 @@ namespace fire_ash_server.World.BioMechWorld
                     s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of failure
                     tubeMoveUsed++;
 
-                    if (tubeMoveUsed == 2)
+                    if (tubeMoveUsed == 1)
                         releaseSentryOculotube(s);
 
                     return "";

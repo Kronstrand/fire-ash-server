@@ -65,6 +65,11 @@ namespace fire_ash_server
             return descriptionAttribute?.Description ?? value.ToString();
         }
 
+        public static string FormatPossessive(string name)
+        {
+            return name.EndsWith("s") ? name + "'" : name + "'s";
+        }
+
         public static int[] Roll(int numberOfDies, int die)
         { 
             Random rnd = new Random();

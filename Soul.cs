@@ -114,7 +114,6 @@ namespace fire_ash_server
         public async Task<string> ReceiveAsync()
         {
             if (Socket == null) throw new ArgumentNullException(nameof(Socket), "Socket cannot be null when sending to server");
-
             byte[] buffer = new byte[1024];
 
             CancelAndResetTokenSource();
@@ -466,7 +465,6 @@ namespace fire_ash_server
             }
             catch (OperationCanceledException)
             {
-                //await Character.Soul.SendAsync($"{Character.Name} was interupted by combat..");
                 Console.WriteLine($"{Character.Name} loop was interrupted by combat.");
                 return;
             }

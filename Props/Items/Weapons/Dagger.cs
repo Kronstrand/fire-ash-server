@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
@@ -67,7 +68,7 @@ namespace fire_ash_server.Props.Items.Weapons
                 descriptions.Add((a, r, w) => { return $"{a} displays a masterful grip, the {w.Name} spiraling towards {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} elicits a silent gasp from the air, the {w.Name} slicing a hushed threat at {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} choreographs a quick lunge, {w.Name} aimed squarely at {r}"; });
-                descriptions.Add((a, r, w) => { return $"{a} maneuvers with the subtlety of smoke, their {w.Name} manifesting suddenly at {r}'s flank"; });
+                descriptions.Add((a, r, w) => { return $"{a} maneuvers with the subtlety of smoke, their {w.Name} manifesting suddenly at {FormatPossessive(r)} flank"; });
                 descriptions.Add((a, r, w) => { return $"{a} deploys the {w.Name} with surgical precision, its tip tracing a deadly trajectory towards {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} employs a swift twist of their wrist, the {w.Name} diving daringly towards {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} executes a nimble sidestep, redirecting their {w.Name}'s bite towards {r}"; });
@@ -85,21 +86,21 @@ namespace fire_ash_server.Props.Items.Weapons
             {
                 List<Func<string, string, Weapon, string>> offhandDescriptions = new List<Func<string, string, Weapon, string>>();
                 offhandDescriptions.Add((a, r, w) => { return $"{a} stealthily extends their off-hand, {w.Name} slicing a quick, sharp line towards {r}"; });
-                offhandDescriptions.Add((a, r, w) => { return $"{a} subtly shifts their off-hand {w.Name}, aiming a precise, low stab towards {r}'s abdomen"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} subtly shifts their off-hand {w.Name}, aiming a precise, low stab towards {FormatPossessive(r)} abdomen"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} catches {r} off-guard with a sudden off-hand jab, the {w.Name} aiming for a tender spot"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} with a slight twist, their off-hand {w.Name} cuts an elusive path towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} uses their off-hand to flick the {w.Name} in a deceptive, angular strike towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} quickly switches their {w.Name} to the off-hand, delivering a stabbing thrust unexpectedly towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} feints with the main hand, while the off-hand {w.Name} slices horizontally towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} keeps their {w.Name} low and unseen, then suddenly drives it upward in an off-hand thrust"; });
-                offhandDescriptions.Add((a, r, w) => { return $"{a} redirects {r}'s attention before the off-hand {w.Name} makes a silent plea for contact"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} redirects {FormatPossessive(r)} attention before the off-hand {w.Name} makes a silent plea for contact"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} manipulates the shadows, the off-hand {w.Name} emerging with a deadly intent towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} maintains a relaxed posture before the off-hand {w.Name} lunges in a swift, piercing motion"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} with a calculated pause, then a swift off-hand motion, the {w.Name} aims directly at {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} ensures their off-hand {w.Name} moves in a tight spiral, driving menacingly towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} employs a quick sidestep, their off-hand {w.Name} tracing a lethal half-circle"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} lets the {w.Name} in their off-hand whisper a threat, barely audible before it strikes towards {r}"; });
-                offhandDescriptions.Add((a, r, w) => { return $"{a} cradles the {w.Name} in the off-hand before it springs forth in a blink, aiming for {r}'s midsection"; });
+                offhandDescriptions.Add((a, r, w) => { return $"{a} cradles the {w.Name} in the off-hand before it springs forth in a blink, aiming for {FormatPossessive(r)} midsection"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} offers a slight nod, the prelude to the off-hand {w.Name}'s rapid journey towards {r}"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} masks the movement of their off-hand, the {w.Name} then darting towards {r} with lethal precision"; });
 

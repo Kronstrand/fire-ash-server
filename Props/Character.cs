@@ -38,6 +38,8 @@ namespace fire_ash_server.Props
         public int Proficiency { get; set; }
         public int HP { get; set; }
 
+        public Weapon DefaultHand = new Fist();
+
         public bool UniqueName;
 
         public List<string> Feats = new List<string>();
@@ -278,7 +280,7 @@ namespace fire_ash_server.Props
                 if (mainHand is Weapon)
                     return (Weapon)mainHand;
 
-            return new Fist();
+            return DefaultHand;
         }
 
         public Weapon GetOffHand()
@@ -287,7 +289,7 @@ namespace fire_ash_server.Props
                 if (offHand is Weapon)
                     return (Weapon)offHand;
 
-            return new Fist();
+            return DefaultHand;
         }
 
         public bool TryUnequipFromSlot(InventorySlot inventorySlot)
