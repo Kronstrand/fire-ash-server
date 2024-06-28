@@ -112,7 +112,11 @@ namespace fire_ash_server.Props
             if (enemy != null)
             {
                 if (enemy.Dead)
-                    return;
+                {
+                    if (!InCombat)
+                        OnAfterCombatEvents();
+                    return;  //this might be problematic, since if there is more monsters in room, combat will not be triggered on onceshot.
+                }
 
                 enabledBy.AddRelatedRelationshipToCombat(enemy);
             }
