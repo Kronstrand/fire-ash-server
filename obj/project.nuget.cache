@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BfFwwZNq5pOv3Pp74b/YGTfTwQBzQjmjZJ+a4sOd33mO3YM0CH5oDrKo8QBiPIixwBXM9XRVux3VlGE5IkXznA==",
+  "dgSpecHash": "DLjXcDaDE4jMgte5NfxyiXzT3FZ0FiHz5pLYLkTc7xMlsH2yt6Ocw/CdMZhP2BpbrLSHxM3pU7w4praYVF89Xg==",
   "success": true,
-  "projectFilePath": "/Users/moonstone/Documents/code/fire-ash-server/fire-ash-server.csproj",
+  "projectFilePath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

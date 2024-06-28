@@ -91,7 +91,6 @@ namespace fire_ash_server.World
         {
             try
             {
-                
                 Console.WriteLine("A soul entered the world.");
 
                 soul.Character = new Character(soul, "Player" + Souls.Count);

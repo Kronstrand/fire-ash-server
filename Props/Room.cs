@@ -111,17 +111,19 @@ namespace fire_ash_server.Props
         {
             if (enemy != null)
             {
-                if (enemy.Dead)
+                /*if (enemy.Dead)
                 {
-                    if (!InCombat)
-                        OnAfterCombatEvents();
+                    //if (!InCombat)
+                    //    OnAfterCombatEvents();
                     return;  //this might be problematic, since if there is more monsters in room, combat will not be triggered on onceshot.
-                }
+                }*/
 
                 enabledBy.AddRelatedRelationshipToCombat(enemy);
             }
 
             AddHostileRelationshipsToCombat();
+
+            bool addedLivingCharacter = false;
 
             List<Faction> factionsInCombat = GetFactionInCombat();
             foreach (Character character in Characters)
@@ -131,6 +133,9 @@ namespace fire_ash_server.Props
 
                 character.InCombat = true;
 
+                if (character != enabledBy && !character.Dead)
+                    addedLivingCharacter = true;            
+
                 if (character.Soul.IsDaemon)
                     if (character.IsInHostileCombatWith(enabledBy))
                         character.SetLookAt(enabledBy);
@@ -139,6 +144,11 @@ namespace fire_ash_server.Props
 
             if (InCombat)
                 return;
+            else if (!InCombat && !addedLivingCharacter) //targets are dead and combat is resolved (before it started)
+            {
+                DisableCombat(false);
+                return;
+            }
 
             enabledBy.BroadcastToSoulsInRoom("Combat breaks out...");
             _ = RunCombatLoopForRoom(enabledBy);
@@ -191,6 +201,8 @@ namespace fire_ash_server.Props
             if (broadcast)
                 BroadcastToSoulsInRoom($"Combat is resolved.");
             Console.WriteLine("Combat has ended.");
+            
+            OnAfterCombatEvents();
         }
 
         public void TestCombatIsResolved()
@@ -242,8 +254,6 @@ namespace fire_ash_server.Props
                 {
                     initiativeRolls.Add(character, character.RollInitiative());
                 }
-                //if (character.Soul.Socket != null && character.CharacterLoopIsActive)
-                    //character.Soul.CancelTokenSource.Cancel();
             }
 
             return combatCharacters.OrderByDescending(character => initiativeRolls[character]).ToList();
@@ -360,7 +370,6 @@ namespace fire_ash_server.Props
                         if (CombatIsResolved())
                         {
                             DisableCombat(true);
-                            OnAfterCombatEvents();
                             return;
                         }
                 }
