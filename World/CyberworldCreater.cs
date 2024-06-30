@@ -117,9 +117,10 @@ namespace fire_ash_server.World
                 "Draped in a cloak of shifting pixels, their appearance is as elusive as their motives. " +
                 "Their eyes, hidden behind a visor of constantly updating data, scan their surroundings with an almost predatory focus. " +
                 "Bytewhisper is known for their expertise in digital warfare, able to manipulate data and electronics with a mere thought. " +
-                "They move with the grace of a shadow, their presence often unnoticed until it’s too late. " +
+                "They move with the grace of a shadow, their presence often unnoticed until it's too late. " +
                 "Despite their intimidating skill set, Bytewhisper is rumored to assist those who find themselves lost in the digital labyrinth of the city.",
                 Race.Cyborg, // race
+                CreatureType.Humanoid,
                 8,  // strength - enhanced by cybernetic augmentations
                 16, // dexterity - incredibly agile, especially in the digital realm
                 10, // constitution - moderately tough, with cybernetic enhancements for resilience

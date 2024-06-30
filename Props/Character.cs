@@ -27,6 +27,7 @@ namespace fire_ash_server.Props
         public Room CurrentRoom;
         private Prop? lookAt;
         public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
+        private List<CreatureType> types;
         public Race Race { get; set; }
         public Gender Gender { get; set; }
         public int Strength { get; set; }
@@ -62,12 +63,12 @@ namespace fire_ash_server.Props
 
         public Character(Soul soul, string name) : base(name, "")
         {
-            
             CurrentRoom = Program.WorldSoul.GetRoom(RoomKey.Void);
             Soul = soul;
 
             init();
 
+            types = new List<CreatureType> { CreatureType.Humanoid };
             Race = Race.Human;
             Gender = RollGender();
             Strength = Roll(3, 6).Sum();
@@ -86,12 +87,13 @@ namespace fire_ash_server.Props
 
             DeathDescription = "todo"; //Todo
         }
-        public Character(string name, string description, Race race , int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
+        public Character(string name, string description, Race race, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
         {
 
             CurrentRoom = Program.WorldSoul.Rooms[Description(RoomKey.Void)];
             init();
 
+            types = new List<CreatureType> {creatureType};
             Race = race;
             Gender = RollGender();
             Strength = strength;
@@ -111,6 +113,16 @@ namespace fire_ash_server.Props
         public void init()
         {
             Inventory.HeldBy = this;
+        }
+
+        public void AddCreatureType(CreatureType creatureType)
+        {
+            types.Add(creatureType);
+        }
+
+        public bool IsOfCreatureType(CreatureType creatureType)
+        {
+            return types.Contains(creatureType);
         }
 
         public void ModifyRelationshipTo(Character? character, int modifyer)
@@ -222,12 +234,12 @@ namespace fire_ash_server.Props
             if (weapon == null)
                 return null;
 
-            return weapon.GetAttackDescription(Name, prop.Name);
+            return weapon.GetAttackDescription(Name, prop);
         }
 
         public string? GetMainHandAttackDescription(Prop prop)
         {
-            return GetMainHand().GetAttackDescription(Name, prop.Name);
+            return GetMainHand().GetAttackDescription(Name, prop);
         }
 
         public string? GetOffHandAttackDescription(Prop prop)

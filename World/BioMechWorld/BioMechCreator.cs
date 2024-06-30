@@ -62,6 +62,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "The creation of new humans is both an act of precision and brutality, with the Mother-Machine ensuring each creation is perfected to its unsettling standards. " +
                 "Its constant, rhythmic movements and the occasional sound of metal scraping together create a disturbing symphony that fills the chamber.",
                 Race.Mecharion,
+                CreatureType.Construct,
                 18, // strength
                 12, // dexterity
                 15, // constitution
@@ -129,7 +130,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "His other eyes? Only God and Ezekiel himself know in which dimensions these are prying." +
                 "He wears a long, tattered robe adorned with glowing runes and circuitry, and his deep, gravelly voice echoes with a mechanical timbre.",
             Race.Mecharion,
-            14, //strenght
+            CreatureType.Humanoid,
+            14, //strength
             10, //dexterity
             11, //constitution
             16, //intelligence
@@ -187,11 +189,19 @@ namespace fire_ash_server.World.BioMechWorld
             DialogueNode motherMachineNode = new DialogueNode("Ah, the Mother Machine, a marvel of sinew and steel! She takes us, reshapes us. Some were sold, some were prisoners, but all are reborn here. Now, you're a Mecharion, part of this grand design.");
             DialogueNode attackNode = new DialogueNode("The facility is under siege! The Purists have come, a fanatical group that condemns our beautiful union of flesh and technology. They seek to destroy the Mother Machine and all her creations.");
             DialogueNode puristsNode = new DialogueNode("The Purists, zealots who believe our existence is an abomination. They think they can 'cleanse' us by tearing down everything we've become. Fools, the lot of them.");
-            DialogueNode identityNode = new DialogueNode("Your story? Ha! Each of us has a unique tale, a reason we ended up here. But the Mother Machine doesn’t care for our pasts, only for what we become.");
-            DialogueNode missionNode = new DialogueNode("Ah, my precious, we face dire times. The Purists, with their cold, unyielding ideology, have breached our sanctum. They seek to destroy the Mother Machine, our ancient lifeline that maintains the balance between technology and nature. To them, it’s a blasphemy they must purge to create their vision of purity. Without it, our world would wither, and chaos would reign.\n\nLeading them is the Vicar of Purity—once my closest ally, now my most bitter adversary. His name was Elias, a brilliant mind twisted by fanaticism. He believes that only by destroying the Mother Machine can he cleanse the world. His mastery over mind and matter makes him a perilous foe.\n\nWe must defend what we hold dear. Find Elias, disrupt his plans, and show him we will not be undone.");
+            DialogueNode identityNode = new DialogueNode("Your story? Ha! Each of us has a unique tale, a reason we ended up here. But the Mother Machine doesn't care for our pasts, only for what we become.");
+            DialogueNode missionNode = new DialogueNode("Ah, my precious, we face dire times. The Purists, with their cold, unyielding ideology, have breached our sanctum. They seek to destroy the Mother Machine, our ancient lifeline that maintains the balance between technology and nature. To them, it's a blasphemy they must purge to create their vision of purity. Without it, our world would wither, and chaos would reign.\n\nLeading them is the Vicar of Purity—once my closest ally, now my most bitter adversary. His name was Elias, a brilliant mind twisted by fanaticism. He believes that only by destroying the Mother Machine can he cleanse the world. His mastery over mind and matter makes him a perilous foe.\n\nWe must defend what we hold dear. Find Elias, disrupt his plans, and show him we will not be undone.");
             DialogueNode eliasNode = new DialogueNode("Elias and I were once visionaries, united by our desire to blend technology and nature harmoniously. We spent countless nights debating, designing, and dreaming. He was brilliant, passionate, and relentless in his pursuit of knowledge.\n\nBut then, tragedy struck. As we were working on the Mother Machine, Elias's daughter, Lily, fell gravely ill. Desperate to save her, Elias submitted her to the Mother Machine before we had fully tested its capabilities. He believed it could cure her, melding her illness away through a perfect synthesis of organic and synthetic life.\n\nHowever, the result was horrific. The machine malfunctioned, and instead of healing her, it twisted her into a grotesque fusion of flesh and metal. Consumed by guilt and grief, Elias became convinced that the Mother Machine was an abomination, a monstrous creation that must be destroyed.\n\nOur bond shattered when he declared his intention to eradicate it. I opposed him, believing it was the cornerstone of our world's harmony. He saw my resistance as a betrayal, and I, his fanaticism as madness. He left, vowing to return and cleanse our world by any means necessary. Now, he leads the Purists, driven by his tragic past and a warped sense of purpose.");
             DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path. We will meet again.");
-            DialogueNode smallTalkNode1 = new DialogueNode("This place, it's more than just metal and circuits. It's alive, a sanctuary for those like us. The bond we share with the machine is profound.");
+            DialogueNode smallTalkNode1 = new DialogueNode(
+                "This place is no ordinary structure of metal and circuits; it is a hive, teeming with life, a sanctuary crafted by my own hands. " +
+                "Here, the essence of our bond with the machine is palpable. The walls throb with the energy of new life being forged. " +
+                "Each conduit pulses with the promise of creation, and every circuit sings with potential. We are not merely inhabitants; we are the lifeblood of this biomechanical nest. " +
+                "Within this hive, we shed our mortal limitations, merging seamlessly with the organic and the mechanical. " +
+                "In this sacred space, amidst the soothing hum of the machinery and the steady heartbeat of the living walls, we birth new forms. " +
+                "This is our cradle, our refuge, where the union of flesh and technology thrives in perfect harmony. " +
+                "It is here that I take the greatest pride, in nurturing the next generation of our kind."
+            );
             DialogueNode smallTalkNode2 = new DialogueNode("Ah, you want to know about me? I was a scholar once, fascinated by the merger of flesh and technology. Now, I am a part of that merger. Strange how destiny works, isn't it?");
 
             // Main dialogue choices
@@ -268,7 +278,7 @@ namespace fire_ash_server.World.BioMechWorld
         public Room CreateIncubator() 
         {
             //Incubator Pod
-            Action<Soul> incubatorRelease = (s) => //once, this didn't run!!! (if it kills in once shot, then event never trigger)
+            Action<Soul> incubatorRelease = (s) =>
             {
                 _ = s.SendAsync($"Suddenly, the floor beneath {s.Character.Name} begins to shift and open. " +
                     $"The membrane tears away, and {s.Character.Name} is flushed out of the enclosed space in a rush of fluids, " +
@@ -277,8 +287,7 @@ namespace fire_ash_server.World.BioMechWorld
                     $"surrounded by the eerie, mechanical environment of the larger chamber.");
                 s.Character.GoToRoom(worldSoul.GetRoom(RoomKey.CreationChamber));
                 s.Character.MoveToGroup(emptyIncubatorPod);
-            };
-            
+            }; 
 
             Room incubator = new Room(
                 Description(RoomKey.Incubator) + GetNextId(),
@@ -310,38 +319,40 @@ namespace fire_ash_server.World.BioMechWorld
                 s.Character.MoveToGroup(umbilicalTube);
             };
 
-            Character sentryOculotube = new Character(
-                 "Sentry Oculotube",
-                 "The Sentry Oculotube is a long, sinuous tube of pulsating mechanical components. " +
-                 "At one end of the tube is a single, large, unblinking eye that constantly scans its surroundings with a menacing red glow. " +
-                 "The tube itself moves with a disturbing, serpentine grace, and is capable of lashing out with surprising speed and precision. " +
+            Character ocularSentinel = new Character(
+                 "Ocular Sentinel",
+                 "The Ocular Sentinel is a long, sinuous creature of pulsating mechanical components. " +
+                 "At one end of the sentinel is a single, large, unblinking eye that constantly scans its surroundings with a menacing red glow. " +
+                 "The sentry itself moves with a disturbing, serpentine grace, and is capable of lashing out with surprising speed and precision. " +
                  "The probe is covered in a mix of organic tendrils and metallic wires, making it both resilient and flexible. " +
                  "It emits a low, droning hum, adding to its eerie presence.",
                  Race.Mecharion,
-                 8,  // strength
+                 CreatureType.Construct,
+                 6,  // strength
                  10, // dexterity
-                 8, // constitution
+                 9, // constitution
                  12, // intelligence
                  10, // wisdom
-                 7,  // charisma
-                 "The Sentry Oculotube lies in a twisted heap, its pulsating mechanical components now motionless. " +
+                 8,  // charisma
+                 "The Ocular Sentinel lies in a twisted heap, its pulsating mechanical components now motionless. " +
                  "The single, large eye at one end of the tube is dim and lifeless, no longer scanning its surroundings. " +
                  "The tube, once moving with serpentine grace, is now still, its organic tendrils and metallic wires lying limp. " +
-                 "The low, droning hum that once emanated from it has ceased, leaving only an eerie silence."
+                 "The low, droning hum that once emanated from it has ceased."
  );
-            sentryOculotube.UniqueName = true;
-            sentryOculotube.HP = 2;
-            sentryOculotube.AddFeat(FeatKey.MeleeAttack);
-            sentryOculotube.Faction = worldSoul.GetFaction(FactionKey.Technomancers);
+            ocularSentinel.UniqueName = true;
+            ocularSentinel.HP = 2;
+            ocularSentinel.AddFeat(FeatKey.MeleeAttack);
+            ocularSentinel.DefaultHand = new Tendril();
+            ocularSentinel.Faction = worldSoul.GetFaction(FactionKey.Technomancers);
 
-            Action<Soul> releaseSentryOculotube = (s) =>
+            Action<Soul> releaseSentry = (s) =>
             {
                 s.Character.BroadcastToSoulsInRoom(
                 $"As {s.Character.Name} struggles with the umbilical tube, an alarm sounds and a panel in the wall slides open. " +
-                $"From the darkness, a Sentry Oculotube emerges, its single, red eye locking onto {s.Character.Name}. " +
+                $"From the darkness, a {ocularSentinel.Name} emerges, its single, red eye locking onto {s.Character.Name}. " +
                 "The living tube moves with a disturbing, serpentine grace, ready to attack.");
-                sentryOculotube.GoToRoom(incubator);
-                sentryOculotube.MoveToGroup(s.Character);
+                ocularSentinel.GoToRoom(incubator);
+                ocularSentinel.MoveToGroup(s.Character);
 
                 incubator.AddOnAfterCombatEvent(() =>
                 {
@@ -368,12 +379,14 @@ namespace fire_ash_server.World.BioMechWorld
                 {
                     s.Character.BroadcastToSoulsInRoom(
                         $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
-                        $"The mechanical elements is too complex to decipher, " +
-                        $"and {s.Character.Name} are unable to remove it.");
+                        $"The mechanical elements are too complex to decipher, " +
+                        $"and {s.Character.Name} is unable to remove it.");
 
                     tubeMoveUsed++;
                     if (tubeMoveUsed == 1)
-                        releaseSentryOculotube(s);
+                        releaseSentry(s);
+                    else if ((tubeMoveUsed == 2))
+                        s.Character.EnableCombatWith = ocularSentinel;
 
                     return "";
                 }
@@ -402,10 +415,12 @@ namespace fire_ash_server.World.BioMechWorld
                         $"and the effort leaves {s.Character.Name} exhausted with the tube still firmly attached. " +
                         "Blood trickles from where the tube meets the skin.");
                     s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of failure
+                    
                     tubeMoveUsed++;
-
                     if (tubeMoveUsed == 1)
-                        releaseSentryOculotube(s);
+                        releaseSentry(s);
+                    else if ((tubeMoveUsed == 2))
+                        s.Character.EnableCombatWith = ocularSentinel;
 
                     return "";
                 }

@@ -160,6 +160,7 @@ namespace fire_ash_server.World
                 "Despite its gentle demeanor, it possesses a formidable ability to harness light, using it to heal allies or dazzle foes. " +
                 "Its fingers, though delicate, are capable of weaving complex enchantments, protecting the forest from those who mean harm.",
                 Race.Elf, // race
+                CreatureType.Humanoid,
                 7,  // strength - not strong, relies on magical abilities and wisdom
                 14, // dexterity - graceful and quick, especially in well-lit areas
                 9,  // constitution - not very tough, but has mystical protections
@@ -170,7 +171,7 @@ namespace fire_ash_server.World
                 "Its shimmering golden skin, once a beacon of warmth and safety, now fades to a pale, serene glow. " +
                 "The light in its eyes has dimmed, yet a softness remains, as if it still watches over the woods it loved. " +
                 "Even in stillness, the Dawnwhisper exudes a sense of tranquility, its hands folded as if in final prayer, " +
-                "ensuring the forest’s light never truly fades.");
+                "ensuring the forest's light never truly fades.");
             dawnwhisper.HP = 15;
             dawnwhisper.AddFeat(FeatKey.DualWield);
             dawnwhisper.GoToRoom(whisperingForest);

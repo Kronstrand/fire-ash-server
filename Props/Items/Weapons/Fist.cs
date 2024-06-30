@@ -13,13 +13,82 @@ namespace fire_ash_server.Props.Items.Weapons
     {
         public Fist() : base("Fist", "Fist", new Die(1, 1), DamageType.Bludgeoning)
         {
-            CreateAttackDescriptions();
-            CreateOffHandAttackDescriptions();
+            CreateGeneralAttackDescriptions();
+            CreateGeneralOffHandAttackDescriptions();
+            CreateHumanoidAttackDescriptions();
+            CreateHumanoidOffHandAttackDescriptions();
         }
 
-        public static void CreateAttackDescriptions()
+        public static void CreateGeneralAttackDescriptions()
         {
-            if (!AttackDescriptionsForType.ContainsKey(typeof(Fist)))
+            if (!GeneralAttackDescriptionsForType.ContainsKey(typeof(Fist)))
+            {
+                List<Func<string, string, Weapon, string>> descriptions = new List<Func<string, string, Weapon, string>>();
+                descriptions.Add((a, r, w) => $"{a} delivers a forceful punch towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} throws a powerful hook at {r}.");
+                descriptions.Add((a, r, w) => $"{a} executes a spinning backhand punch directed at {r}.");
+                descriptions.Add((a, r, w) => $"{a} hurls a devastating overhand right towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} channels momentum into a crushing blow to {r}.");
+                descriptions.Add((a, r, w) => $"{a} delivers a sharp jab towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} rears back and launches a swift uppercut at {r}.");
+                descriptions.Add((a, r, w) => $"{a} throws a strong straight punch at {r}.");
+                descriptions.Add((a, r, w) => $"{a} releases a forceful hook towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} adjusts their footing and delivers a rapid punch at {r}.");
+                descriptions.Add((a, r, w) => $"{a} launches a brutal cross towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} propels a vicious jab directly at {r}.");
+                descriptions.Add((a, r, w) => $"{a} fires a quick straight punch at {r}.");
+                descriptions.Add((a, r, w) => $"{a} unleashes a powerful uppercut at {r}.");
+                descriptions.Add((a, r, w) => $"{a} swings a fierce hook towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} delivers a solid jab at {r}.");
+                descriptions.Add((a, r, w) => $"{a} sends a heavy straight punch towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} lunges forward with a forceful uppercut at {r}.");
+                descriptions.Add((a, r, w) => $"{a} fires a rapid hook at {r}.");
+                descriptions.Add((a, r, w) => $"{a} strikes with a devastating right cross towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} slams a powerful jab into {r}.");
+                descriptions.Add((a, r, w) => $"{a} unleashes a sharp hook towards {r}.");
+                descriptions.Add((a, r, w) => $"{a} hammers a quick uppercut at {r}.");
+                descriptions.Add((a, r, w) => $"{a} delivers a crushing punch to {r}.");
+
+                GeneralAttackDescriptionsForType.Add(typeof(Fist), descriptions);
+            }
+        }
+
+        public static void CreateGeneralOffHandAttackDescriptions()
+        {
+            if (!GeneralOffHandAttackDescriptionsForType.ContainsKey(typeof(Fist)))
+            {
+                List<Func<string, string, Weapon, string>> offhandDescriptions = new List<Func<string, string, Weapon, string>>();
+                offhandDescriptions.Add((a, r, w) => $"{a} snaps an off-hand jab towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} unexpectedly swings an off-hand hook at {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} uses an off-hand reverse slap directed at {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} performs a swift off-hand overhand strike towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} rotates and throws an off-hand backhand strike at {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} flicks an off-hand jab quickly towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} strikes with an off-hand straight punch from a side stance at {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} twists and delivers an off-hand hook towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} shifts weight and pops a quick off-hand punch from the side towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} delivers an off-hand cross from an adjusted stance towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} generates an off-hand jab from an off-angle towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} leans and delivers an off-hand straight punch from the side towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} sets their feet and explodes with an off-hand uppercut towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} clenches and swings an off-hand hook from a side angle towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} steps in and delivers an off-hand jab towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} finds an opening and sends an off-hand straight punch towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} advances with an off-hand uppercut towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} lashes out with an off-hand hook towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} primes and connects an off-hand cross towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} launches an off-hand jab towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} shifts weight and drives an off-hand hook towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} advances with an off-hand uppercut towards {r}.");
+                offhandDescriptions.Add((a, r, w) => $"{a} angles their body and strikes with an off-hand punch towards {r}.");
+
+                GeneralOffHandAttackDescriptionsForType.Add(typeof(Fist), offhandDescriptions);
+            }
+        }
+
+        public static void CreateHumanoidAttackDescriptions()
+        {
+            if (!HumanoidAttackDescriptionsForType.ContainsKey(typeof(Fist)))
             {
                 List<Func<string, string, Weapon, string>> descriptions = new List<Func<string, string, Weapon, string>>();
                 descriptions.Add((a, r, w) => { return $"{a} clenches their fist, driving a forceful punch towards {FormatPossessive(r)} midsection"; });
@@ -47,13 +116,13 @@ namespace fire_ash_server.Props.Items.Weapons
                 descriptions.Add((a, r, w) => { return $"{a} advances and hammers a quick uppercut to {FormatPossessive(r)} lower jaw"; });
                 descriptions.Add((a, r, w) => { return $"{a} angles their body and delivers a crushing punch to {FormatPossessive(r)} collarbone"; });
 
-                AttackDescriptionsForType.Add(typeof(Fist), descriptions);
+                HumanoidAttackDescriptionsForType.Add(typeof(Fist), descriptions);
             }
         }
 
-        public static void CreateOffHandAttackDescriptions()
+        public static void CreateHumanoidOffHandAttackDescriptions()
         {
-            if (!OffHandAttackDescriptionsForType.ContainsKey(typeof(Fist)))
+            if (!HumanoidOffHandAttackDescriptionsForType.ContainsKey(typeof(Fist)))
             {
                 List<Func<string, string, Weapon, string>> offhandDescriptions = new List<Func<string, string, Weapon, string>>();
                 offhandDescriptions.Add((a, r, w) => { return $"{a} quickly snaps an off-hand jab towards {FormatPossessive(r)} midsection"; });
@@ -80,7 +149,7 @@ namespace fire_ash_server.Props.Items.Weapons
                 offhandDescriptions.Add((a, r, w) => { return $"{a} advances with an off-hand uppercut from an off-angle to {FormatPossessive(r)} lower jaw"; });
                 offhandDescriptions.Add((a, r, w) => { return $"{a} angles their body slightly and strikes with an off-hand punch from the side to {FormatPossessive(r)} collarbone"; });
 
-                OffHandAttackDescriptionsForType.Add(typeof(Fist), offhandDescriptions);
+                HumanoidOffHandAttackDescriptionsForType.Add(typeof(Fist), offhandDescriptions);
             }
         }
 

@@ -234,7 +234,7 @@ namespace fire_ash_server.Props
                     if (rel.Faction1 != rel.Faction2)
                         return false;
                     else
-                        if (charactersInCombat.Any(c => c != character && c.Faction == rel.Faction1)) //make sure he is not just fighting himself
+                        if (charactersInCombat.Any(c => c != character && c.Faction == rel.Faction1)) //makes sure he is not just fighting himself
                             return false;
                 }
             }
