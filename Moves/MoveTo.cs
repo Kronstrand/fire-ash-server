@@ -14,25 +14,28 @@ namespace fire_ash_server.Moves
         {
             Range = RangeType.RangeSingleTarget;
 
-            Action = () =>
-            {
-                
+            Action = async () =>
+            {                
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
                 soul.Character.MoveToGroup(targetProp);
                 if (soul.Character.LookAt != targetProp)
                 {
-                    new LookAt(soul, targetProp).Action();
-                }                   
+                    soul.Character.SetLookAt(targetProp);
+                    await LookAt.LookAtAction(soul, targetProp);
+                }
+
+                targetProp.RunOnAfterMoveToEvents(soul);
             };
         }
 
         public static string CreateName(Prop prop)
         {
-
             if (prop is Exit)
                 return ((Exit)prop).GoToRoom.Name + " Entrance";
 
             return prop.Name;
         }
+
+
     }
 }

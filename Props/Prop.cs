@@ -18,7 +18,7 @@ namespace fire_ash_server.Props
     {
         public string Name { get; set; }
         public string Description { get;  set; }
-        public int FurtherDescriptionDC { get; set; }
+        public string? ContextDescription;
         private bool pickupable;
         private bool hidden;
         public int HiddenDC { get; set; }
@@ -27,6 +27,9 @@ namespace fire_ash_server.Props
         public ThreadSafeList<Move> moves = new ThreadSafeList<Move>();
 
         public List<Effect> Effects = new List<Effect>();
+
+        private ThreadSafeList<Action<Soul>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul>>();
+        private ThreadSafeList<Action<Soul>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul>>();
 
         public Prop(string name, string description)
         {
@@ -50,13 +53,41 @@ namespace fire_ash_server.Props
 
         public string GetDescription()
         {
-            if (GetType() == typeof(Character))
+            return GetDescription(null, true);
+        }
+
+        public string GetDescription(Character? lookingCharacter, bool showImage)
+        {
+            string exitImagePrefix = "";
+
+            string description = Description;
+            if (lookingCharacter != null && ContextDescription != null)
+                description = ContextDescription + ", " + ToLowerFirstChar(description);
+            
+
+            if (this is Character)
             {
                 Character character = (Character)this;
                 if (character.Dead)
                     return character.DeathDescription;
             }
-            return Img(Name.ToLower().Replace(" ", "")) + Description;
+            else if (this is Exit)
+            {
+                Exit exit = (Exit)this;
+
+                if (lookingCharacter != null && lookingCharacter.LastRoom == exit.GoToRoom)
+                    description = "Where you came from, " + ToLowerFirstChar(description);
+
+                if (exit.LocatedInRoom != null)
+                    exitImagePrefix = exit.LocatedInRoom.Name;
+            }
+
+            if (!showImage)
+                return description;
+
+            string Imagename = (exitImagePrefix + Name).ToLower().Replace(" ", "");
+
+            return Img(Imagename) + description;
         }
 
         public void AddItem(Item item)
@@ -296,6 +327,22 @@ namespace fire_ash_server.Props
                 }
             }
             return false;
+        }
+
+        public void RunOnAfterMoveToEvents(Soul soul)
+        {
+            foreach (Action<Soul> afterCombatEvent in OnAfterMoveToEvents)
+                afterCombatEvent(soul);
+
+            OnAfterMoveToEvents.RemoveAll(OnAfterMoveToEventsToBeRemoved);
+            OnAfterMoveToEventsToBeRemoved.Clear();
+        }
+
+        public void AddOnAfterMoveToEvent(Action<Soul> action, bool runOnce)
+        {
+            OnAfterMoveToEvents.Add(action);
+            if (runOnce)
+                OnAfterMoveToEventsToBeRemoved.Add(action);
         }
     }
 }

@@ -86,6 +86,23 @@ namespace fire_ash_server
             }
         }
 
+        public void RemoveAll(ThreadSafeList<T> ToBeRemovedList)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                for (int i = _list.Count - 1; i >= 0; i--)
+                {
+                    if (ToBeRemovedList.Contains(_list[i]))
+                        _list.RemoveAt(i);
+                }
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+
         public int Count
         {
             get

@@ -19,12 +19,14 @@ using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
 using fire_ash_server.Abstract_Entities;
 using static fire_ash_server.Helpers;
+using fire_ash_server.World;
 
 namespace fire_ash_server.Props
 {
     internal class Character : Prop
     {
         public Room CurrentRoom;
+        public Room? LastRoom;
         private Prop? lookAt;
         public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
         private List<CreatureType> types;
@@ -36,7 +38,6 @@ namespace fire_ash_server.Props
         public int Wisdom { get; set; }
         public int Intelligence { get; set; }
         public int Charisma { get; set; }
-        public int Proficiency { get; set; }
         public int HP { get; set; }
 
         public Weapon DefaultHand = new Fist();
@@ -45,6 +46,7 @@ namespace fire_ash_server.Props
 
         public List<string> Feats = new List<string>();
         public Faction Faction;
+        public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
 
         public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
         public Dictionary<InventorySlot, Item> EquippedItems = new Dictionary<InventorySlot, Item>();
@@ -79,11 +81,9 @@ namespace fire_ash_server.Props
             Charisma = Roll(3, 6).Sum();
 
             HP = 8 + GetModifer(Ability.Constitution);
-
-            Proficiency = 2;
             UniqueName = true;
 
-            Faction = Program.WorldSoul.GetFaction(FactionKey.Players);         
+            Faction = NewPlayerFaction(Name);
 
             DeathDescription = "todo"; //Todo
         }
@@ -115,6 +115,31 @@ namespace fire_ash_server.Props
             Inventory.HeldBy = this;
         }
 
+        public static Faction NewPlayerFaction(string name)
+        {
+            Faction newPlayerFaction = new Faction(name);
+            Faction playerFactionTemplate = Program.WorldSoul.GetFaction(FactionKey.Players);
+
+            var relationships1 = Program.WorldSoul.Relationships.Where(r => r.Faction1 == playerFactionTemplate).ToList();
+            foreach (Relationship rel in relationships1)
+            {
+                Relationship.CreateNew(newPlayerFaction, rel.Faction2, rel.Value);
+            }
+
+            var relationships2 = Program.WorldSoul.Relationships.Where(r => r.Faction2 == playerFactionTemplate).ToList();
+            foreach (Relationship rel in relationships2)
+            {
+                Relationship.CreateNew(rel.Faction1, newPlayerFaction, rel.Value);
+            }
+
+            return newPlayerFaction;
+        }
+
+        public void SetFaction(FactionKey faction)
+        {
+            Faction = Program.WorldSoul.GetFaction(faction);
+        }
+
         public void AddCreatureType(CreatureType creatureType)
         {
             types.Add(creatureType);
@@ -125,13 +150,53 @@ namespace fire_ash_server.Props
             return types.Contains(creatureType);
         }
 
-        public void ModifyRelationshipTo(Character? character, int modifyer)
+        public void ModifyRelationshipTo(Character? character, int modifier)
         {
             if (character == null)
                 return;
 
+            if (!(IsInfluencer && character.IsInfluencer))
+                return;
+
             Relationship rel = GetRelationShipTo(character);
-            rel.Value += modifyer;
+            rel.Value += modifier;
+
+            string message = "";
+
+            if (modifier > 0)
+            {
+                if (modifier == 1)
+                {
+                    message = $"{character.Faction.Name} seems pleased with {Faction.Name}.";
+                }
+                else if (modifier <= 5)
+                {
+                    message = $"{character.Faction.Name} seems delighted with {Faction.Name}.";
+                }
+                else
+                {
+                    message = $"{character.Faction.Name} seems ecstatic with {Faction.Name}.";
+                }
+            }
+            else if (modifier < 0)
+            {
+                if (modifier == -1)
+                {
+                    message = $"{character.Faction.Name} seems annoyed with {Faction.Name}.";
+                }
+                else if (modifier >= -5)
+                {
+                    message = $"{character.Faction.Name} seems furious with {Faction.Name}.";
+                }
+                else
+                {
+                    message = $"{character.Faction.Name} seems enraged with {Faction.Name}.";
+                }
+            }
+
+            if (message != "")
+                CurrentRoom.BroadcastToSoulsInRoom(message);
+
         }
 
         public void Speak(string messaage)
@@ -462,21 +527,21 @@ namespace fire_ash_server.Props
 
         public void GoToRoom(Room room)
         {
-            Room xRoom = CurrentRoom;
-            LeaveCurrentRoom();
+            LastRoom = CurrentRoom;
+            RemoveFromCurrentRoom();
             CurrentRoom = room;
             CurrentRoom.Characters.Add(this);
 
-            Exit? exitInNewRoom = CurrentRoom.Exits.Where(exit => exit.GoToRoom == xRoom).FirstOrDefault();
+            Exit? exitInNewRoom = CurrentRoom.Exits.Where(exit => exit.GoToRoom == LastRoom).FirstOrDefault();
             if (exitInNewRoom != null)
                 MoveToGroup(exitInNewRoom);
 
             ResetLookAt();
-            xRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
-            if (xRoom.RoomKey == Description(RoomKey.Void))
+            LastRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
+            if (LastRoom.RoomKey == Description(RoomKey.Void))
                 room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name}.", this);
             else
-                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {xRoom.Name}.", this);
+                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {LastRoom.Name}.", this);
         }
 
         public void BroadcastToSoulsInRoom(string message)
@@ -514,7 +579,7 @@ namespace fire_ash_server.Props
             SetLookAt(CurrentRoom);         
         }
 
-        public void LeaveCurrentRoom()
+        public void RemoveFromCurrentRoom()
         {
             if (CurrentRoom != null)
             {
@@ -602,8 +667,15 @@ namespace fire_ash_server.Props
 
         public void EnableCombat(Character enemy)
         {
-            if (this.InCombat && enemy.InCombat)
+            if (InCombat && enemy.InCombat)
                 return;
+
+            RelationshipStatus relStatus = GetRelationshipStatus(enemy);
+
+            if (relStatus == RelationshipStatus.good)
+                ModifyRelationshipTo(enemy, -10);
+            else if (relStatus == RelationshipStatus.neutral)
+                ModifyRelationshipTo(enemy, -5);
 
             CurrentRoom.EnableOrUpdateCombat(this, enemy);
         }

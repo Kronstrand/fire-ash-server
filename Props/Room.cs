@@ -42,16 +42,18 @@ namespace fire_ash_server.Props
             Exits.Add(exit);
             exit.LocatedInRoom = this;
         }
-        public string GetFullRoomDescription(Character excludeCharacter)
+        public string GetFullRoomDescription(Character lookingCharacter)
         {
             string description = GetDescription();
 
             foreach (Exit exit in Exits)
             {
-                description += exit.GetDescription();
+                description += exit.GetDescription(lookingCharacter, false);
             }       
             
-            description += ListCharactersAsString(excludeCharacter);
+            string charactersAsString = ListCharactersAsString(lookingCharacter);
+            if (charactersAsString != "")
+                description += " " + charactersAsString;
 
             return description;
         }
@@ -111,13 +113,6 @@ namespace fire_ash_server.Props
         {
             if (enemy != null)
             {
-                /*if (enemy.Dead)
-                {
-                    //if (!InCombat)
-                    //    OnAfterCombatEvents();
-                    return;  //this might be problematic, since if there is more monsters in room, combat will not be triggered on onceshot.
-                }*/
-
                 enabledBy.AddRelatedRelationshipToCombat(enemy);
             }
 
@@ -202,7 +197,7 @@ namespace fire_ash_server.Props
                 BroadcastToSoulsInRoom($"Combat is resolved.");
             Console.WriteLine("Combat has ended.");
             
-            OnAfterCombatEvents();
+            RunOnAfterCombatEvents();
         }
 
         public void TestCombatIsResolved()
@@ -377,7 +372,7 @@ namespace fire_ash_server.Props
             }
         }
 
-        private void OnAfterCombatEvents()
+        private void RunOnAfterCombatEvents()
         {
             foreach (Action afterCombatEvent in onCombatEndEvents)
                 afterCombatEvent();

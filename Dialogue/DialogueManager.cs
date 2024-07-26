@@ -75,7 +75,6 @@ namespace fire_ash_server.Dialogue
             if (SpeakingCharacter.SpeakingTo == null)
                 return;
             SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, 1);
-            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is increased.");
         }
 
 
@@ -84,7 +83,6 @@ namespace fire_ash_server.Dialogue
             if (SpeakingCharacter.SpeakingTo == null)
                 return;
             SpeakingCharacter.ModifyRelationshipTo(SpeakingCharacter.SpeakingTo, -1);
-            SpeakingCharacter.CurrentRoom.BroadcastToSoulsInRoom($"{SpeakingCharacter.SpeakingTo.Faction.Name} relationship to {SpeakingCharacter.Faction.Name} is decreased.");
         }
     }
 }

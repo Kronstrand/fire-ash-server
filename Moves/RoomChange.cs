@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves
 {
     internal class RoomChange : Move
     {
-        public RoomChange(Soul soul, Room room) : base("e", CreateDescription(room), room, CreateAction(soul, room))
+        public RoomChange(Soul soul, Exit exit) : base("e", CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
         {
         }
 
@@ -19,15 +19,19 @@ namespace fire_ash_server.Moves
             return $"Enter {room.Name}.";
         }
 
-        private static Action CreateAction(Soul soul, Room goToRoom)
+        private static Action CreateAction(Soul soul, Exit exit)
         {
             return async () =>
             {
-                Room xRoom = soul.Character.CurrentRoom;
-                await soul.MoveCharToRoomAndSendDescriptionAsync(goToRoom);
+                
+                if (exit.OnBeforeExitEvent != null)
+                {
+                    bool isHandled = exit.OnBeforeExitEvent(soul);
+                    if (isHandled)
+                        return;
+                }
 
-                if (soul.Character.InCombat)
-                    xRoom.FlagCombatMightBeResolved();
+                await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom);
             };
         }
     }

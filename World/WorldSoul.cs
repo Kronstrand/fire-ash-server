@@ -28,7 +28,7 @@ namespace fire_ash_server.World
             GenerateGenericContent();
             //new WorldCreator(this);
             //new CyberworldCreater(this);
-            World = new BioMechCreator(this);
+            World = new BioMechCreator();
 
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -110,7 +110,8 @@ namespace fire_ash_server.World
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);                
                 if (World == null)
                     throw new Exception("World is not initiatited and is null");
-                await soul.MoveCharToRoomAndSendDescriptionAsync(World.CreateIncubator());
+                //await soul.MoveCharToRoomAndSendDescriptionAsync(World.CreateIncubator());
+                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.NexusBridge);
 
                 while (!soul.Character.Dead)
                 {

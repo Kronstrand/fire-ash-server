@@ -16,8 +16,11 @@ namespace fire_ash_server.Enums
         NeonAlley,
         AbandonedArcade,
         NeonPlaza,
-        MainCorridor,
         CreationChamber,
-        Incubator
+        CaretakerRoom,
+        MainHall,
+        NexusBridge,
+        CaretakerBackRoom,
+        Corridor2A
     }
 }

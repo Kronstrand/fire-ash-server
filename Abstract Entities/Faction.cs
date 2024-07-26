@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using fire_ash_server.Enums;
 
 namespace fire_ash_server
 {
@@ -13,6 +14,11 @@ namespace fire_ash_server
         public Faction(string name)
         {
             Name = name;
+        }
+
+        public static Faction Get(FactionKey key)
+        {
+            return Program.WorldSoul.GetFaction(key);
         }
     }
 }

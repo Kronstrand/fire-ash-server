@@ -19,6 +19,10 @@ namespace fire_ash_server.Props.Items
         {
             MakePickable();
         }
+        public Item(string name, string Context, string description) : base(name, description)
+        {
+            ContextDescription = Context;
+        }
 
         public new Item Hide(int DC)
         {

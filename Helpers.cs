@@ -53,6 +53,24 @@ namespace fire_ash_server
             return randomIdentifer++;
         }
 
+        public static string ToLowerFirstChar(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
+            char firstChar = char.ToLower(str[0]);
+            if (str.Length > 1)
+            {
+                return firstChar + str.Substring(1);
+            }
+            else
+            {
+                return firstChar.ToString();
+            }
+        }
+
         public static string Description(Enum value)
         {
             var descriptionAttribute = value.GetType()

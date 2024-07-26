@@ -57,7 +57,7 @@ namespace fire_ash_server.Moves
             Range = RangeType.None;
         }
 
-        public async Task LookAtAction(Soul soul, Prop? prop)
+        public static async Task LookAtAction(Soul soul, Prop? prop)
         {
             if (prop == null)
             {

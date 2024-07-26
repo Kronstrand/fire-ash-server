@@ -151,29 +151,30 @@ namespace fire_ash_server
             {
                 AddPossibleMove(new LookAt(this));
 
-                if (Character.LookAt is Character && !Character.IsHidden())
+                if (Character.LookAt is Character)
                 {                     
                     Character lookAtCharacter = (Character)Character.LookAt;
 
                     if (Character.IsInGroupWith(Character.LookAt) == false)
                         AddPossibleMove(new MoveTo(this, lookAtCharacter));
 
-                    if (lookAtCharacter.DialogueManager != null && Character.IsInGroupWith(Character.LookAt) == true)
-                    {
-                        AddPossibleMove(new Move(
-                            "sp",
-                            $"Speak to {lookAtCharacter.Name}",
-                            () =>
-                            {
-                                lookAtCharacter.DialogueManager.InitSpeakWith(Character);
-                            }));
-                    }
+                    if (!Character.IsHidden())
+                        if (lookAtCharacter.DialogueManager != null && Character.IsInGroupWith(Character.LookAt) == true)
+                        {
+                            AddPossibleMove(new Move(
+                                "sp",
+                                $"Speak to {lookAtCharacter.Name}",
+                                () =>
+                                {
+                                    lookAtCharacter.DialogueManager.InitSpeakWith(Character);
+                                }));
+                        }
                 }
                 else if (Character.LookAt is Item)
                 {
                     AddPossibleInvestigationOrLookMove(Character.LookAt);
                 }
-                else if (Character.LookAt.GetType() == typeof(Room))
+                else if (Character.LookAt is Room)
                 {
                     Room lookAtRoom = (Room)Character.LookAt;
                     AddPossibleInvestigationOrLookMove(lookAtRoom);
@@ -232,7 +233,12 @@ namespace fire_ash_server
                 foreach (Move move in feat.Moves)
                 {
                     if (move.IsValid(this) && IsValidCloseSingleTargetMove(move))
-                        AddPossibleMove(move);
+                    {
+                        if (move is Attack && Character.LookAt is Character && Character.GetRelationShipTo((Character)Character.LookAt).GetStatus() == RelationshipStatus.good)
+                            AddPossibleMove(move, true);
+                        else
+                            AddPossibleMove(move, false);
+                    }
                 }
             }
 
@@ -247,7 +253,7 @@ namespace fire_ash_server
                     if (ReferenceEquals(Character.LookAt, exit))
                     {
                         if (!Character.InCombat)
-                            AddPossibleMove(new RoomChange(this, exit.GoToRoom));
+                            AddPossibleMove(new RoomChange(this, exit));
                         else
                         {
                             int countedEnemies = Character.CurrentRoom.Characters.Where(c => c.InCombat && c.LookAt == Character && c.IsInHostileCombatWith(Character)).Count();
@@ -262,7 +268,7 @@ namespace fire_ash_server
                                 true, //should be a nonpersonal process?
                                 (Soul s) =>
                                 {
-                                    RoomChange roomChange = new RoomChange(this, exit.GoToRoom);
+                                    RoomChange roomChange = new RoomChange(this, exit);
                                     roomChange.Action();
                                     return null;
                                 },
@@ -302,7 +308,9 @@ namespace fire_ash_server
                         () =>
                         {
                             dialogueManager.SetCurrentNodeBasedOnChoice(choice);
-                            dialogueManager.SpeakCurrentNode();
+
+                            if (dialogueManager.CurrentNode.Dialogue)                            
+                                dialogueManager.SpeakCurrentNode();
                             if (!dialogueManager.CurrentNodeHasChoices())
                                 dialogueManager.EndSpeakWith();
                         }
@@ -489,6 +497,11 @@ namespace fire_ash_server
 
         public void AddPossibleMove(Move move)
         {
+            AddPossibleMove(move, false);
+        }
+
+        public void AddPossibleMove(Move move, bool forceHide)
+        {
             string possibleMoveKey = move.GetCompleteMoveKey();
 
             int number = 0;
@@ -507,7 +520,7 @@ namespace fire_ash_server
                 number++;
             }
 
-            if (move.Hidden)
+            if (move.Hidden || forceHide)
                 return;
 
             int key = ShownPossibleMoves.Count() + 1;
@@ -522,11 +535,14 @@ namespace fire_ash_server
         public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom)
         {
             Character.InCombat = goToRoom.InCombat;
-            Room xRoom = Character.CurrentRoom;
+            
 
             Character.GoToRoom(goToRoom);
 
-            xRoom.TestCombatIsResolved();
+            if (Character.LastRoom != null && Character.LastRoom.InCombat)
+                Character.LastRoom.FlagCombatMightBeResolved();
+
+            //LastRoom.TestCombatIsResolved();
 
             await SendAsync(goToRoom.GetFullRoomDescription(Character));
 

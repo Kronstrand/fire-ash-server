@@ -15,6 +15,8 @@ namespace fire_ash_server.Enums
         LightShades,
         Corporates,
         Resistance,
-        Technomancers
+        Technomancers,
+        [Description("Technomancer Defence System")]
+        TechnomancersDefenceSystem,
     }
 }
