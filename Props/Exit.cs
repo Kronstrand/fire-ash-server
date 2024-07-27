@@ -10,6 +10,7 @@ namespace fire_ash_server.Props
     {
         public Room GoToRoom;
         public Room? LocatedInRoom;
+        public bool MinorExit;
         public Func<Soul, bool>? OnBeforeExitEvent;
         public Exit(string description, Room goToRoom) : base(CreateName(goToRoom), description)
         {
@@ -20,9 +21,10 @@ namespace fire_ash_server.Props
             GoToRoom = goToRoom;
             ContextDescription = context;
         }
+
         private static string CreateName(Room room)
         {
-            return $"Exit to {room.Name}"; //this don't work with images....
+            return $"Entrance to {room.Name}";
         }
     }
 }

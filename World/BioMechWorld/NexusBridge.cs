@@ -37,7 +37,7 @@ namespace fire_ash_server.World.BioMechWorld
 
             //new rooms
             new CaretakerRoom(nexusBridge);
-            new MainHallRoom(nexusBridge);
+            new Bazar(nexusBridge);
         }
     }
 }

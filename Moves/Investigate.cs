@@ -34,30 +34,30 @@ namespace fire_ash_server.Moves
             };
         }
 
-        private async Task InvestigateProp(Soul soul, Prop prop, Roll investigationRoll)
+        private async Task InvestigateProp(Soul soul, Prop tagetProp, Roll investigationRoll)
         {
-            List<Item> foundItems = prop.FoundItems(investigationRoll.GetSum());
-            if (foundItems.Count > 0)
+            List<Prop> foundProps = tagetProp.FoundItems(investigationRoll.GetSum());
+            if (foundProps.Count > 0)
             {
-                foreach (Item item in foundItems)
+                foreach (Prop prop in foundProps)
                 {
-                    item.Unhide();
+                    prop.Unhide();
                 }
 
-                if (prop.GetType() == typeof(Room))
-                    await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundItems)}.");
+                if (tagetProp.GetType() == typeof(Room))
+                    await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
                 else
                     await soul.SendAsync(
-                        $"{prop.GetDescription()}\n\n" +
-                        $"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundItems)}.");
+                        $"{tagetProp.GetDescription()}\n\n" +
+                        $"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
             }
             else
             {
-                if (prop.GetType() == typeof(Room))
+                if (tagetProp.GetType() == typeof(Room))
                     await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and didn't seem to find anything...");
                 else
                     await soul.SendAsync(
-                        $"{prop.GetDescription()}\n\n" +
+                        $"{tagetProp.GetDescription()}\n\n" +
                         $"{soul.Character.Name} rolls {investigationRoll} and didn't seem to find anything...");
             }
         }

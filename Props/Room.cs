@@ -46,10 +46,17 @@ namespace fire_ash_server.Props
         {
             string description = GetDescription();
 
-            foreach (Exit exit in Exits)
+            List<Exit> exitList = Exits.Where(e => !e.IsHidden()).ToList();
+
+            if (exitList.Any())
             {
-                description += exit.GetDescription(lookingCharacter, false);
-            }       
+                description += "\n";
+
+                foreach (Exit exit in exitList)
+                {
+                    description += "\n" + exit.GetDescription(lookingCharacter, false);
+                }
+            }
             
             string charactersAsString = ListCharactersAsString(lookingCharacter);
             if (charactersAsString != "")

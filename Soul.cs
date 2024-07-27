@@ -339,7 +339,7 @@ namespace fire_ash_server
 
         private void AddPossibleInvestigationOrLookMove(Prop prop)
         {
-            if (prop.HasHiddenItems() && AddPossibleUnusedMove(new Investigate(this, prop)))
+            if (prop.HasHiddenProps() && AddPossibleUnusedMove(new Investigate(this, prop)))
                 return;
 
 
@@ -485,9 +485,6 @@ namespace fire_ash_server
 
         public bool AddPossibleUnusedMove(Move move)
         {
-            if (Character == null)
-                throw new ArgumentNullException(nameof(Character), "Character cannot be null when adding possible move");
-
             if (!move.Repeatable && Character.HasUsedMoveOnProp(move))
                 return false;
 
@@ -534,6 +531,10 @@ namespace fire_ash_server
         }
         public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom)
         {
+            await MoveCharToRoomAndSendDescriptionAsync(goToRoom, false);
+        }
+        public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom, bool skipDescription)
+        {
             Character.InCombat = goToRoom.InCombat;
             
 
@@ -544,7 +545,11 @@ namespace fire_ash_server
 
             //LastRoom.TestCombatIsResolved();
 
-            await SendAsync(goToRoom.GetFullRoomDescription(Character));
+            if (!skipDescription)
+                await SendAsync(goToRoom.GetFullRoomDescription(Character));
+            else
+                await SendAsync($"{Character.Name} moves to {goToRoom.Name}.");
+
 
             if (goToRoom.OnEnterEvent != null)
                 goToRoom.OnEnterEvent(this);

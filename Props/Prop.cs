@@ -46,9 +46,14 @@ namespace fire_ash_server.Props
             Effects.RemoveAll(e => e.Name == effectName);
         }
 
-        public bool HasHiddenItems()
+        public bool HasHiddenProps()
         {
-            return Items.Where(item => item.IsHidden()).Any();
+            if (Items.Where(item => item.IsHidden()).Any())
+                return true;
+            if (this is Room && ((Room)this).Exits.Where(item => item.IsHidden()).Any())
+                return true;
+
+            return false;
         }
 
         public string GetDescription()
@@ -171,10 +176,21 @@ namespace fire_ash_server.Props
             return (Prop)this.MemberwiseClone();
         }
 
-        public List<Item> FoundItems(int result)
+        public List<Prop> FoundItems(int result)
+        {
+            List<Prop> props = Items.Where(item => item.IsHidden() && item.HiddenDC <= result).Select(item => (Prop)item).ToList();
+            if (this is Room)
+            {
+                List<Prop> exits = ((Room)this).Exits.Where(exit => exit.IsHidden() && exit.HiddenDC <= result).Select(item => (Prop)item).ToList();
+                props.AddRange(exits);
+            }
+            return props;
+        }
+
+        /*public List<Item> FoundItems(int result)
         {
             return Items.Where(item => item.IsHidden() && item.HiddenDC <= result).ToList();
-        }
+        }*/
 
         public Prop? GetPropPosition()
         {

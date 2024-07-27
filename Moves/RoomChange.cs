@@ -31,7 +31,7 @@ namespace fire_ash_server.Moves
                         return;
                 }
 
-                await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom, exit.MinorExit);
             };
         }
     }

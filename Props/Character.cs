@@ -762,7 +762,7 @@ namespace fire_ash_server.Props
                 outOfReach = true;
             else if (!target.IsInRoomOrIsRoom(CurrentRoom))
                 outOfReach = true;
-            else if (move.Range == RangeType.CloseSingleTarget && IsInGroupWith(target) != true)
+            else if (move.Range == RangeType.CloseSingleTarget && IsInGroupWith(target) == false)
                 outOfReach = true;
 
             if (outOfReach)
