@@ -10,12 +10,12 @@ namespace fire_ash_server.Moves
 {
     internal class MoveTo : Move
     {
-        public MoveTo(Soul soul, Prop targetProp) : base("m", $"Move to {CreateName(targetProp)}", targetProp)
+        public MoveTo(Soul soul, Prop targetProp) : base(MoveKey.m.ToString(), $"Move to {CreateName(targetProp)}", targetProp)
         {
             Range = RangeType.RangeSingleTarget;
 
             Action = async () =>
-            {                
+            {
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
                 soul.Character.MoveToGroup(targetProp);
                 if (soul.Character.LookAt != targetProp)
@@ -24,7 +24,7 @@ namespace fire_ash_server.Moves
                     await LookAt.LookAtAction(soul, targetProp);
                 }
 
-                targetProp.RunOnAfterMoveToEvents(soul);
+                targetProp.RunOnAfterMoveToEvents(soul, targetProp);
             };
         }
 

@@ -15,6 +15,8 @@ namespace fire_ash_server.Moves
         public string Description;
         public Action Action;
         public bool Repeatable = true;
+        public bool AllowedInTrade = false;
+        public bool AllowedInCombat = true;
         public Prop? Prop;
         public Prop? PropPosition;
         public bool Hidden;

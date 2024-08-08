@@ -12,7 +12,7 @@ namespace fire_ash_server.Moves
 {
     internal class LookInventory : Move
     {
-        public LookInventory(Soul soul) : base("i", "Inventory")
+        public LookInventory(Soul soul) : base(MoveKey.i.ToString(), "Inventory")
         {
             Hidden = true;
             Type = MoveType.MinorAction;

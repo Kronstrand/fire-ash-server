@@ -154,25 +154,27 @@ namespace fire_ash_server
                 if (Character.LookAt is Character)
                 {                     
                     Character lookAtCharacter = (Character)Character.LookAt;
+                    bool? isInGroupWithTargert = Character.IsInGroupWith(Character.LookAt);
 
-                    if (Character.IsInGroupWith(Character.LookAt) == false)
+                    if (isInGroupWithTargert == false)
                         AddPossibleMove(new MoveTo(this, lookAtCharacter));
 
-                    if (!Character.IsHidden())
-                        if (lookAtCharacter.DialogueManager != null && Character.IsInGroupWith(Character.LookAt) == true)
-                        {
-                            AddPossibleMove(new Move(
-                                "sp",
-                                $"Speak to {lookAtCharacter.Name}",
-                                () =>
-                                {
-                                    lookAtCharacter.DialogueManager.InitSpeakWith(Character);
-                                }));
-                        }
+                    if (!Character.IsHidden() && isInGroupWithTargert == true)
+                    {
+                        if (lookAtCharacter.DialogueManager != null)
+                            AddPossibleMove(new SpeakTo(this, lookAtCharacter));
+                        if (lookAtCharacter.IsTrader)
+                            AddPossibleMove(new BrowseGoods(this, lookAtCharacter)); 
+                    }
                 }
                 else if (Character.LookAt is Item)
                 {
-                    AddPossibleInvestigationOrLookMove(Character.LookAt);
+                    Item item = (Item)Character.LookAt;
+
+                    AddPossibleInvestigationOrLookMove(item);
+                    
+                    if (item.HeldByCharacter() != Character && item.IsPickupable())
+                        AddPossibleMove(new BuyItem(this, item));
                 }
                 else if (Character.LookAt is Room)
                 {
@@ -209,8 +211,9 @@ namespace fire_ash_server
                         isClose = Character.IsInGroupWith(item) != false;
                     }
 
+                    
                     if (isClose)
-                    {            
+                    {
                         AddPossibleInvestigationOrLookMove(item);
 
                         if (item.HeldByCharacter() == null)
@@ -220,7 +223,11 @@ namespace fire_ash_server
                             AddPossibleMove(grabMove);
                         }
                     }
-                    else
+                    else if (!isClose && item.Unreachable)
+                    {
+                        AddPossibleMove(new LookAt(this, item));
+                    }
+                    else if (!item.Unreachable)
                         AddPossibleMove(new MoveTo(this, item));
                 }
             }
@@ -262,7 +269,7 @@ namespace fire_ash_server
                             AddPossibleMove(new SkillCheck(
                                 this,
                                 exit,
-                                "fl",
+                                MoveKey.f.ToString(),
                                 $"Flee combat and enter {exit.GoToRoom.Name}.",
                                 new SkillNumber(Skill.Acrobatics, DC),
                                 true, //should be a nonpersonal process?
@@ -287,6 +294,10 @@ namespace fire_ash_server
 
             //Back..
             AddPossibleBackMove();
+
+            //stop trading
+            if (Character.TradingWith != null && Character.LookAt == Character.TradingWith.Inventory)
+                AddPossibleMove(new StopBrowseGoods(this));
 
             //inventory
             AddPossibleMove(new LookInventory(this));
@@ -320,29 +331,32 @@ namespace fire_ash_server
         private void AddPossibleBackMove()
         {
             int lookedAtIndex = Character.LookedAt.Count - 1;
-            if (lookedAtIndex > 0 && Character.LookAt != null)
-            {
-                Move backMove = new Move(
-                    "b",
-                    "Back..",
-                    async () =>
-                    {
-                        Prop xLookedAt = Character.LookAt;
-                        Character.LookBack();
-                        await SendAsync(Character.Name + " stops looking at " + xLookedAt.Name + ".");
-                    });
-                backMove.Type = MoveType.MinorAction;
+            if (!(lookedAtIndex > 0 && Character.LookAt != null))
+                return;
+            
+            if (Character.TradingWith != null && Character.LookAt == Character.TradingWith.Inventory)
+                return;
 
-                AddPossibleMove(backMove);
-            }
+            Move backMove = new Move(
+                MoveKey.b.ToString(),
+                "Back..",
+                async () =>
+                {
+                    Prop xLookedAt = Character.LookAt;
+                    Character.LookBack();
+                    await SendAsync(Character.Name + " stops looking at " + xLookedAt.Name + ".");
+                });
+            backMove.Type = MoveType.MinorAction;
+            backMove.AllowedInTrade = true;
+
+            AddPossibleMove(backMove);
+            
         }
 
         private void AddPossibleInvestigationOrLookMove(Prop prop)
         {
             if (prop.HasHiddenProps() && AddPossibleUnusedMove(new Investigate(this, prop)))
                 return;
-
-
 
             if (prop != Character.LookAt)
                 AddPossibleMove(new LookAt(this, prop));
@@ -429,7 +443,6 @@ namespace fire_ash_server
 
                 if (Character.IsHidden())
                     Character.Unhide();
-
             }
             else
                 move.Action();
@@ -499,6 +512,14 @@ namespace fire_ash_server
 
         public void AddPossibleMove(Move move, bool forceHide)
         {
+            if (!move.AllowedInCombat && Character.CurrentRoom.InCombat) return;
+            if (Character.TradingWith != null)
+            {
+                if (!move.AllowedInTrade) return;
+                if (move.Hidden && !(move is LookInventory)) return;
+                if (forceHide) return;
+            }
+
             string possibleMoveKey = move.GetCompleteMoveKey();
 
             int number = 0;
@@ -531,28 +552,19 @@ namespace fire_ash_server
         }
         public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom)
         {
-            await MoveCharToRoomAndSendDescriptionAsync(goToRoom, false);
-        }
-        public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom, bool skipDescription)
-        {
             Character.InCombat = goToRoom.InCombat;
             
-
             Character.GoToRoom(goToRoom);
 
             if (Character.LastRoom != null && Character.LastRoom.InCombat)
                 Character.LastRoom.FlagCombatMightBeResolved();
 
-            //LastRoom.TestCombatIsResolved();
-
-            if (!skipDescription)
-                await SendAsync(goToRoom.GetFullRoomDescription(Character));
-            else
-                await SendAsync($"{Character.Name} moves to {goToRoom.Name}.");
-
+            await SendAsync(goToRoom.GetDescription());
 
             if (goToRoom.OnEnterEvent != null)
                 goToRoom.OnEnterEvent(this);
+
+            await SendAsync(goToRoom.GetAdditionalRoomDescription(Character));
 
             if (goToRoom.InCombat)
                 goToRoom.EnableOrUpdateCombat(Character, null);

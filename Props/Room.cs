@@ -14,6 +14,9 @@ using fire_ash_server.World;
 using fire_ash_server.Moves;
 using fire_ash_server.Abstract_Entities;
 using static fire_ash_server.Helpers;
+using fire_ash_server.Props.Items;
+using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace fire_ash_server.Props
 {
@@ -42,69 +45,154 @@ namespace fire_ash_server.Props
             Exits.Add(exit);
             exit.LocatedInRoom = this;
         }
-        public string GetFullRoomDescription(Character lookingCharacter)
+        public string GetAdditionalRoomDescription(Character lookingCharacter)
         {
-            string description = GetDescription();
+            string description = "";
 
             List<Exit> exitList = Exits.Where(e => !e.IsHidden()).ToList();
 
-            if (exitList.Any())
+            foreach (Exit exit in exitList)
             {
-                description += "\n";
-
-                foreach (Exit exit in exitList)
-                {
-                    description += "\n" + exit.GetDescription(lookingCharacter, false);
-                }
+                description += exit.GetDescription(lookingCharacter, false);
             }
             
             string charactersAsString = ListCharactersAsString(lookingCharacter);
             if (charactersAsString != "")
-                description += " " + charactersAsString;
+                description += "\n\n" + charactersAsString;
 
             return description;
         }
 
         private string ListCharactersAsString(Character excludeCharacter)
         {
-            Dictionary<string, Tuple<int, bool>> countedNamesInRoom = new Dictionary<string, Tuple<int, bool>> ();
-            foreach(Character character in Characters)
-            {
-                if (Equals(character, excludeCharacter))
-                    continue;
+            List<Tuple<Prop?, List<Character>>> groupedCharactersByProp = new List<Tuple<Prop?, List<Character>>>();
 
-                string name = character.Name;
-                if (countedNamesInRoom.ContainsKey(name))
-                    countedNamesInRoom[name] = Tuple.Create(countedNamesInRoom[name].Item1 + 1, countedNamesInRoom[name].Item2);
-                else
-                    countedNamesInRoom.Add(name, Tuple.Create(1, character.UniqueName));
+            List<Character> allGroupedCharacters = new List<Character>();
+ 
+            foreach (Grouping grouping in Groupings)
+            {
+                Prop? stageItem = null;
+                List<Character> groupedCharacters = new List<Character>();
+                foreach (Prop prop in grouping.Props)
+                {
+                    if (!prop.IsPickupable() && stageItem == null)
+                        if (prop is Item || prop is Exit)
+                            stageItem = prop;
+
+
+                    if (prop is Character)
+                        if (!Equals((Character)prop, excludeCharacter))
+                        {
+                            allGroupedCharacters.Add((Character)prop);
+                            groupedCharacters.Add((Character)prop);
+                        }
+                        else
+                            stageItem = prop;
+
+                }
+                if (groupedCharacters.Any())
+                    groupedCharactersByProp.Add(Tuple.Create(stageItem, groupedCharacters));
             }
 
-            if (countedNamesInRoom.Count() < 1)
+            List<Character> ungroupedcharacters = Characters.Where(c => !allGroupedCharacters.Contains(c)).ToList();
+
+            List<GroupedCountedProp> groupedCountedProps = new List<GroupedCountedProp>();
+            foreach (Tuple<Prop?, List<Character>> propCharacters in groupedCharactersByProp)
+            {
+
+                GroupedCountedProp groupedCountedProp = new GroupedCountedProp(propCharacters.Item1);
+                groupedCountedProps.Add(groupedCountedProp);
+
+                foreach(Character groupedCharacter in propCharacters.Item2)
+                {
+                    groupedCountedProp.AddToCountedCharacters(groupedCharacter);
+                }
+            }
+
+            if (ungroupedcharacters.Any())
+            {
+                GroupedCountedProp groupedCountedProp = new GroupedCountedProp(null);
+                foreach (Character character in ungroupedcharacters)
+                {
+                    if (Equals(character, excludeCharacter))
+                        continue;
+
+                    groupedCountedProp.AddToCountedCharacters(character);
+                }
+                if (groupedCountedProp.CountedCharacters.Count > 0)
+                    groupedCountedProps.Add(groupedCountedProp);
+            }
+
+            if (groupedCountedProps.Count() < 1)
                 return "";
 
-            string output = "As you look around you see ";
-            int lengthOfList = countedNamesInRoom.Count;
-            for (int i = 0; i < lengthOfList; i++)
+            int numberOfItems = 0;
+            int outerLoopCounter = 1;
+            foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
+                numberOfItems += groupedCountedProp.CountedCharacters.Count();
+
+            string output = "As you look around you see";     
+            foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
             {
-                //first item
-                if (i == 0)
+                int i = 0;
+                numberOfItems = groupedCountedProp.CountedCharacters.Count();
+                output += " ";
+                foreach (KeyValuePair<string, CountedCharacter> countedName in groupedCountedProp.CountedCharacters)
                 {
-                    output += GetCountedElement(countedNamesInRoom, i);
+
+                    string name = countedName.Key;
+
+                    bool isLastItem = false;
+                    //first item
+                    if (i == 0)
+                    {
+                        output += GetCountedElement(countedName.Value, name);
+                        if (numberOfItems == 1)
+                            isLastItem = true;
+                    }
+                    //not last item
+                    else if (i + 1 != numberOfItems && numberOfItems != 1)
+                    {
+                        output += $", {GetCountedElement(countedName.Value, name)}";
+
+                    }
+                    //last item
+                    else
+                    {
+                        output += $", and {GetCountedElement(countedName.Value, name)}";
+                        isLastItem = true;
+
+                    }
+
+                    if (isLastItem)
+                    {
+                        if (groupedCountedProp.Prop == excludeCharacter)
+                            output += " close at hand";
+                        else if (groupedCountedProp.Prop != null)
+                            output += " at the " + groupedCountedProp.Prop.Name;
+                        else if (groupedCountedProp.Prop == null)
+                            output += $" is also here.";
+
+                        if (outerLoopCounter != groupedCountedProps.Count())
+                            output += ';';
+                        else
+                            output += '.';
+                    }
+                    
+                    i++;
                 }
-                //not last item
-                else if (i + 1 != lengthOfList)
-                {
-                    output += $", {GetCountedElement(countedNamesInRoom, i)}";
-                }
-                //last item
-                else
-                {
-                    output += $", and {GetCountedElement(countedNamesInRoom, i)}.";
-                }
+                outerLoopCounter++;
             }
             return output;
         }
+
+        private string AddAtThe(string? groupName)
+        {
+            if (groupName != null)
+                return " at the " + groupName;
+            return "";
+        }
+        
 
         public void FlagCombatMightBeResolved()
         {
@@ -305,13 +393,16 @@ namespace fire_ash_server.Props
 
                     foreach(Character combatCaracter in orderedCombatChars)
                     {
-                        if (combatCaracter.Soul.Socket != null && combatCaracter != initiater)
-                        {
-                            await combatCaracter.Soul.SendAsync("$[cancel]");
-                            combatCaracter.Soul.CancelAndResetTokenSource();
-                            initiater = null;
-                        }
+                        if (combatCaracter != initiater)                        
+                            await combatCaracter.Interrupt();
                     }
+                    
+                    foreach (Character tradingCharacterNotInCombat in Characters.Where(c => c.TradingWith != null && !c.InCombat))
+                    {
+                        if (tradingCharacterNotInCombat != initiater)
+                            await tradingCharacterNotInCombat.Interrupt();
+                    }
+                    initiater = null;
 
                     BroadcastInitiative(orderedCombatChars, activeOrderedCombatCharsInRound, initiativeRolls, (round == 1));
                 }

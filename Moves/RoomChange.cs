@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves
 {
     internal class RoomChange : Move
     {
-        public RoomChange(Soul soul, Exit exit) : base("e", CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
+        public RoomChange(Soul soul, Exit exit) : base(MoveKey.c.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
         {
         }
 
@@ -31,7 +31,7 @@ namespace fire_ash_server.Moves
                         return;
                 }
 
-                await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom, exit.MinorExit);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom);
             };
         }
     }

@@ -26,12 +26,11 @@ namespace fire_ash_server.World.BioMechWorld
             // Adding exit to the Enclosed Room
             Exit toCareTakersRoomFromNexusBridge = new Exit(
                 "In the middle of the bridge, branching eastward", 
-                "A staircase ascends, leading to a small, enclosed room., " +
-                "perhaps a place where someone oversees the machinery?",
+                "A staircase ascends, leading to a small, enclosed room.",
                 caretakerRoom);
             nexusBridge.AddExit(toCareTakersRoomFromNexusBridge);
 
-            toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul Soul) =>
+            toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul Soul, Prop p) =>
             {
                 _ = Soul.SendAsync(
                     "A biomechanical rat scurries out from the enclosed room, " +

@@ -21,6 +21,7 @@ namespace fire_ash_server.Props
         public string? ContextDescription;
         private bool pickupable;
         private bool hidden;
+        public bool Unreachable = false;
         public int HiddenDC { get; set; }
 
         public ThreadSafeList<Item> Items = new ThreadSafeList<Item>();
@@ -28,8 +29,8 @@ namespace fire_ash_server.Props
 
         public List<Effect> Effects = new List<Effect>();
 
-        private ThreadSafeList<Action<Soul>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul>>();
-        private ThreadSafeList<Action<Soul>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul>>();
+        private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul, Prop>>();
+        private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul, Prop>>();
 
         public Prop(string name, string description)
         {
@@ -289,9 +290,9 @@ namespace fire_ash_server.Props
 
             foreach (Grouping group in room1.Groupings)
             {
-                if (group.Characters.Contains(prop))
+                if (group.Props.Contains(prop))
                 {
-                    group.Characters.Add(this);
+                    group.Props.Add(this);
                     return true;
                 }
             }
@@ -311,10 +312,10 @@ namespace fire_ash_server.Props
             for (int i = room.Groupings.Count - 1; i >= 0; i--)
             {
                 Grouping group = room.Groupings.GetAt(i);
-                if (group.Characters.Contains(this))
+                if (group.Props.Contains(this))
                 {
-                    group.Characters.Remove(this);
-                    if (group.Characters.Count == 0)
+                    group.Props.Remove(this);
+                    if (group.Props.Count == 0)
                     {
                         room.Groupings.RemoveAt(i);
                     }
@@ -323,20 +324,42 @@ namespace fire_ash_server.Props
             }
         }
 
+        public Prop? GetGroundLevelProp()
+        {
+
+            if (this is Room)
+            {
+                return null;
+            }
+            else if (this is Item)
+            {
+                Item item = (Item)this;
+                if (item.HeldBy is Room)
+                    return item;
+                else if (item.HeldBy == null)
+                    return null;
+                return item.HeldBy.GetGroundLevelProp();
+            }
+            return this;
+        }
+
         public bool? IsInGroupWith(Prop prop)
         {
-            if (prop is Room)
+            Prop? prop1 = this.GetGroundLevelProp();
+            Prop? prop2 = prop.GetGroundLevelProp();
+
+            if (prop1 == null || prop2 == null)
                 return null;
 
-            Room? currentRoom = GetEmidiateRoomLocation();
+            Room? currentRoom = GetRoomLocation();
             if (currentRoom == null)
                 return null;
 
             foreach (Grouping grouping in currentRoom.Groupings)
             {
-                if (grouping.Characters.Contains(this))
+                if (grouping.Props.Contains(prop1))
                 {
-                    if (grouping.Characters.Contains(prop))
+                    if (grouping.Props.Contains(prop2))
                         return true;
                     else
                         return false;
@@ -345,16 +368,16 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public void RunOnAfterMoveToEvents(Soul soul)
+        public void RunOnAfterMoveToEvents(Soul soul, Prop movedToProp)
         {
-            foreach (Action<Soul> afterCombatEvent in OnAfterMoveToEvents)
-                afterCombatEvent(soul);
+            foreach (Action<Soul,Prop> afterCombatEvent in OnAfterMoveToEvents)
+                afterCombatEvent(soul, movedToProp);
 
             OnAfterMoveToEvents.RemoveAll(OnAfterMoveToEventsToBeRemoved);
             OnAfterMoveToEventsToBeRemoved.Clear();
         }
 
-        public void AddOnAfterMoveToEvent(Action<Soul> action, bool runOnce)
+        public void AddOnAfterMoveToEvent(Action<Soul,Prop> action, bool runOnce)
         {
             OnAfterMoveToEvents.Add(action);
             if (runOnce)

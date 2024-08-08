@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves.Attacks
 {
     internal class DuelWieldAttack : Attack
     {
-        public DuelWieldAttack(Soul soul, Character characterToAttack) : base("aa", $"Attack {characterToAttack.Name}. (Dual Wield)", characterToAttack, RangeType.CloseSingleTarget)
+        public DuelWieldAttack(Soul soul, Character characterToAttack) : base(MoveKey.aa.ToString(), $"Attack {characterToAttack.Name}. (Dual Wield)", characterToAttack, RangeType.CloseSingleTarget)
         {
             if (characterToAttack == null)
             {

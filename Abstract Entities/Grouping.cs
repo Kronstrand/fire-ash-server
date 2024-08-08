@@ -9,11 +9,11 @@ namespace fire_ash_server.Abstract_Entities
 {
     internal class Grouping
     {
-        public  ThreadSafeList<Prop> Characters = new ThreadSafeList<Prop>();
+        public  ThreadSafeList<Prop> Props = new ThreadSafeList<Prop>();
         public Grouping(Prop prop1, Prop prop2)
         {
-            Characters.Add(prop1);
-            Characters.Add(prop2);
+            Props.Add(prop1);
+            Props.Add(prop2);
         }
     }
 }

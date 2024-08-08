@@ -22,6 +22,7 @@ namespace fire_ash_server.Enums
         NexusBridge,
         CaretakerBackRoom,
         Corridor2A,
-        Bazar
+        Bazar,
+        TempleEntranceHall
     }
 }

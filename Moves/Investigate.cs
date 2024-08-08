@@ -13,7 +13,7 @@ namespace fire_ash_server.Moves
 {
     internal class Investigate : Move
     {
-        public Investigate(Soul soul, Prop prop) : base("i", CreateDescription(prop), prop)
+        public Investigate(Soul soul, Prop prop) : base(MoveKey.i.ToString(), CreateDescription(prop), prop)
         {
             Repeatable = false;
             Action = CreateAction(soul, prop);

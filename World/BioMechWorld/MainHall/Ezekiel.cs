@@ -25,6 +25,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 16, //intelligence
                 13, //wisdom
                 9,  //charisma
+                //death description
                 "Ezekiel's lifeless body lies still, a grotesque mix of cybernetic implants and organic tissue. " +
                 "His face, once marked by a disturbing grin, is frozen in death. " +
                 "His heavy, worn armor, adorned with numerous tools and weapons, rests motionless. " +

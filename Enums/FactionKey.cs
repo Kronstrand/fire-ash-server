@@ -18,5 +18,6 @@ namespace fire_ash_server.Enums
         Technomancers,
         [Description("Technomancer Defence System")]
         TechnomancersDefenceSystem,
+        Zathar,
     }
 }

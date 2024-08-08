@@ -13,7 +13,7 @@ namespace fire_ash_server.Moves
 {
     internal class LookAt : Move
     {
-        public LookAt(Soul soul, Prop prop) : base("l", CreateDescription(prop), prop)
+        public LookAt(Soul soul, Prop prop) : base(MoveKey.l.ToString(), CreateDescription(prop), prop)
         {
             InitValues();
 
@@ -24,7 +24,7 @@ namespace fire_ash_server.Moves
                 };
         }
 
-        public LookAt(Soul soul) : base("l", $"Look at current prop.")
+        public LookAt(Soul soul) : base(MoveKey.l.ToString(), $"Look at current prop.")
         {
             InitValues();
 
@@ -55,6 +55,7 @@ namespace fire_ash_server.Moves
         {
             Type = MoveType.MinorAction;
             Range = RangeType.None;
+            AllowedInTrade = true;
         }
 
         public static async Task LookAtAction(Soul soul, Prop? prop)
@@ -68,7 +69,8 @@ namespace fire_ash_server.Moves
             if (prop is Room)
             {
                 Room room = (Room)prop;
-                await soul.SendAsync(room.GetFullRoomDescription(soul.Character));
+                await soul.SendAsync(room.GetDescription());
+                await soul.SendAsync(room.GetAdditionalRoomDescription(soul.Character));
                 return;
             }
             if (prop is Character)

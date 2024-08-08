@@ -13,8 +13,9 @@ namespace fire_ash_server.Moves
 
     internal class Grab : Move
     {
-        public Grab(Soul soul, Item prop) : base("g", CreateDescription(prop), prop, () => { })
+        public Grab(Soul soul, Item prop) : base(MoveKey.g.ToString(), CreateDescription(prop), prop, () => { })
         {            
+            AllowedInTrade = true;
             EnablesCombat = true;
             Action = CreateAction(soul, prop);
         }

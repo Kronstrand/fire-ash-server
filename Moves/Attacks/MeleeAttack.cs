@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves.Attacks
 {
     internal class MeleeAttack : Attack
     {
-        public MeleeAttack(Soul soul, Character characterToAttack) : base("a", $"Attack {characterToAttack.Name} with {soul.Character.GetMainHand().Name}.", characterToAttack, RangeType.CloseSingleTarget)
+        public MeleeAttack(Soul soul, Character characterToAttack) : base(MoveKey.a.ToString(), $"Attack {characterToAttack.Name} with {soul.Character.GetMainHand().Name}.", characterToAttack, RangeType.CloseSingleTarget)
         {
             Character character = soul.Character;
 

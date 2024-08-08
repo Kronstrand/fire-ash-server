@@ -11,7 +11,7 @@ namespace fire_ash_server.Moves
 {
     internal class Stealth : Move
     {
-        public Stealth(Soul soul) : base ("sh", SkillCheck.CreateDescription("Hide.", Skill.Stealth))
+        public Stealth(Soul soul) : base (MoveKey.s.ToString(), SkillCheck.CreateDescription("Hide.", Skill.Stealth))
         {
             Range = RangeType.None;
             Character character = soul.Character;

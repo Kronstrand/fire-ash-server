@@ -25,9 +25,17 @@ namespace fire_ash_server.World.BioMechWorld
                 "Below, the room drops into shadow, filled with the faint hum of unseen machinery."
             );
 
-            creationChamber.AddExit(new Exit(
+
+            Exit toBridgeFromCreationChamber = new Exit(
                 "An imposing steel doorframe marks the exit, its rigid structure contrasting with the room's lifeblood. Beyond, a central metal bridge stretches into shadow.",
-                nexusBridge));
+                nexusBridge);
+            toBridgeFromCreationChamber.AddOnAfterMoveToEvent(
+                (Soul soul, Prop exit) => {
+                    _ = soul.SendAsync("A cold breeze wafts in from beyond the door, carrying a hint of metallic chill.");
+                }, false);
+            creationChamber.AddExit(toBridgeFromCreationChamber);
+
+
 
             // Adding exit to the Creation Chamber
             nexusBridge.AddExit(new Exit(
@@ -37,7 +45,7 @@ namespace fire_ash_server.World.BioMechWorld
 
             //new rooms
             new CaretakerRoom(nexusBridge);
-            new Bazar(nexusBridge);
+            IndustrialStaircase.Create(nexusBridge);
         }
     }
 }

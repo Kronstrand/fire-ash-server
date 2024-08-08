@@ -10,6 +10,7 @@ namespace fire_ash_server.Enums
     {
         Humanoid,
         Monstrosity,
-        Construct
+        Construct,
+        Beast
     }
 }

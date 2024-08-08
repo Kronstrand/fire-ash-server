@@ -12,7 +12,7 @@ namespace fire_ash_server.Moves
     internal class Equip : Move
     {
         public InventorySlot TargetInventorySlot;
-        public Equip(Soul soul, Item item, InventorySlot inventorySlot) : base("e", CreateDescription(item, inventorySlot), CreateAction(soul, item, inventorySlot))
+        public Equip(Soul soul, Item item, InventorySlot inventorySlot) : base(MoveKey.e.ToString(), CreateDescription(item, inventorySlot), CreateAction(soul, item, inventorySlot))
         {
             Prop = item;
             TargetInventorySlot = inventorySlot;

@@ -51,7 +51,10 @@ namespace fire_ash_server.Props
         public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
         public Dictionary<InventorySlot, Item> EquippedItems = new Dictionary<InventorySlot, Item>();
         public Inventory Inventory = new Inventory();
+        public int GP;
         public DialogueManager? DialogueManager;
+        public Character? TradingWith;
+        public bool IsTrader = false;
         public Character? SpeakingTo;
         private Dictionary<Prop, ThreadSafeList<string>> UsedMovesOnProp = new Dictionary<Prop, ThreadSafeList<string>>();
 
@@ -117,6 +120,9 @@ namespace fire_ash_server.Props
 
         public static Faction NewPlayerFaction(string name)
         {
+            return Program.WorldSoul.GetFaction(FactionKey.Players);
+
+            //individual factions for players?
             Faction newPlayerFaction = new Faction(name);
             Faction playerFactionTemplate = Program.WorldSoul.GetFaction(FactionKey.Players);
 
@@ -288,6 +294,21 @@ namespace fire_ash_server.Props
             CurrentRoom.FlagCombatMightBeResolved();
         }
 
+        public async Task Interrupt()
+        {
+            if (Soul.Socket == null)
+                return;
+            
+            await Soul.SendAsync("$[cancel]");
+            if (TradingWith != null)
+            {
+                SetLookAt(TradingWith);
+                TradingWith = null;
+            }
+            
+            Soul.CancelAndResetTokenSource();          
+        }
+
         public int GetAC()
         {
             return 10 + GetModifer(Ability.Dexterity);
@@ -312,33 +333,34 @@ namespace fire_ash_server.Props
             return GetOffHand().GetOffHandAttackDescription(Name, prop.Name);
         }
 
-        public Roll GetAttackRoll()
+        public Roll GetMeleeAttackRoll(Weapon meleeWeapon)
         {
-           return new Roll(GetModifer(Skill.CloseCombat), RollType.AttackRoll, this);
+           return new Roll(GetModifer(Skill.CloseCombat) + meleeWeapon.Modifier, RollType.AttackRoll, this);
+        }
+
+        public Roll GetRangedAttackRoll(Weapon rangedWeapon)
+        {
+            return new Roll(GetModifer(Skill.RangedCombat) + rangedWeapon.Modifier, RollType.AttackRoll, this);
         }
 
         public Damage GetRangedDamageRoll(Weapon rangedWeapon)
         {
             return new Damage(
-                new Roll(rangedWeapon.DamageDie, GetModifer(Ability.Dexterity), RollType.DamageRoll, this),
+                new Roll(rangedWeapon.DamageDie, GetModifer(Ability.Dexterity) + rangedWeapon.Modifier, RollType.DamageRoll, this),
                 rangedWeapon.DamageType);
         }
 
-        public Damage GetMainHandDamageRoll()
+        public Damage GetMainHandDamageRoll(Weapon mainHandWeapon)
         {
-            Weapon mainHandWeapon = GetMainHand();
-
             return new Damage(
-                new Roll(mainHandWeapon.DamageDie, GetModifer(Ability.Strength), RollType.DamageRoll, this),
+                new Roll(mainHandWeapon.DamageDie, GetModifer(Ability.Strength) + mainHandWeapon.Modifier, RollType.DamageRoll, this),
                 mainHandWeapon.DamageType);
         }
 
-        public Damage GetOffHandDamageRoll()
+        public Damage GetOffHandDamageRoll(Weapon offHandWeapon)
         {
-            Weapon offHandWeapon = GetOffHand();
-
             return new Damage(
-                new Roll(offHandWeapon.DamageDie, 0, RollType.DamageRoll, this),
+                new Roll(offHandWeapon.DamageDie, offHandWeapon.Modifier, RollType.DamageRoll, this),
                 offHandWeapon.DamageType);
         }
 
@@ -387,7 +409,7 @@ namespace fire_ash_server.Props
             if (weapon == null) 
                 return;
             string? attack = GetRangedAttackDescription(characterToAttack);
-            Roll roll = GetAttackRoll();
+            Roll roll = GetRangedAttackRoll(weapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
                 Damage damage = GetRangedDamageRoll(weapon);
@@ -408,14 +430,15 @@ namespace fire_ash_server.Props
         public void AttackWithMainHand(Character characterToAttack)
         {
             string? attack = GetMainHandAttackDescription(characterToAttack);
-            Roll roll = GetAttackRoll();
+            Weapon weapon = GetMainHand();
+            Roll roll = GetMeleeAttackRoll(weapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
-                Damage damage = GetMainHandDamageRoll();
+                Damage damage = GetMainHandDamageRoll(weapon);
                 characterToAttack.TakeDamage(
                     damage,
                     this,
-                    GetMainHand().Name,
+                    weapon.Name,
                     attack + SingleHitMessage(roll),
                     true);
             }
@@ -438,14 +461,15 @@ namespace fire_ash_server.Props
         public void AttackWithOffhand(Character characterToAttack)
         {
             string? attack = GetOffHandAttackDescription(characterToAttack);
-            Roll roll = GetAttackRoll();
+            Weapon wapon = GetOffHand();
+            Roll roll = GetMeleeAttackRoll(wapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
-                Damage damage = GetMainHandDamageRoll();
+                Damage damage = GetMainHandDamageRoll(wapon);
                 characterToAttack.TakeDamage(
                     damage,
                     this,
-                    GetMainHand().Name,
+                    wapon.Name,
                     attack + SingleHitMessage(roll),
                     true);
             }
@@ -460,56 +484,6 @@ namespace fire_ash_server.Props
             Inventory.AddItem(itemToAdd);
             LookBackFromItem(itemToAdd);
             return $"{Name} added {itemToAdd.Name} to their inventory.";
-        }
-
-        public string AddToInventory2(Item itemToAdd) //obsolete
-        {
-            bool bothHandsFull = EquippedItems.ContainsKey(InventorySlot.MainHand) && EquippedItems.ContainsKey(InventorySlot.OffHand);
-            if (bothHandsFull)
-            {
-                return $"{Name} tries to grab {itemToAdd.Name}, but has no free hands.";
-            }
-
-            //add to "random" container
-            foreach (KeyValuePair<InventorySlot, Item> kvp in EquippedItems.Where(kvp => kvp.Value.IsContainer))
-            {
-                Item container = kvp.Value;
-                AddCarriedItem(itemToAdd, container);
-                return $"{Name} grabs {itemToAdd.Name} and put it in {container.Name}.";
-            }
-                 
-            foreach (InventorySlot inventorySlot in itemToAdd.CarriableByInventorySlots)
-            {
-                if (!EquippedItems.ContainsKey(inventorySlot))
-                {
-                    AddEquippedItem(inventorySlot, itemToAdd);
-                    switch (inventorySlot)
-                    {
-                        case InventorySlot.MainHand or 
-                             InventorySlot.OffHand:
-                            return 
-                                $"{Name} grabs {itemToAdd.Name} and holds it with their {Description(inventorySlot)}.";
-                        case InventorySlot.Waist:
-                            return 
-                                $"{Name} grabs {itemToAdd.Name} and places it at their {Description(inventorySlot)}.";
-                    }
-                }
-            }
-
-            if (!EquippedItems.ContainsKey(InventorySlot.MainHand))
-            {
-                AddEquippedItem(InventorySlot.MainHand, itemToAdd);
-                return 
-                    $"{Name} grabs {itemToAdd.Name} with their main hand and keeps it there since they have no place to put it.";
-            }
-            if (!EquippedItems.ContainsKey(InventorySlot.OffHand))
-            {
-                AddEquippedItem(InventorySlot.OffHand, itemToAdd);
-                return 
-                    $"{Name} grabs {itemToAdd.Name} with their off-hand and keeps it there since they have no place to put it.";
-            }
-            return
-                $"By some devine intervention, {Name} can't seem to grab {itemToAdd.Name}. Is it fate, or a glitch in the matrix?";
         }
 
         public void AddEquippedItem(InventorySlot inventorySlot, Item item)

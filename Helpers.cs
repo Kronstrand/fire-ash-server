@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Props;
 using fire_ash_server.World;
 
@@ -153,16 +154,18 @@ namespace fire_ash_server
         {
             return $"misses with a roll of {roll}.";
         }
-        public static string GetCountedElement(Dictionary<string, Tuple<int, bool>> countedNamesInRoom, int i)
+        public static string GetCountedElement(CountedCharacter countedName, string elementName)
         {
-            string elementName = countedNamesInRoom.ElementAt(i).Key;
-            if (countedNamesInRoom[elementName].Item1 == 1)
-                if (countedNamesInRoom[elementName].Item2 == true) //is unique name
-                    return $"{elementName}";
+            string result = "";
+            if (countedName.Count == 1)
+                if (countedName.UniqueName == true)
+                    result = $"{elementName}";
                 else
-                    return $"one {elementName}";
+                    result = $"one {elementName}";
             else
-                return  $"{NumberToWord(countedNamesInRoom[elementName].Item1)} {GetPluralizedName(elementName)}";
+                result = $"{NumberToWord(countedName.Count)} {GetPluralizedName(elementName)}";
+
+            return result;
         }
 
         static string GetPluralizedName(string creature)

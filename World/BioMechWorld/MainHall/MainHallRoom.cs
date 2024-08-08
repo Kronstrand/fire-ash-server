@@ -61,7 +61,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 "A sense of awe overwhelms you. Towering columns rise towards a vaulted ceiling obscured by shadows. " +
                 "The air is thick with animated chatter and the occasional clink of mechanical parts. " +
                 "Intricate carvings depicting ancient Mecharion lore adorn the walls and columns, telling tales of a civilization that marries the mechanical with the organic in a dark, eerie harmony. " +
-                "The hall is a social hub where the Mecharions gather to exchange stories. " +
+                "The hall is a gathering place for Mecharions to exchange stories and lived experiences. " +
                 "At the far end of the hall, a raised stage stands ready for speakers to address the assembly or for occasional performances to entertain the Mecharions. " +
                 "The atmosphere is heavy with an undercurrent of ancient wisdom, a place where the past and future converge in an unsettling, yet fascinating blend."
             );
@@ -80,26 +80,26 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 string ezekielEntrance =
                 "As you step into the hall, the Mecharions gather around a raised stage at the far end, " +
                 "where a figure, known as Ezekiel, emerges from the shadows. " +
-                "With a commanding presence, the Ezekiel strides purposefully to the center of the stage. " +
-                "He raises his arms, and the room falls silent in anticipation.";
-
-                // Introduction of the song
-                string songIntroduction =
-                "His voice, a blend of mechanical resonance and commanding presence, fills the hall: \"Brothers and sisters, in this time of great peril, we gather to fortify our spirits and remember our strength. " +
-                "First, let us honor our ancestors and draw inspiration from their resilience. " +
-                "Join me in the song of our lineage, The Lament of Steel and Bone, as we prepare our souls to face the Purist threat.\" " +
-                "With a fluid motion, he signals the start, and the hall resonates with the harmonious and haunting melody sung by the Mecharions.";
+                "With a commanding presence, Ezekiel strides purposefully to the center of the stage. " +
+                "He raises his arms, and the room falls silent in anticipation.";       
 
                 // Ezekiel's speech about the situation
                 string ezekielSpeech =
-                "As the final notes of the song fade into the silence, Ezekiel steps forward once more. " +
-                "\"My fellow Mecharions\", he continues, his voice solemn, \"we face a grave threat. The Purists have breached our outer defenses and now press against our barricades. " +
+                //"As the final notes of the song fade into the silence, Ezekiel steps forward once more. " +
+                "His voice, a blend of mechanical resonance and commanding presence, fills the hall, " +
+                "\"My fellow Mecharions\", his voice solemn, \"as you know, we face a grave threat. The Purists have breached our outer defenses and now press against our barricades. " +
                 "But we are not defeated. Even now, preparations for a final frontal assault are underway. " +
-                "We will meet them head-on and show them the strength and resolve of the Mecharions. Stand ready, for our moment of reckoning approaches.\" " +
+                "We will meet them head-on and show them the strength and resolve of the Mecharions. So Mecharions, embrace yourselves, for our moment of reckoning approaches.\" " +
                 "A wave of fervent applause and triumphant cheers erupts from the audience, their determination and resolve echoing through the hall.";
 
+                // Introduction of the song
+                string songIntroduction =
+                "Ezekiel proceeds as the Mecharions fall silent, \"Brothers and sisters, before I leave you for your final preparations, let us fortify our spirits and remember our strength. " +
+                "Join me in the song of our lineage, The Lament of Steel and Bone, as we prepare our souls to face the Purist threat.\" " +
+                "With a fluid motion, he signals the start, and the hall resonates with the harmonious and haunting melody sung by the Mecharions.";
+
                 // Broadcast the event to souls in the room
-                mainHall.BroadcastToSoulsInRoom(ezekielEntrance + "\n\n" + songIntroduction + "\n\n" + song + "\n\n" + ezekielSpeech);
+                mainHall.BroadcastToSoulsInRoom(ezekielEntrance + "\n\n" + ezekielSpeech + "\n\n" + songIntroduction + "\n\n" + song);
             };
 
             // bazar -> nexus
@@ -152,6 +152,8 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             Character elaraTheDefender = Elara.Create();
             elaraTheDefender.GoToRoom(mainHall);
             elaraTheDefender.MoveToGroup(stage);
+
+            ShadowyTemple.Create(mainHall);
         }
     }
 }

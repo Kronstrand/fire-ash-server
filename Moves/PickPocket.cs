@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves
 {
     internal class PickPocket : Move
     {
-        public PickPocket(Soul soul, Character targetCharacter) : base("pp", $"Pickpocket {targetCharacter.Name}", targetCharacter)
+        public PickPocket(Soul soul, Character targetCharacter) : base(MoveKey.pp.ToString(), $"Pickpocket {targetCharacter.Name}", targetCharacter)
         {
             Type = MoveType.MinorAction;
             Action = async () =>

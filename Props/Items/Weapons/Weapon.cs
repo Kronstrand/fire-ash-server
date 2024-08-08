@@ -12,6 +12,7 @@ namespace fire_ash_server.Props.Items.Weapons
         public Die DamageDie;
         public bool TwoHander;
         public DamageType DamageType;
+        public int Modifier;
         public List<Func<string, string, Weapon, string>> AttackDescriptions = new List<Func<string, string, Weapon, string>>();
         public List<Func<string, string, Weapon, string>> OffHandAttackDescriptions = new List<Func<string, string, Weapon, string>>();
         public static Dictionary<Type, List<Func<string, string, Weapon, string>>> GeneralAttackDescriptionsForType = new Dictionary<Type, List<Func<string, string, Weapon, string>>>();
