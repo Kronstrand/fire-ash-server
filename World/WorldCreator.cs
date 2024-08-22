@@ -159,7 +159,7 @@ namespace fire_ash_server.World
                 "This creature moves with grace and fluidity, its presence often heralding safety and peace. " +
                 "Despite its gentle demeanor, it possesses a formidable ability to harness light, using it to heal allies or dazzle foes. " +
                 "Its fingers, though delicate, are capable of weaving complex enchantments, protecting the forest from those who mean harm.",
-                Race.Elf, // race
+                Kindred.Elf,
                 CreatureType.Humanoid,
                 7,  // strength - not strong, relies on magical abilities and wisdom
                 14, // dexterity - graceful and quick, especially in well-lit areas

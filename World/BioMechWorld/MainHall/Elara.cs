@@ -21,7 +21,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 "a clear indication that her original skin has been replaced. " +
                 "Elara's demeanor is both fierce and protective. " +
                 "She is the shield that guards this stronghold.",
-            Race.Mecharion,
+            Kindred.Mecharion,
             CreatureType.Humanoid,
             15, //strength
             14, //dexterity

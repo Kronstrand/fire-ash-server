@@ -16,6 +16,7 @@ namespace fire_ash_server.Enums
         [Description("Off-hand")]
         OffHand,
         Ranged,
-        Waist
+        Waist,
+        Head
     }
 }

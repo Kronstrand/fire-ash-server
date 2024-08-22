@@ -10,6 +10,8 @@ namespace fire_ash_server.Enums
     {
         public string Name;
         public List<RollModifier> rollModifiers = new List<RollModifier>();
+        public Light LightRadiusModifer = Light.None;
+        public Light LightPointerModifer = Light.None;
 
         public Effect(string name)
         {

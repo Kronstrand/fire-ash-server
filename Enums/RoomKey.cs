@@ -23,6 +23,9 @@ namespace fire_ash_server.Enums
         CaretakerBackRoom,
         Corridor2A,
         Bazar,
-        TempleEntranceHall
+        TempleEntranceHall,
+        UndergroundCavePath,
+        SerpentsSpine,
+        TempleCourtyard
     }
 }

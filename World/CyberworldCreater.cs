@@ -119,7 +119,7 @@ namespace fire_ash_server.World
                 "Bytewhisper is known for their expertise in digital warfare, able to manipulate data and electronics with a mere thought. " +
                 "They move with the grace of a shadow, their presence often unnoticed until it's too late. " +
                 "Despite their intimidating skill set, Bytewhisper is rumored to assist those who find themselves lost in the digital labyrinth of the city.",
-                Race.Cyborg, // race
+                Kindred.Cyborg,
                 CreatureType.Humanoid,
                 8,  // strength - enhanced by cybernetic augmentations
                 16, // dexterity - incredibly agile, especially in the digital realm

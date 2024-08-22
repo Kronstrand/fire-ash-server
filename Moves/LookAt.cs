@@ -13,7 +13,7 @@ namespace fire_ash_server.Moves
 {
     internal class LookAt : Move
     {
-        public LookAt(Soul soul, Prop prop) : base(MoveKey.l.ToString(), CreateDescription(prop), prop)
+        public LookAt(Soul soul, Prop prop) : base(MoveKey.l.ToString(), CreateDescription(soul.Character, prop), prop)
         {
             InitValues();
 
@@ -38,14 +38,14 @@ namespace fire_ash_server.Moves
                 };
         }
 
-        private static string CreateDescription(Prop prop)
+        private static string CreateDescription(Character character, Prop targetProp)
         {
-            string description = $"Look at {prop.Name}.";
+            string description = $"{targetProp.GetLightEffectedName("Look at ", "Look into the ", character)}.";
 
-            if (prop is Character)
+            if (targetProp is Character)
             {
-                Character character = (Character)prop;
-                if (character.Dead)
+                Character targetCharacter = (Character)targetProp;
+                if (targetCharacter.Dead)
                     description += " (Dead)";
             }
             return description;
@@ -65,21 +65,20 @@ namespace fire_ash_server.Moves
                 await soul.SendAsync($"{soul.Character.Name} are staring absentmindedly into the air...");
                 return;
             }
-
-            if (prop is Room)
+            else if (prop is Room)
             {
                 Room room = (Room)prop;
-                await soul.SendAsync(room.GetDescription());
+                await soul.SendAsync(room.GetDescription(soul.Character, true));
                 await soul.SendAsync(room.GetAdditionalRoomDescription(soul.Character));
                 return;
             }
-            if (prop is Character)
+            else if (prop is Character)
             {
                 Character character = (Character)prop;
-                await soul.SendAsync(prop.GetDescription() + "\n\n" + $"The relationship to {character.Name} is {Description(soul.Character.GetRelationshipStatus(character))}.");
+                await soul.SendAsync(prop.GetDescription(soul.Character) + "\n\n" + $"The relationship to {character.Name} is {Description(soul.Character.GetRelationshipStatus(character))}.");
                 return;
             }
-            await soul.SendAsync(prop.GetDescription());
+            await soul.SendAsync(prop.GetDescription(soul.Character));
         }
     }
 }

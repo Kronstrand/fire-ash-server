@@ -9,7 +9,7 @@ namespace fire_ash_server.Abstract_Entities
 {
     internal class GroupedCountedProp
     {
-        public Prop? Prop { get; set; }
+        public Prop? Prop { get; set; } //unpickupable item or exit
         public Dictionary<string,CountedCharacter> CountedCharacters { get; set; }
         public bool UniqueName { get; set; }
 

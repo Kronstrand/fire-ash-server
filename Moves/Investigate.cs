@@ -48,7 +48,7 @@ namespace fire_ash_server.Moves
                     await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
                 else
                     await soul.SendAsync(
-                        $"{tagetProp.GetDescription()}\n\n" +
+                        $"{tagetProp.GetDescription(soul.Character)}\n\n" +
                         $"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
             }
             else
@@ -57,7 +57,7 @@ namespace fire_ash_server.Moves
                     await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and didn't seem to find anything...");
                 else
                     await soul.SendAsync(
-                        $"{tagetProp.GetDescription()}\n\n" +
+                        $"{tagetProp.GetDescription(soul.Character)}\n\n" +
                         $"{soul.Character.Name} rolls {investigationRoll} and didn't seem to find anything...");
             }
         }

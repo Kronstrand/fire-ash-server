@@ -24,7 +24,7 @@ namespace fire_ash_server.World
                 "often leading travelers astray with misleading whispers and echoing footsteps. " +
                 "Its slender fingers are adept at picking locks and setting traps, " +
                 "making it a tricky foe or an invaluable, albeit unpredictable, ally.",
-                Race.Human, // race
+                Kindred.Human,
                 CreatureType.Humanoid,
                 8,  // strength - not very strong, relies on cunning and agility
                 15, // dexterity - extremely agile, quick in its shadowy environment

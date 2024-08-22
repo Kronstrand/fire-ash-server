@@ -1,16 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
@@ -20,6 +9,7 @@ using fire_ash_server.Props.Items.Weapons;
 using fire_ash_server.Abstract_Entities;
 using static fire_ash_server.Helpers;
 using fire_ash_server.World;
+using System.Linq;
 
 namespace fire_ash_server.Props
 {
@@ -30,7 +20,7 @@ namespace fire_ash_server.Props
         private Prop? lookAt;
         public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
         private List<CreatureType> types;
-        public Race Race { get; set; }
+        public Kindred Kindred { get; set; }
         public Gender Gender { get; set; }
         public int Strength { get; set; }
         public int Dexterity { get; set; }
@@ -45,6 +35,7 @@ namespace fire_ash_server.Props
         public bool UniqueName;
 
         public List<string> Feats = new List<string>();
+        public List<Action<Character>> Conditions = new List<Action<Character>>();
         public Faction Faction;
         public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
 
@@ -58,7 +49,7 @@ namespace fire_ash_server.Props
         public Character? SpeakingTo;
         private Dictionary<Prop, ThreadSafeList<string>> UsedMovesOnProp = new Dictionary<Prop, ThreadSafeList<string>>();
 
-        public Character? EnableCombatWith = null;
+        public ToxicRelationship? EnableCombatWith = null;
         public bool InCombat;
         public bool Dead;
         public string DeathDescription;
@@ -74,7 +65,7 @@ namespace fire_ash_server.Props
             init();
 
             types = new List<CreatureType> { CreatureType.Humanoid };
-            Race = Race.Human;
+            Kindred = Kindred.Human;
             Gender = RollGender();
             Strength = Roll(3, 6).Sum();
             Dexterity = Roll(3, 6).Sum();
@@ -90,14 +81,14 @@ namespace fire_ash_server.Props
 
             DeathDescription = "todo"; //Todo
         }
-        public Character(string name, string description, Race race, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
+        public Character(string name, string description, Kindred kindred, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
         {
 
             CurrentRoom = Program.WorldSoul.Rooms[Description(RoomKey.Void)];
             init();
 
             types = new List<CreatureType> {creatureType};
-            Race = race;
+            Kindred = kindred;
             Gender = RollGender();
             Strength = strength;
             Dexterity = dexterity;
@@ -139,6 +130,11 @@ namespace fire_ash_server.Props
             }
 
             return newPlayerFaction;
+        }
+
+        public void SetEnableCombatWith(Character enemy)
+        {
+            EnableCombatWith = new ToxicRelationship(enemy, true);
         }
 
         public void SetFaction(FactionKey faction)
@@ -325,7 +321,9 @@ namespace fire_ash_server.Props
 
         public string? GetMainHandAttackDescription(Prop prop)
         {
-            return GetMainHand().GetAttackDescription(Name, prop);
+            return GetMainHand().GetAttackDescription(
+                Name,
+                prop);
         }
 
         public string? GetOffHandAttackDescription(Prop prop)
@@ -398,6 +396,10 @@ namespace fire_ash_server.Props
                 Item equippedItem = EquippedItems[inventorySlot];
                 EquippedItems.Remove(inventorySlot);
                 Inventory.AddItem(equippedItem);
+
+                foreach (Effect effect in equippedItem.EquipEffects)
+                    Effects.Remove(effect);
+
                 return true;
             }
             return false;
@@ -481,6 +483,7 @@ namespace fire_ash_server.Props
 
         public string AddToInventory(Item itemToAdd)
         {
+            itemToAdd.RemoveFromCurrentGrouping();
             Inventory.AddItem(itemToAdd);
             LookBackFromItem(itemToAdd);
             return $"{Name} added {itemToAdd.Name} to their inventory.";
@@ -491,6 +494,10 @@ namespace fire_ash_server.Props
             item.ClearHeldBy();
             EquippedItems.Add(inventorySlot, item);
             item.HeldBy = this;
+
+            foreach(Effect effect in item.EquipEffects)
+                Effects.Add(effect);
+
             LookBackFromItem(item);
         }
         public void AddCarriedItem(Item item, Item MoveTo)
@@ -566,7 +573,7 @@ namespace fire_ash_server.Props
         {
             return
                 "Name: " + Name + "\n" +
-                "Race: " + Race + "\n" +
+                "Kindred: " + Kindred + "\n" +
                 "Gender: " + Description(Gender) + "\n" +
                 "Strength: " + Strength + "\n" +
                 "Dexterity: " + Dexterity + "\n" +
@@ -595,7 +602,7 @@ namespace fire_ash_server.Props
         {
             Ability ability = SkillNumber.GetRelatedAbility(skill);
 
-            Skills.TryGetValue(skill, out  int modifier);
+            Skills.TryGetValue(skill, out int modifier);
             modifier += GetModifer(ability);
 
             return modifier;
@@ -639,19 +646,27 @@ namespace fire_ash_server.Props
             EnableCombatWith = null;
         }
 
-        public void EnableCombat(Character enemy)
+        public void EnableCombat(ToxicRelationship toxicRel)
         {
-            if (InCombat && enemy.InCombat)
+            if (InCombat && toxicRel.ToxicCharacter.InCombat)
                 return;
 
-            RelationshipStatus relStatus = GetRelationshipStatus(enemy);
+            Character aggressor = this;
+            Character victim = toxicRel.ToxicCharacter;
+            if (toxicRel.ToxicCharacterIsInitiator)
+            {
+                aggressor = toxicRel.ToxicCharacter;
+                victim = this;
+            }
+
+            RelationshipStatus relStatus = aggressor.GetRelationshipStatus(victim);
 
             if (relStatus == RelationshipStatus.good)
-                ModifyRelationshipTo(enemy, -10);
+                aggressor.ModifyRelationshipTo(victim, -10);
             else if (relStatus == RelationshipStatus.neutral)
-                ModifyRelationshipTo(enemy, -5);
+                aggressor.ModifyRelationshipTo(victim, -5);
 
-            CurrentRoom.EnableOrUpdateCombat(this, enemy);
+            CurrentRoom.EnableOrUpdateCombat(this, toxicRel.ToxicCharacter);
         }
 
         public Relationship GetRelationShipTo(Character character)
@@ -779,9 +794,38 @@ namespace fire_ash_server.Props
             return withinReach;
         }
 
-        public void AddFeat(FeatKey featKey)
+        public bool HasPointLight()
         {
-            Feats.Add(Description(featKey));
+            foreach(Effect effect in GetAllEffectsIncludingFeats())
+            {
+                if (effect.LightPointerModifer >= Light.Dim)
+                    return true;
+            }
+            return false;
+        }
+
+        public List<Effect> GetAllEffectsIncludingFeats()
+        {
+            List<Effect> allEffects = Effects.ToList();
+            foreach(string featName in Feats)
+            {
+                Feat? feat = World.Feats.GetWithoutMoves(featName, Soul);
+                if (feat != null)
+                {
+                    allEffects.AddRange(feat.Effects);
+                }
+            }
+            return allEffects;
+        }
+
+        public void AddFeat(FeatKey key)
+        {
+            Feats.Add(Description(key));
+        }
+
+        public bool HasFeat(EffectKey key)
+        {
+            return Feats.Contains(Description(key));
         }
     }
 }

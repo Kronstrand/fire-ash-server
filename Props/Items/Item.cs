@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
+using fire_ash_server.World;
 
 namespace fire_ash_server.Props.Items
 {
@@ -14,6 +15,7 @@ namespace fire_ash_server.Props.Items
         public Prop? HeldBy;
         public bool IsContainer;
         public ThreadSafeList<InventorySlot> CarriableByInventorySlots = new ThreadSafeList<InventorySlot>();
+        public List<Effect> EquipEffects = new List<Effect>();
 
         public Item(string name, string description) : base(name, description)
         {
@@ -37,8 +39,11 @@ namespace fire_ash_server.Props.Items
             {
                 if (itemPointer.HeldBy == null)
                     return null;
-
-                if (itemPointer.HeldBy.GetType() == typeof(Inventory))
+                
+                if (itemPointer is Inventory && itemPointer.HeldBy is Character)               
+                    return (Character)itemPointer.HeldBy;
+                
+                if (itemPointer.HeldBy is Inventory)
                 {
                     Inventory inventory = (Inventory)itemPointer.HeldBy;
                     if (inventory.HeldBy is Character)
@@ -69,6 +74,11 @@ namespace fire_ash_server.Props.Items
                     }
                 }
             }
+        }
+
+        public void AddEquipEffect(EffectKey effectKey)
+        {
+            EquipEffects.Add(World.Effects.Get(effectKey));
         }
 
         public Room? LocatedInRoom()

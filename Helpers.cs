@@ -201,5 +201,32 @@ namespace fire_ash_server
                 return "" + number;
             }
         }
+
+        public static void SetThreadBasedBufferText(string bufferText)
+        {
+            Program.WorldSoul.ThreadBufferText.GetOrAdd(Thread.CurrentThread, bufferText);
+        }
+
+        public static void RemoveBufferTextForThread()
+        {
+            Program.WorldSoul.ThreadBufferText.TryRemove(Thread.CurrentThread, out _);
+        }
+
+        public static string RemoveLastDot(string input)
+        {
+            // Check if the input string is not null or empty
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            // Check if the last character is a '.'
+            if (input[input.Length - 1] == '.')
+            {
+                // Return the string without the last character (the '.')
+                return input.Substring(0, input.Length - 1);
+            }
+
+            // Return the original string if there is no '.' at the end
+            return input;
+        }
     }
 }

@@ -37,7 +37,16 @@ namespace fire_ash_server.Props
         public Room(string roomKey,string name, string description) : base(name, description)
         {   
             RoomKey = roomKey;
+            Light = Light.Bright;
             Program.WorldSoul.AddRoom(this);
+        }
+
+        public Room(RoomKey roomKey, string name, string description) : this(Description(roomKey), name, description)
+        {
+        }
+
+        public Room(string name, string description) : this(name, name, description)
+        {
         }
 
         public void AddExit(Exit exit)
@@ -51,9 +60,17 @@ namespace fire_ash_server.Props
 
             List<Exit> exitList = Exits.Where(e => !e.IsHidden()).ToList();
 
-            foreach (Exit exit in exitList)
+            for (int i = 0; i < exitList.Count; i++)
             {
-                description += exit.GetDescription(lookingCharacter, false);
+                if (i != 0)
+                    description += "; ";
+
+                string exitDescription = exitList[i].GetDescription(lookingCharacter, false);
+
+                if (i != exitList.Count - 1)
+                    description += RemoveLastDot(exitDescription); //not last exit
+                else
+                    description += exitDescription; //last exit
             }
             
             string charactersAsString = ListCharactersAsString(lookingCharacter);
@@ -63,7 +80,7 @@ namespace fire_ash_server.Props
             return description;
         }
 
-        private string ListCharactersAsString(Character excludeCharacter)
+        private string ListCharactersAsString(Character lookingCharacter)
         {
             List<Tuple<Prop?, List<Character>>> groupedCharactersByProp = new List<Tuple<Prop?, List<Character>>>();
 
@@ -73,18 +90,28 @@ namespace fire_ash_server.Props
             {
                 Prop? stageItem = null;
                 List<Character> groupedCharacters = new List<Character>();
+                bool groupIsShroudedInDarkness = grouping.GetLightState(lookingCharacter) == Light.Darkness;
                 foreach (Prop prop in grouping.Props)
                 {
-                    if (!prop.IsPickupable() && stageItem == null)
+                    if (groupIsShroudedInDarkness)
+                    {
+                        if (prop is Character)
+                            if (!Equals((Character)prop, lookingCharacter))
+                                allGroupedCharacters.Add((Character)prop);
+                        continue;
+                    }
+
+                    if (!prop.IsPickupable() && stageItem == null && !prop.IsHidden())
                         if (prop is Item || prop is Exit)
-                            stageItem = prop;
+                                stageItem = prop;
 
 
                     if (prop is Character)
-                        if (!Equals((Character)prop, excludeCharacter))
+                        if (!Equals((Character)prop, lookingCharacter))
                         {
                             allGroupedCharacters.Add((Character)prop);
-                            groupedCharacters.Add((Character)prop);
+                            if (!prop.IsHidden())
+                                groupedCharacters.Add((Character)prop);
                         }
                         else
                             stageItem = prop;
@@ -114,7 +141,11 @@ namespace fire_ash_server.Props
                 GroupedCountedProp groupedCountedProp = new GroupedCountedProp(null);
                 foreach (Character character in ungroupedcharacters)
                 {
-                    if (Equals(character, excludeCharacter))
+                    if (Equals(character, lookingCharacter))
+                        continue;
+                    if (character.GetLightState(lookingCharacter) == Light.Darkness)
+                        continue;
+                    if (character.IsHidden())
                         continue;
 
                     groupedCountedProp.AddToCountedCharacters(character);
@@ -127,13 +158,13 @@ namespace fire_ash_server.Props
                 return "";
 
             int numberOfItems = 0;
-            int outerLoopCounter = 1;
-            foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
-                numberOfItems += groupedCountedProp.CountedCharacters.Count();
+            int outerLoopCounter = 0;
 
             string output = "As you look around you see";     
             foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
             {
+                outerLoopCounter++;
+                //if (groupedCountedProp.Prop != )
                 int i = 0;
                 numberOfItems = groupedCountedProp.CountedCharacters.Count();
                 output += " ";
@@ -166,7 +197,7 @@ namespace fire_ash_server.Props
 
                     if (isLastItem)
                     {
-                        if (groupedCountedProp.Prop == excludeCharacter)
+                        if (groupedCountedProp.Prop == lookingCharacter)
                             output += " close at hand";
                         else if (groupedCountedProp.Prop != null)
                             output += " at the " + groupedCountedProp.Prop.Name;
@@ -181,7 +212,6 @@ namespace fire_ash_server.Props
                     
                     i++;
                 }
-                outerLoopCounter++;
             }
             return output;
         }
@@ -510,11 +540,23 @@ namespace fire_ash_server.Props
         public void BroadcastToSoulsInRoom(Character? character, string message, Character? excludeChar)
         {
             if (character != null)
+            {
+                string? buffer;
+                if (Program.WorldSoul.ThreadBufferText.TryGetValue(Thread.CurrentThread, out buffer) && !string.IsNullOrEmpty(buffer))
+                {
+                    message = buffer + message;
+                    RemoveBufferTextForThread();
+                    Console.WriteLine("Buffer used and cleared at " + DateTime.Now);
+                }
+                else
+                    Console.WriteLine("send without buffer at " + DateTime.Now);
+
                 if (character.IsHidden())
                 {
                     _ = character.Soul.SendAsync(message);
                     return;
                 }
+            }
 
             foreach (Character characterInRoom in Characters)
             {

@@ -9,12 +9,15 @@ using System.Linq;
 using System.Collections.Concurrent;
 using fire_ash_server.World.BioMechWorld;
 using System.Diagnostics.Metrics;
+using fire_ash_server.Moves;
+using System.Threading;
 
 namespace fire_ash_server.World
 {
     internal class WorldSoul
     {
         public ThreadSafeList<Soul> Souls = new ThreadSafeList<Soul>();
+        public ConcurrentDictionary<Thread, string> ThreadBufferText = new ConcurrentDictionary<Thread, string>();
         public Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
         public List<Faction> Factions = new List<Faction>();
         public List<Relationship> Relationships = new List<Relationship>();
@@ -40,6 +43,18 @@ namespace fire_ash_server.World
             while (true)
             {
                 NewSoul(await listener.AcceptAsync());
+                CleanUpThreadBufferText(); //better safe than sorry
+            }
+        }
+
+        public void CleanUpThreadBufferText()
+        {
+            foreach (Thread thread in ThreadBufferText.Keys.ToList())
+            {
+                if (!thread.IsAlive)
+                {
+                    ThreadBufferText.TryRemove(thread, out _);
+                }
             }
         }
 
@@ -101,6 +116,10 @@ namespace fire_ash_server.World
                 soul.Character.AddFeat(FeatKey.DualWield);
                 soul.Character.AddFeat(FeatKey.RangedAttack);
                 soul.Character.AddFeat(FeatKey.PickPocket);
+                soul.Character.AddToInventory(WeaponList.ColtARFifteen());
+                soul.Character.AddToInventory(WeaponList.HolographicBlade());
+                soul.Character.AddToInventory(WeaponList.LuminarBaton());
+                soul.Character.AddToInventory(ArmorList.NocturnalOptics());
 
                 string messageToSoul =
                 "Welcome to Fire & Ashes.\n\n" +
@@ -113,7 +132,7 @@ namespace fire_ash_server.World
                 if (World == null)
                     throw new Exception("World is not initiatited and is null");
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(World.CreateIncubator());
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.TempleEntranceHall);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.TempleCourtyard);
 
                 while (!soul.Character.Dead)
                 {

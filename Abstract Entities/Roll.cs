@@ -65,7 +65,7 @@ namespace fire_ash_server
         public int GetCharacterEffectsModifier() 
         {
             int modifer = 0;
-            foreach(Effect effect in RollingCharacter.Effects) 
+            foreach(Effect effect in RollingCharacter.GetAllEffectsIncludingFeats()) 
             {
                 foreach(RollModifier rollModifier in effect.rollModifiers)
                 {

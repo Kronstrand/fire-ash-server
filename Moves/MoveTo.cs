@@ -3,20 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
     internal class MoveTo : Move
     {
-        public MoveTo(Soul soul, Prop targetProp) : base(MoveKey.m.ToString(), $"Move to {CreateName(targetProp)}", targetProp)
+        public MoveTo(Soul soul, Prop targetProp) : base(MoveKey.m.ToString(), CreateMoveName(soul.Character, targetProp), targetProp)
         {
             Range = RangeType.RangeSingleTarget;
 
             Action = async () =>
             {
-                soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreateName(targetProp)}.");
+                bool interruptMove = false;
+                Grouping? grouping = soul.Character.GetGrouping();
+                if (grouping != null)
+                    interruptMove = grouping.RunAllOnBeforeMoveFromEventsInGroup(soul);
+
+                if (interruptMove)
+                    return;
+
+                if (targetProp.GetLightState(null) != Light.Darkness)
+                    soul.Character.BroadcastToSoulsInRoom($"{soul.Character.Name} moves to {CreatePropName(targetProp)}.");
+                else
+                    soul.Character.BroadcastToSoulsInRoom($"{soul.Character.Name} moves into the darkness, {targetProp.ContextDescription}");
+
                 soul.Character.MoveToGroup(targetProp);
                 if (soul.Character.LookAt != targetProp)
                 {
@@ -24,11 +38,23 @@ namespace fire_ash_server.Moves
                     await LookAt.LookAtAction(soul, targetProp);
                 }
 
-                targetProp.RunOnAfterMoveToEvents(soul, targetProp);
+                targetProp.RunOnAfterMoveToEvents(soul);
             };
         }
 
-        public static string CreateName(Prop prop)
+        public static string CreateMoveName(Character character, Prop prop)
+        {
+            if (prop.DynamicDescription && prop.GetLightState(character) == Light.Darkness)
+            {
+                if (prop.ContextDescription == null) throw new Exception($"{prop.Name} has no context description");
+
+                return $"Move into the darkness, {ToLowerFirstChar(prop.ContextDescription)}.";
+            }
+            else
+                return $"Move to {CreatePropName(prop)}.";
+        }
+
+        public static string CreatePropName(Prop prop)
         {
             if (prop is Exit)
                 return ((Exit)prop).GoToRoom.Name + " Entrance";

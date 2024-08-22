@@ -59,7 +59,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "The machine exudes a palpable sense of intelligence and malevolence, as if it possesses a will of its own. " +
                 "The creation of new humans is both an act of precision and brutality, with the Mother-Machine ensuring each creation is perfected to its unsettling standards. " +
                 "Its constant, rhythmic movements and the occasional sound of metal scraping together create a disturbing symphony that fills the chamber.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Construct,
                 18, // strength
                 12, // dexterity
@@ -75,7 +75,7 @@ namespace fire_ash_server.World.BioMechWorld
             motherMachine.UniqueName = true;
             motherMachine.HP = 70;
             motherMachine.AddFeat(FeatKey.DualWield);
-            motherMachine.DefaultHand = new SpiderClaw();
+            motherMachine.DefaultHand = new InsectClaw();
             motherMachine.GoToRoom(creationChamber);
             motherMachine.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
 
@@ -151,7 +151,7 @@ namespace fire_ash_server.World.BioMechWorld
                  "The sentry itself moves with a disturbing, serpentine grace, and is capable of lashing out with surprising speed and precision. " +
                  "The probe is covered in a mix of organic tendrils and metallic wires, making it both resilient and flexible. " +
                  "It emits a low, droning hum, adding to its eerie presence.",
-                 Race.Mecharion,
+                 Kindred.Mecharion,
                  CreatureType.Construct,
                  6,  // strength
                  10, // dexterity
@@ -213,7 +213,7 @@ namespace fire_ash_server.World.BioMechWorld
                     if (tubeMoveUsed == 1)
                         releaseSentry(s);
                     else if ((tubeMoveUsed == 2))
-                        s.Character.EnableCombatWith = ocularSentinel;
+                        s.Character.SetEnableCombatWith(ocularSentinel);
 
                     return "";
                 }
@@ -247,7 +247,7 @@ namespace fire_ash_server.World.BioMechWorld
                     if (tubeMoveUsed == 1)
                         releaseSentry(s);
                     else if ((tubeMoveUsed == 2))
-                        s.Character.EnableCombatWith = ocularSentinel;
+                        s.Character.SetEnableCombatWith(ocularSentinel);
 
                     return "";
                 }

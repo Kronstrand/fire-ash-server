@@ -51,7 +51,8 @@ namespace fire_ash_server.Moves
 
         public override bool IsValid(Soul soul)
         {
-            return !soul.Character.IsHidden();
+            Light lightSate = soul.Character.GetLightState(null);
+            return !soul.Character.IsHidden() && lightSate < Light.Bright;
         }
     }
 }

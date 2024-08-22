@@ -16,6 +16,7 @@ namespace fire_ash_server.Enums
         InitiativeRoll,
         ContestRoll,
         RandomRoll,
-        ConcentrationCheck
+        ConcentrationCheck,
+        DimLightAttackRoll
     }
 }

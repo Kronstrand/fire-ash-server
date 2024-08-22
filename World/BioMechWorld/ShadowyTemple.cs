@@ -80,7 +80,7 @@ namespace fire_ash_server.World.BioMechWorld
             Character auroraTheShadowmancer = new Character(
                 "Aurora",
                 "Aurora, her presence commanding yet peaceful. Her attire is a blend of serene fabrics and metallic elements, reflecting the temple's dual nature.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 8, // strength
                 16, // dexterity
@@ -115,7 +115,7 @@ namespace fire_ash_server.World.BioMechWorld
             Character nyx = new Character(
                 "Nyx, the Temple Cat",
                 "A sleek, dark-furred cat with eyes like liquid silver. Nyx moves with ethereal grace, often blending into the shadows of the temple. Her presence is both comforting and enigmatic, adding a subtle touch of mystique wherever she goes.",
-                Race.Feline,
+                Kindred.Feline,
                 CreatureType.Beast,
                 4, // strength
                 16, // dexterity

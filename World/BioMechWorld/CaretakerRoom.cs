@@ -62,7 +62,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Vexis' face is an odd blend of amphibian and machine, featuring large, glowing green eyes and peculiar, protruding ears. " +
                 "Despite his unsettling appearance, he exudes a warm, welcoming aura. " +
                 "His voice, a distorted whisper with a hint of static, often carries a tone of curiosity and friendliness.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 14, //strength
                 9, //dexterity

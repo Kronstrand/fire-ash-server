@@ -28,8 +28,8 @@ namespace fire_ash_server.Props.Items.Weapons
                 descriptions.Add((a, r, w) => $"{a} lunges forward, slashing at {r} with their sharp claws.");
                 descriptions.Add((a, r, w) => $"{a} snarls and strikes at {r} with a fierce claw swipe.");
                 descriptions.Add((a, r, w) => $"{a} leaps towards {r}, claws extended in an attempt to rake them.");
-                descriptions.Add((a, r, w) => $"{a} darts forward, claws outstretched, aiming for {r}'s vulnerable spots.");
-                descriptions.Add((a, r, w) => $"{a} slashes at {r}'s body with a quick, precise claw attack.");
+                descriptions.Add((a, r, w) => $"{a} darts forward, claws outstretched, aiming for {FormatPossessive(r)} vulnerable spots.");
+                descriptions.Add((a, r, w) => $"{a} slashes at {FormatPossessive(r)} body with a quick, precise claw attack.");
                 descriptions.Add((a, r, w) => $"{a} twists and brings their claws down on {r} with a vicious strike.");
                 descriptions.Add((a, r, w) => $"{a} pounces on {r}, claws flashing in the dim light.");
                 descriptions.Add((a, r, w) => $"{a} strikes at {r} with a swift claw attack, aiming to wound deeply.");

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
 using fire_ash_server.Props.Items;
+using fire_ash_server.World;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props
@@ -21,13 +24,19 @@ namespace fire_ash_server.Props
         public string? ContextDescription;
         private bool pickupable;
         private bool hidden;
+        public Light Light { private get; set; } = Light.None;
+        public bool DarknessOverride { get; set; } = false;
+        public bool DynamicDescription = false;
         public bool Unreachable = false;
         public int HiddenDC { get; set; }
 
         public ThreadSafeList<Item> Items = new ThreadSafeList<Item>();
         public ThreadSafeList<Move> moves = new ThreadSafeList<Move>();
 
-        public List<Effect> Effects = new List<Effect>();
+        public ThreadSafeList<Effect> Effects = new ThreadSafeList<Effect>();
+
+        private ThreadSafeList<Func<Soul, bool>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, bool>>();
+        private ThreadSafeList<Func<Soul, bool>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, bool>>();
 
         private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul, Prop>>();
         private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul, Prop>>();
@@ -44,7 +53,11 @@ namespace fire_ash_server.Props
         }
         public void RemoveAllEffects(string effectName)
         {
-            Effects.RemoveAll(e => e.Name == effectName);
+            for (int i = Effects.Count - 1; i >= 0; i--)
+            {
+                if (Effects.GetAt(i).Name == effectName)
+                    Effects.RemoveAt(i);
+            }
         }
 
         public bool HasHiddenProps()
@@ -57,20 +70,20 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public string GetDescription()
+        public string GetDescription(Character lookingCharacter)
         {
-            return GetDescription(null, true);
+            return GetDescription(lookingCharacter, true);
         }
 
-        public string GetDescription(Character? lookingCharacter, bool showImage)
+        public string GetDescription(Character lookingCharacter, bool showImage)
         {
-            string exitImagePrefix = "";
-
             string description = Description;
-            if (lookingCharacter != null && ContextDescription != null)
+            if (GetLightState(lookingCharacter) == Light.Darkness)
+                description = "There is darkness.";
+            if (lookingCharacter.LookAt != this && ContextDescription != null)
                 description = ContextDescription + ", " + ToLowerFirstChar(description);
-            
 
+            string exitImagePrefix = "";
             if (this is Character)
             {
                 Character character = (Character)this;
@@ -86,6 +99,19 @@ namespace fire_ash_server.Props
 
                 if (exit.LocatedInRoom != null)
                     exitImagePrefix = exit.LocatedInRoom.Name;
+            }
+            else if (this is Room)
+            {
+                Room room = (Room)this;
+
+                if (room.GetLightState(lookingCharacter) == Light.Darkness)
+                    showImage = false;
+
+                List<Item> dynamicItems = room.Items.Where(i => i.DynamicDescription).ToList();
+                foreach (Item item in dynamicItems)
+                {
+                    description += " " + item.GetDescription(lookingCharacter, false);
+                }
             }
 
             if (!showImage)
@@ -171,10 +197,9 @@ namespace fire_ash_server.Props
             return pickupable;
         }
 
-
         public Prop ShallowCopy()
         {
-            return (Prop)this.MemberwiseClone();
+            return (Prop)MemberwiseClone();
         }
 
         public List<Prop> FoundItems(int result)
@@ -187,11 +212,6 @@ namespace fire_ash_server.Props
             }
             return props;
         }
-
-        /*public List<Item> FoundItems(int result)
-        {
-            return Items.Where(item => item.IsHidden() && item.HiddenDC <= result).ToList();
-        }*/
 
         public Prop? GetPropPosition()
         {
@@ -368,10 +388,30 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public void RunOnAfterMoveToEvents(Soul soul, Prop movedToProp)
+        public bool RunOnBeforeMoveFromEvents(Soul soul)
         {
-            foreach (Action<Soul,Prop> afterCombatEvent in OnAfterMoveToEvents)
-                afterCombatEvent(soul, movedToProp);
+            bool interruptMove = false;
+            foreach (Func<Soul, bool> beforeMoveEvent in OnBeforeMoveFromEvents)
+                if (beforeMoveEvent(soul))
+                    interruptMove = true;
+
+            OnBeforeMoveFromEvents.RemoveAll(OnBeforeMoveFromEventsToBeRemoved);
+            OnBeforeMoveFromEventsToBeRemoved.Clear();
+
+            return interruptMove;
+        }
+
+        public void AddOnBeforeMoveFromEvent(Func<Soul, bool> action, bool runOnce)
+        {
+            OnBeforeMoveFromEvents.Add(action);
+            if (runOnce)
+                OnBeforeMoveFromEventsToBeRemoved.Add(action);
+        }
+
+        public void RunOnAfterMoveToEvents(Soul soul)
+        {
+            foreach (Action<Soul,Prop> afterMoveEvent in OnAfterMoveToEvents)
+                afterMoveEvent(soul, this);
 
             OnAfterMoveToEvents.RemoveAll(OnAfterMoveToEventsToBeRemoved);
             OnAfterMoveToEventsToBeRemoved.Clear();
@@ -382,6 +422,205 @@ namespace fire_ash_server.Props
             OnAfterMoveToEvents.Add(action);
             if (runOnce)
                 OnAfterMoveToEventsToBeRemoved.Add(action);
+        }
+
+        public string GetLightEffectedName(string preTextWithLigh, string preTextWithDarkness, Character? lookingCharacter)
+        {
+            return GetLightEffectedName(preTextWithLigh, preTextWithDarkness, false, lookingCharacter);
+        }
+        public string GetLightEffectedName(string preTextWithLigh, string preTextWithDarkness, bool excludeContext, Character? lookingCharacter)
+        {
+            if (DynamicDescription && GetLightState(lookingCharacter) == Light.Darkness)
+            {
+                if (ContextDescription == null) throw new Exception($"{Name} has no context description");
+                string darkResult = preTextWithDarkness + "darkness";
+                if (!excludeContext)
+                    darkResult += $", {ToLowerFirstChar(ContextDescription)}";
+                return darkResult;
+            }
+            else
+                return preTextWithLigh + Name;
+        }
+
+        public Grouping? GetGrouping()
+        {
+            return GetGrouping(null);
+        }
+        public Grouping? GetGrouping(Room? currentRoom)
+        {
+            if (currentRoom == null)
+            {
+                currentRoom = GetRoomLocation();
+                if (currentRoom == null)
+                    return null;
+            }
+
+            foreach (Grouping group in currentRoom.Groupings)
+                if (group.Props.Contains(this))
+                    return group;
+
+            return null;
+        }
+
+        public Light GetPropLight()
+        {
+            Light light = Light;
+
+            foreach(Effect effect in GetAllEfects())
+            {
+                if (effect.LightRadiusModifer > light)
+                    light = effect.LightRadiusModifer;
+            }
+
+            return light;
+        }
+
+        public List<Effect> GetAllEfects()
+        {
+            if (this is Character)
+                return ((Character)this).GetAllEffectsIncludingFeats();
+
+            return Effects.ToList();
+        }
+
+        public bool HasEffect(EffectKey effectKey)
+        {
+            List <Effect> effects = GetAllEfects();
+            string effectName = Description(effectKey);
+            return effects.Where(e => e.Name == effectName).Any();
+        }
+        public Light GetLightState(Character? characterLooking)
+        {
+            return GetLightState(characterLooking, true);
+        }
+        public Light GetLightState(Character? characterLooking, bool includeLightPointers)
+        {
+            Light currentLightSate = Light.Bright;
+            if (characterLooking != null && characterLooking.HasEffect(EffectKey.Darkvision))
+                return currentLightSate;
+            
+            //room ligh is base light
+            Room? currentRoom = GetRoomLocation();
+            if (currentRoom != null)
+                currentLightSate = currentRoom.GetPropLight();
+
+            if (this is Room)
+            {
+                Room thisRoom = (Room)this;
+
+                if (thisRoom.Light == Light.Bright)
+                    return thisRoom.Light;
+
+                List<Prop> unprocecessedProps = thisRoom.Characters
+                                                        .Concat<Prop>(thisRoom.Items)
+                                                        .Concat(thisRoom.Exits)
+                                                        .Where(p => !p.DarknessOverride)
+                                                        .ToList();
+
+                while (unprocecessedProps.Count > 0)
+                {
+                    Prop unprocecessedProp = unprocecessedProps[0];
+                    unprocecessedProps.RemoveAt(0);
+
+                    Light lightContenter = Light.None;
+                    Grouping? grouping = unprocecessedProp.GetGrouping();
+                    if (grouping != null)
+                    {
+                        lightContenter = grouping.GetLightState(null);
+
+                        foreach (Prop groupedProp in grouping.Props)
+                            unprocecessedProps.Remove(groupedProp);
+                    }
+                    else
+                        lightContenter = unprocecessedProp.GetLightState(null);
+
+                    if (lightContenter > currentLightSate)
+                    {
+                        currentLightSate = lightContenter;
+                        if (currentLightSate == Light.Bright)
+                            return currentLightSate;
+                    }
+                }
+                return currentLightSate;
+            }
+
+            Grouping? group = GetGrouping(currentRoom);
+            if (group != null)
+            {
+                //does any lightsource in the group darken it?
+                foreach (Prop dakrProp in group.Props.Where(p => p.DarknessOverride))
+                {
+                    Light darkPropLight = dakrProp.GetPropLight();
+                    if (darkPropLight < currentLightSate)
+                        currentLightSate = darkPropLight;
+                }
+                if (currentLightSate == Light.Bright)
+                    return currentLightSate;
+
+                //does any lightsource in the group light it up?
+                foreach (Prop prop in group.Props.Where(p => p.DarknessOverride == false))
+                {
+                    Light propLight = prop.GetPropLight();
+                    if (propLight > currentLightSate)
+                        currentLightSate = propLight;
+                }
+            }
+            //prop is not in group
+            else
+            {
+                Light propLight = GetPropLight();
+                if (DarknessOverride)
+                {
+                    
+                    if (propLight < currentLightSate)
+                        currentLightSate = propLight;
+                }
+                else
+                {
+                    if (propLight > currentLightSate)
+                        currentLightSate = propLight;
+                }
+            }
+
+            if (currentLightSate == Light.Bright)
+                return currentLightSate;
+
+            if (!includeLightPointers)
+                return currentLightSate;
+
+            // add light from light pointers
+            if (currentRoom == null)
+                return currentLightSate;
+
+            List<Character> charactersWithPointLight = currentRoom.Characters.Where(c => c.HasPointLight()).ToList();
+            if (!charactersWithPointLight.Any())
+                return currentLightSate;
+
+            if (group != null)
+            {
+                foreach (Prop prop in group.Props)
+                    currentLightSate = prop.AddLookedAtLightSource(currentLightSate, charactersWithPointLight);
+            }
+            else
+                currentLightSate = AddLookedAtLightSource(currentLightSate, charactersWithPointLight);
+
+            return currentLightSate;
+        }
+
+        private Light AddLookedAtLightSource(Light currentLightSate, List<Character> characters)
+        {
+            foreach (Character character in characters)
+            {
+                if (character.LookAt == this)
+                    foreach (Effect effect in character.GetAllEffectsIncludingFeats())
+                    {
+                        if (effect.LightPointerModifer == Light.Bright)
+                            return Light.Bright;
+                        else if (effect.LightPointerModifer > currentLightSate)
+                            currentLightSate = effect.LightPointerModifer;
+                    }
+            }
+            return currentLightSate;
         }
     }
 }

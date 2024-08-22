@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using fire_ash_server.Moves.Attacks;
 using fire_ash_server.Dialogue;
 using fire_ash_server.World;
+using fire_ash_server.Abstract_Entities;
 
 namespace fire_ash_server
 {
@@ -26,6 +27,8 @@ namespace fire_ash_server
         public ConcurrentDictionary<string, Move> AllPossibleMoves = new ConcurrentDictionary<string, Move>();
         public ConcurrentDictionary<string, Move> ShownPossibleMoves = new ConcurrentDictionary<string, Move>();
         public CancellationTokenSource CancelTokenSource = new CancellationTokenSource();
+        public string BufferText = "";
+        public bool AddToBufferText = false;
 
         public Soul(Socket soulSocket)
         {
@@ -152,35 +155,45 @@ namespace fire_ash_server
                 AddPossibleMove(new LookAt(this));
 
                 if (Character.LookAt is Character)
-                {                     
+                {                  
                     Character lookAtCharacter = (Character)Character.LookAt;
-                    bool? isInGroupWithTargert = Character.IsInGroupWith(Character.LookAt);
-
-                    if (isInGroupWithTargert == false)
-                        AddPossibleMove(new MoveTo(this, lookAtCharacter));
-
-                    if (!Character.IsHidden() && isInGroupWithTargert == true)
+                    if (lookAtCharacter.GetLightState(Character) != Light.Darkness)
                     {
-                        if (lookAtCharacter.DialogueManager != null)
-                            AddPossibleMove(new SpeakTo(this, lookAtCharacter));
-                        if (lookAtCharacter.IsTrader)
-                            AddPossibleMove(new BrowseGoods(this, lookAtCharacter)); 
+                        bool? isInGroupWithTargert = Character.IsInGroupWith(Character.LookAt);
+
+                        if (isInGroupWithTargert == false)
+                            AddPossibleMove(new MoveTo(this, lookAtCharacter));
+
+                        if (!Character.IsHidden() && isInGroupWithTargert == true)
+                        {
+                            if (lookAtCharacter.DialogueManager != null)
+                                AddPossibleMove(new SpeakTo(this, lookAtCharacter));
+                            if (lookAtCharacter.IsTrader)
+                                AddPossibleMove(new BrowseGoods(this, lookAtCharacter));
+                        }
                     }
                 }
                 else if (Character.LookAt is Item)
                 {
                     Item item = (Item)Character.LookAt;
+                    
 
                     AddPossibleInvestigationOrLookMove(item);
-                    
-                    if (item.HeldByCharacter() != Character && item.IsPickupable())
+
+                    if (Character.IsInGroupWith(item) == false && item.HeldByCharacter() != Character)
+                        AddPossibleMove(new MoveTo(this, item));
+
+                    if (Character.TradingWith != null && item.HeldByCharacter() != Character && item.IsPickupable())
                         AddPossibleMove(new BuyItem(this, item));
                 }
                 else if (Character.LookAt is Room)
                 {
                     Room lookAtRoom = (Room)Character.LookAt;
                     AddPossibleInvestigationOrLookMove(lookAtRoom);
-                    foreach (Character otherChar in lookAtRoom.Characters.Where(character => character != Character && !character.IsHidden()))
+                    foreach (Character otherChar in lookAtRoom.Characters.Where(character =>
+                                                                    character != Character && 
+                                                                    !character.IsHidden() && 
+                                                                    character.GetLightState(Character) != Light.Darkness))
                     {
                         AddPossibleMove(new LookAt(this, otherChar));
                     }
@@ -198,43 +211,66 @@ namespace fire_ash_server
                             AddPossibleMove(new Equip(this, item, inventorySlot));
                 }
 
-                foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
+                Light characterLookAtLightSate = Character.LookAt.GetLightState(Character);
+                bool lookAtWithLight = !(characterLookAtLightSate == Light.Darkness && !Character.HasPointLight());
+                if (lookAtWithLight)
                 {
-                    AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, Character.LookAt));
-                }
-
-                foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
-                {
-                    bool isClose = true;
-                    if (item.HeldBy == Character.CurrentRoom)
+                    foreach (SkillCheck skillCheck in Character.LookAt.moves.Where(move => move.GetType() == typeof(SkillCheck)))
                     {
-                        isClose = Character.IsInGroupWith(item) != false;
+                        AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, Character.LookAt));
                     }
-
-                    
-                    if (isClose)
+                }
+                if (lookAtWithLight || (Character.LookAt is Inventory && ((Inventory)Character.LookAt).HeldBy == Character))
+                {
+                    foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
                     {
-                        AddPossibleInvestigationOrLookMove(item);
-
-                        if (item.HeldByCharacter() == null)
+                        bool isClose = true;
+                        if (item.HeldBy == Character.CurrentRoom)
                         {
-                            Grab grabMove = new Grab(this, item);
-                            grabMove.Hidden = true;
-                            AddPossibleMove(grabMove);
+                            isClose = Character.IsInGroupWith(item) != false;
+                        }
+
+
+                        if (isClose)
+                        {
+                            AddPossibleInvestigationOrLookMove(item);
+
+                            if (item.HeldByCharacter() == null)
+                            {
+                                Grab grabMove = new Grab(this, item);
+                                grabMove.Hidden = true;
+                                AddPossibleMove(grabMove);
+                            }
+                        }
+                        else if ((!isClose && item.Unreachable) || (item.DynamicDescription && item.GetLightState(character) == Light.Darkness && Character.HasPointLight()))
+                        {
+                            AddPossibleMove(new LookAt(this, item));
+                        }
+                        else if (!item.Unreachable)
+                            AddPossibleMove(new MoveTo(this, item));
+                    }
+                }
+                //looking at darkness with flashlight to see all props in group
+                if (Character.LookAt.GetLightState(null, false) == Light.Darkness && Character.HasPointLight())
+                {
+                    Grouping? group = Character.LookAt.GetGrouping();
+                    if (group != null)
+                    {
+                        foreach (Prop prop in group.Props)
+                        {
+                            if (Character.LookAt == prop)
+                                continue;
+
+                            AddPossibleMove(new LookAt(this, prop));
                         }
                     }
-                    else if (!isClose && item.Unreachable)
-                    {
-                        AddPossibleMove(new LookAt(this, item));
-                    }
-                    else if (!item.Unreachable)
-                        AddPossibleMove(new MoveTo(this, item));
+                    
                 }
             }
 
             foreach (string featKey in Character.Feats)
             {
-                Feat? feat = FeatCreater.Get(featKey, this, Character.LookAt);
+                Feat? feat = Feats.Get(featKey, this, Character.LookAt);
                 if (feat == null) continue;
 
                 foreach (Move move in feat.Moves)
@@ -254,7 +290,7 @@ namespace fire_ash_server
             {                           
                 if (Character.IsInGroupWith(exit) == true)
                 {
-                    if (Character.LookAt == Character.CurrentRoom)
+                    if (Character.LookAt == Character.CurrentRoom) // or force (todo)
                         AddPossibleMove(new LookAt(this, exit));
 
                     if (ReferenceEquals(Character.LookAt, exit))
@@ -344,7 +380,7 @@ namespace fire_ash_server
                 {
                     Prop xLookedAt = Character.LookAt;
                     Character.LookBack();
-                    await SendAsync(Character.Name + " stops looking at " + xLookedAt.Name + ".");
+                    await SendAsync(Character.Name + " stops looking " + xLookedAt.GetLightEffectedName("at ", "into the ", true, Character) + ".");
                 });
             backMove.Type = MoveType.MinorAction;
             backMove.AllowedInTrade = true;
@@ -355,8 +391,17 @@ namespace fire_ash_server
 
         private void AddPossibleInvestigationOrLookMove(Prop prop)
         {
-            if (prop.HasHiddenProps() && AddPossibleUnusedMove(new Investigate(this, prop)))
-                return;
+            Light propLightState = prop.GetLightState(Character);
+        
+            if (propLightState != Light.Darkness)
+            {
+                if (prop.HasHiddenProps() && AddPossibleUnusedMove(new Investigate(this, prop)))
+                    return;
+            }
+
+            if (!(prop is Room))
+                if (prop.DynamicDescription && propLightState == Light.Darkness && !Character.HasPointLight())
+                    return;
 
             if (prop != Character.LookAt)
                 AddPossibleMove(new LookAt(this, prop));
@@ -429,10 +474,26 @@ namespace fire_ash_server
 
         public void Execute(ref Move move)
         {
+            Execute(ref move, Character);
+        }
+        public void Execute(ref Move move, Character activeCharacter)
+        {
             if (!Character.PropTargetIsValid(move))
                 return;
             
             Character.RegisterUsedMoveOnProp(move);
+
+
+            if (move is Attack)
+                if (Character.GetLightState(null) == Light.Darkness)
+                {
+                    if (move.Prop != null)
+                        SetThreadBasedBufferText($"From the darkness, ");
+                    else
+                        SetThreadBasedBufferText($"Within the darkness, ");
+                    Console.WriteLine("Buffer is set at " + DateTime.Now);
+                }
+            
 
             if (move.EnablesCombat)
             {
@@ -440,6 +501,7 @@ namespace fire_ash_server
                     Character.CurrentRoom.BroadcastToSoulsInRoom($"{Character.Name} reveals themselves from the shadows...");
 
                 move.Action();
+                RemoveBufferTextForThread();
 
                 if (Character.IsHidden())
                     Character.Unhide();
@@ -465,7 +527,11 @@ namespace fire_ash_server
                     targetCharacer = (Character)move.Prop;
 
                 if (targetCharacer != null && move.EnablesCombat)
-                    Character.EnableCombatWith = targetCharacer;
+                    if (targetCharacer != activeCharacter)
+                        activeCharacter.EnableCombatWith = new ToxicRelationship(targetCharacer, false);
+                    else
+                        activeCharacter.EnableCombatWith = new ToxicRelationship(Character, true);
+
             }
         }
 
@@ -559,7 +625,7 @@ namespace fire_ash_server
             if (Character.LastRoom != null && Character.LastRoom.InCombat)
                 Character.LastRoom.FlagCombatMightBeResolved();
 
-            await SendAsync(goToRoom.GetDescription());
+            await SendAsync(goToRoom.GetDescription(Character, true));
 
             if (goToRoom.OnEnterEvent != null)
                 goToRoom.OnEnterEvent(this);

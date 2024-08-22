@@ -16,7 +16,9 @@ namespace fire_ash_server.Moves.Attacks
 
             Action = () =>
             {
+                Console.WriteLine("BufferText from Action is _" + character.Soul.BufferText + "_ at " + DateTime.Now);
                 if (!TryAttack(character, characterToAttack, character.AttackWithMainHand)) return;
+                
             };
         }
     }

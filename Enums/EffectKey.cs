@@ -8,6 +8,10 @@ namespace fire_ash_server.Enums
 {
     internal enum EffectKey
     {
-        Stealth
+        Stealth,
+        BrightLight,
+        LightPointer,
+        DimLight,
+        Darkvision
     }
 }

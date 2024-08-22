@@ -63,7 +63,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Kael",
                 "Kael, a stoic figure in tactical gear with mechanical enhancements. " +
                 "Kael speaks only when necessary, with a calm, authoritative voice.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 13, // strength
                 11, // dexterity
@@ -90,23 +90,11 @@ namespace fire_ash_server.World.BioMechWorld
                     movedToCharacter.SetLookAt(soul.Character);
                     _ = soul.SendAsync($"{movedToCharacter.Name} gives you a measured look, a subtle nod suggesting you make a purchase or continue on your journey.");
                 },
-                false);
+                false);                 
 
-            Weapon coltRifle = new AssaultRifle(
-                "Colt AR-15",
-                "A classic semi-automatic rifle, " +
-                "renowned for its reliability and precision, " +
-                "equipped with a robust barrel and a sleek, ergonomic design, " +
-                "exuding a sense of timeless power and modern efficiency.");
-
-            Weapon holographicBlade = new Dagger(
-                "Holographic Blade",
-                "A sleek, high-tech blade that shimmers with a holographic edge, designed for both precision and style. " +
-                "Its handle is wrapped in synthetic leather, providing a comfortable grip.");
-            holographicBlade.Modifier = +1;
-
-            weaponsTrader.AddToInventory(coltRifle);
-            weaponsTrader.AddToInventory(holographicBlade);
+            weaponsTrader.AddToInventory(WeaponList.ColtARFifteen());
+            weaponsTrader.AddToInventory(WeaponList.HolographicBlade());
+            weaponsTrader.AddToInventory(WeaponList.LuminarBaton());
 
             //Armor Stall
             Room armorStallRoom = new Room(
@@ -130,7 +118,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "giving him an enigmatic presence. Talon's single eye, " +
                 "glowing faintly from his visor, " +
                 "scan the surroundings with a keen and calculating gaze.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 16, // strength
                 12, // dexterity
@@ -192,7 +180,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Quirin",
                 "Quirin, the aged trader of 'Cogs & Curios,' stands with surprising strength, supported by a mechanical suit that maintains his posture. " +
                 "Despite his advanced age, his eyes are sharp and observant, though they carry a deep weariness.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 10, // strength
                 10, // dexterity
@@ -210,6 +198,8 @@ namespace fire_ash_server.World.BioMechWorld
             artifactTrader.AddFeat(FeatKey.MeleeAttack);
             artifactTrader.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
             artifactTrader.GoToRoom(artifactStallRoom);
+
+            artifactTrader.AddToInventory(WeaponList.FlashLight());
 
             new MainHallRoom(bazar);
         }

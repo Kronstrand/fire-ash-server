@@ -17,7 +17,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             Character ezekielTheMechanomancer = new Character(
                 "Ezekiel",
                 "Ezekiel's appearance is a chilling fusion of human and machine, with cybernetic parts grotesquely integrated into his body. His face, frozen in a sinister grin, is a ghastly combination of metal and skin. Draped in old, scarred armor adorned with a variety of menacing tools and weapons, Ezekiel's very presence instills terror and demands respect.",
-                Race.Mecharion,
+                Kindred.Mecharion,
                 CreatureType.Humanoid,
                 14, //strength
                 10, //dexterity
@@ -57,7 +57,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                     },
                     (s) =>
                     {
-                        if (s.Character.Race == Race.Mecharion)
+                        if (s.Character.Kindred == Kindred.Mecharion)
                         {
                             return "Your newborn memory is failing you, " +
                             "the details of this strange and ominous figure slipping through the cracks " +
