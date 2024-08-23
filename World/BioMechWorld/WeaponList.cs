@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
+using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.World.BioMechWorld
@@ -70,6 +71,30 @@ namespace fire_ash_server.World.BioMechWorld
             );
             yShapedSlingShot.DamageDie = new Die(1, 4);
             return yShapedSlingShot;
+        }
+
+        public static Dagger StoneKnife()
+        {
+            Dagger stoneknife = new Dagger(
+                "Crude Stone Knife",
+                "A crudely fashioned stone knife, " +
+                "its jagged blade chipped from flint, " +
+                "bound to a rough wooden handle with aged sinew, " +
+                "exuding a primal, utilitarian essence.");
+
+            return stoneknife;
+        }
+
+        public static ShortBow TribalShortBow()
+        {
+            ShortBow tribalShortBow = new ShortBow(
+                "Tribal Short Bow",
+                "A short bow crafted from weathered wood, " +
+                "its limbs reinforced with sinew and decorated with tattered pieces of cloth. " +
+                "The cloth strips are marked with faded tribal symbols, " +
+                "each telling stories of hunts and battles long past.");
+
+            return tribalShortBow;
         }
     }
 }

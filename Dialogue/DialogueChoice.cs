@@ -18,6 +18,14 @@ namespace fire_ash_server.Dialogue
             Result = result;
             PreReq = (DialogueManager dm) => { return true; };
         }
+
+        public DialogueChoice(string text, DialogueNode node)
+        {
+            Text = text;
+            Result = (DialogueManager dm) => { return node; };
+            PreReq = (DialogueManager dm) => { return true; };
+        }
+
         public DialogueNode GetNextDialogueNode(DialogueManager dialogueManager)
         {            
             return Result.Invoke(dialogueManager);

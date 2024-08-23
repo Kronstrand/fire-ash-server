@@ -15,6 +15,7 @@ namespace fire_ash_server.Enums
         Mecharion,
         Cyborg,
         Feline,
-        Undead
+        Undead,
+        Fay
     }
 }
