@@ -43,7 +43,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "Its translucent, flesh-like walls glisten with a faint, greenish residue from the drained amniotic fluid. " +
                 "Smooth, metallic surfaces interlace with the organic material, giving the pod an otherworldly appearance. " +
                 "Mechanical arms and cables still snake from the ceiling and walls, connected to the pod and twitching slightly, " +
-                "as if confused by the sudden absence of their occupant."
+                "as if confused by the sudden absence of their occupant.",
+                0
             );
             emptyIncubatorPod.MakeUnpickupable();
 
@@ -134,7 +135,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "One end is securely attached to your abdomen, the connection feeling both invasive and strangely comforting. " +
                 "The other end disappears into the wall of the enclosure, merging seamlessly with the surrounding membrane. " +
                 "This tube not only provides nourishment and sustenance, but also seems to monitor your vital signs, " +
-                "with occasional pulses indicating a transfer of information."
+                "with occasional pulses indicating a transfer of information.",
+                0
             );
             umbilicalTube.MakeUnpickupable();
 

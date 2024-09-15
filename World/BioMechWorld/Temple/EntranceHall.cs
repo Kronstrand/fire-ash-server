@@ -7,32 +7,44 @@ using fire_ash_server.Enums;
 using fire_ash_server.Moves;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items.Weapons;
+using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
 {
     internal class EntranceHall
     {
-        public Room Create(Room courtyard)
+        public static Room Create(Room courtyard)
         {
 
             Room entranceHall = new Room(
-                "Temple Entrance Hall",
-                "Temple Entrance Hall",
+                "Grand Temple Ascent",
                 "An imposing stone chamber, with towering columns lining the walls, each one etched with worn, " +
                 "ancient symbols. The floor is uneven, with cracks revealing roots that have forced their way through the stone. " +
                 "The air is thick with the scent of age and decay, and the faint echo of dripping water can be heard in the distance. "
             );
+            entranceHall.Light = Light.Dim;
 
-            Exit toCourtyard = new Exit(
-                "Framed by vines and overgrown foliage, at the bottom of the stairs",
-                "A weathered stone doorway, leading back to the temple courtyard.",
-                courtyard
+            // from courtyard
+            Exit toTempleEntrance = new Exit(
+                "Flanked by tall pillars",
+                "An imposing entrance leads to an ancient temple.",
+                entranceHall
             );
+            courtyard.AddExit(toTempleEntrance);
 
-            Exit toTemple = new Exit(
-                "A grand staircase ascends into darkness at the far end, its steps worn from centuries of passage",
-                "leading further into the unknown depths of the temple.",
-                entranceHall); //fix
+            entranceHall.AddExit(new Exit(
+                "In the center of the camber",
+                "A grand staircase ascends toward the main temple, " +
+                "its steps worn from centuries of passage " +
+                "leading further into the unknown depths.",
+                entranceHall)); //fix
+
+            entranceHall.AddExit(
+                new Exit(
+                    "At the bottom of the stairs",
+                    "Framed by vines and overgrown foliage, a weathered stone doorway, leading out of the temple to the courtyard.",
+                    courtyard
+            ));
 
             Character shadecreeper = new Character(
                 "Shadecreeper",
@@ -52,16 +64,20 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "as if the shadows cling to its body. The primitive bow rests by its side, a reminder of the unseen dangers lurking in the darkness."
             );
             shadecreeper.AddEquippedItem(InventorySlot.MainHand, WeaponList.StoneKnife());
-            shadecreeper.AddEquippedItem(InventorySlot.MainHand, WeaponList.TribalShortBow());
+            shadecreeper.AddEquippedItem(InventorySlot.Ranged, WeaponList.TribalShortBow());
 
             // Set the creature's health
-            shadecreeper.HP = 10;
+            shadecreeper.HP = 1;
 
             // Add special feats or abilities
             shadecreeper.AddFeat(FeatKey.Stealth); // Allows them to move undetected
             shadecreeper.AddFeat(FeatKey.DarkVision); // Can see clearly in low-light conditions
             shadecreeper.AddFeat(FeatKey.MeleeAttack);
             shadecreeper.AddFeat(FeatKey.RangedAttack);
+            shadecreeper.AddToInventory(TempleTrinketList.GetRandom());
+            shadecreeper.AddToInventory(Coins.GenerateCoins(1));
+            shadecreeper.GoToRoom(entranceHall);
+            shadecreeper.MoveToGroup(toTempleEntrance);
 
             return entranceHall;
         }

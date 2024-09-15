@@ -10,7 +10,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class Tendril : Weapon
     {
-        public Tendril() : base("Tendril", "Tendril", new Die(1, 4), DamageType.Slashing)
+        public Tendril() : base("Tendril", "Tendril", new Die(1, 4), DamageType.Slashing, 0)
         {
             SetGeneralAttackDescriptionsForType();
             SetGeneralOffHandAttackDescriptionsForType();

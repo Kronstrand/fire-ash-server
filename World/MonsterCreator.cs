@@ -41,7 +41,7 @@ namespace fire_ash_server.World
             Shadecreeper.HP = 6;
             Shadecreeper.AddFeat(FeatKey.Stealth);
             Shadecreeper.AddFeat(FeatKey.MeleeAttack);
-            Shadecreeper.Inventory.AddItem(new Item("Emerald", "A Green Emerald."));
+            Shadecreeper.Inventory.AddItem(new Item("Emerald", "A Green Emerald.", 50));
 
             if (!Character.hitReactions.ContainsKey(Shadecreeper.Name))
             {

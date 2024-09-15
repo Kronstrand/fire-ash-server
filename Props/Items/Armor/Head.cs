@@ -9,7 +9,7 @@ namespace fire_ash_server.Props.Items.Armor
 {
     internal class Head : Item
     {
-        public Head(string name, string description) : base(name, description)
+        public Head(string name, string description, int value) : base(name, description, value)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                                                             InventorySlot.Head

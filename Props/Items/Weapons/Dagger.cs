@@ -10,7 +10,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class Dagger : Weapon
     {
-        public Dagger(string name, string description) : base(name, description, new Die(1, 4), DamageType.Piercing)
+        public Dagger(string name, string description) : base(name, description, new Die(1, 4), DamageType.Piercing, 2)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                 InventorySlot.MainHand,

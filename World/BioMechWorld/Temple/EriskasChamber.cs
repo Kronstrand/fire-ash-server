@@ -34,7 +34,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             Those who fail its test are said to be lost in time, their fate forever sealed within the coils of the Serpent’s domain.
             ";
 
-            Item book = new Item("An Account of the Nine Serpents", bookDescription);
+            Item book = new Item("An Account of the Nine Serpents", bookDescription, 13);
 
             return new Room("", "");
         }

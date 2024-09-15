@@ -9,7 +9,7 @@ namespace fire_ash_server.Props.Items
 {
     internal class Inventory : Item
     {
-        public Inventory() : base("Inventory", "Inventory")
+        public Inventory() : base("Inventory", "Inventory", 0)
         {
             IsContainer = true;
             MakeUnpickupable();

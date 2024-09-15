@@ -17,7 +17,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "Flash Lite",
                 "The Flash Lite is a compact, dual-purpose tool. It features a cylindrical handle with a grip textured for both comfort and durability. " +
                 "The head of the device doubles as a powerful flashlight, casting a bright beam of light capable of piercing the darkest environments. " +
-                "When used as a weapon, its strikes are feeble, more likely to bruise egos than break bones."
+                "When used as a weapon, its strikes are feeble, more likely to bruise egos than break bones.", 
+                15
             );
             flashLite.AddEquipEffect(EffectKey.LightPointer);
             flashLite.DamageDie = new Die(1, 2);
@@ -31,7 +32,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "A classic semi-automatic rifle, " +
                 "renowned for its reliability and precision, " +
                 "equipped with a robust barrel and a sleek, ergonomic design, " +
-                "exuding a sense of timeless power and modern efficiency.");
+                "exuding a sense of timeless power and modern efficiency.", 
+                40);
 
             return coltRifle;
         }
@@ -42,6 +44,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Holographic Blade",
                 "A sleek, high-tech blade that shimmers with a holographic edge, designed for both precision and style. " +
                 "Its handle is wrapped in synthetic leather, providing a comfortable grip.");
+            holographicBlade.VendorValue = 250;
             holographicBlade.Modifier = +1;
             holographicBlade.AddEquipEffect(EffectKey.DimLight);
 
@@ -56,7 +59,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "with a surface that alternates between smooth, " +
                 "polished metal and segments of translucent crystal. " +
                 "The core of the baton houses a sophisticated energy conduit that channels light through the crystalline segments, " +
-                "causing them to glow with a soft, pulsating light");
+                "causing them to glow with a soft, pulsating light",
+                10);
             luminarBaton.AddEquipEffect(EffectKey.BrightLight);
 
             return luminarBaton;

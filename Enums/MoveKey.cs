@@ -24,5 +24,6 @@ namespace fire_ash_server.Enums
         f,  //flee
         b,  //back
         bi, //buy item
+        lo,
     }
 }

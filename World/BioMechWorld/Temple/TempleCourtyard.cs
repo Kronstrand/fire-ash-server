@@ -58,15 +58,6 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             templeCourtyard.AddItem(fireflies);
 
 
-
-            // Add an exit to the Temple Entrance
-            /*Exit toTempleEntrance = new Exit(
-                "Through the entrance",
-                "A dark, imposing entrance to the ancient temple, flanked by tall pillars.",
-                templeEntrance
-            );
-            templeCourtyard.AddExit(toTempleEntrance);*/
-
             Character lily = new Character(
                 "Lily",
                 "Lily's form is a haunting fusion of human and machine. Her once delicate features are now marred by the grotesque melding of flesh and metal. " +
@@ -324,7 +315,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             eriska.CreateDialogueManager(eriskaIntroNode);
             eriska.GoToRoom(templeCourtyard);
 
-
+            EntranceHall.Create(templeCourtyard);
 
             return templeCourtyard;
         }

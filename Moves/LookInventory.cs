@@ -12,25 +12,37 @@ namespace fire_ash_server.Moves
 {
     internal class LookInventory : Move
     {
-        public LookInventory(Soul soul) : base(MoveKey.i.ToString(), "Inventory")
+        public LookInventory(Soul soul) : this(soul, soul.Character, "Iventory")
         {
-            Hidden = true;
-            Type = MoveType.MinorAction;
 
-            Action = async () =>
+        }
+
+        public LookInventory(Soul soul, Character targetCharacter) : this(soul, targetCharacter, $"Loot {targetCharacter.Name}")
+        {
+
+        }
+        private LookInventory(Soul soul, Character targetCharacter, string description) : base(MoveKey.i.ToString(), description)
+        {
+            Type = MoveType.MinorAction;
+            if (targetCharacter == soul.Character) //is iventory
+                Hidden = true;
+            else //is Loot
+                Prop = targetCharacter; 
+
+                Action = async () =>
             {
-                bool hasEquippedItem = (soul.Character.EquippedItems.Count  > 0);
-                bool hasInventoryItem = (soul.Character.Inventory.Items.Count > 0);
+                bool hasEquippedItem = (targetCharacter.EquippedItems.Count  > 0);
+                bool hasInventoryItem = (targetCharacter.Inventory.Items.Count > 0);
 
                 if (!hasEquippedItem && !hasInventoryItem)
-                    await soul.SendAsync($"{soul.Character.Name} holds no items.");
+                    await soul.SendAsync($"{targetCharacter.Name} holds no items.");
                 else
                 {
                     string inventory = "";
                     if (hasEquippedItem)
                     {
-                        inventory = $"{soul.Character.Name} has the following items equipped:";
-                        foreach (KeyValuePair<InventorySlot, Item> kvp in soul.Character.EquippedItems)
+                        inventory = $"{targetCharacter.Name} has the following items equipped:";
+                        foreach (KeyValuePair<InventorySlot, Item> kvp in targetCharacter.EquippedItems)
                         {
                             inventory += $"\n{Description(kvp.Key)}: {kvp.Value.Name}.";
                         }
@@ -40,13 +52,13 @@ namespace fire_ash_server.Moves
                         if (inventory != "")
                             inventory += "\n\n";
 
-                        inventory += $"{soul.Character.Name} has the following items in their inventory:";
-                        foreach (Item item in soul.Character.Inventory.Items)
+                        inventory += $"{targetCharacter.Name} has the following items in their inventory:";
+                        foreach (Item item in targetCharacter.Inventory.Items)
                         {
                             inventory += $"\n{item.Name}";
                         }
                     }
-                    soul.Character.SetLookAt(soul.Character.Inventory);
+                    soul.Character.SetLookAt(targetCharacter.Inventory);
                     await soul.SendAsync(inventory);
                 }                
             };

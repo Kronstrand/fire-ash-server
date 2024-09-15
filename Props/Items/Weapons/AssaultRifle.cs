@@ -14,7 +14,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class AssaultRifle : Weapon
     {
-        public AssaultRifle(string name, string description) : base(name, description, new Die(1, 10), DamageType.Piercing)
+        public AssaultRifle(string name, string description, double value) : base(name, description, new Die(1, 10), DamageType.Piercing, value)
         {
             TwoHander = true;
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{

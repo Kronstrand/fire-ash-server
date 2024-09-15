@@ -45,7 +45,8 @@ namespace fire_ash_server.World
                 "A classic semi-automatic rifle, " +
                 "renowned for its reliability and precision, " +
                 "equipped with a robust barrel and a sleek, ergonomic design, " +
-                "exuding a sense of timeless power and modern efficiency.");
+                "exuding a sense of timeless power and modern efficiency.",
+                50);
 
             wolfCave.AddItem(coltRifle);
 
@@ -63,7 +64,7 @@ namespace fire_ash_server.World
             Item wolfAlter = (Item) new Item(
                 "Wolf Alter",
                 "A palpable silence envelops the alter, a respectful hush that seems to ward off the uninitiated, " +
-                "making the air feel thick with unspoken secrets and lost histories.").
+                "making the air feel thick with unspoken secrets and lost histories.",0).
                 MakeUnpickupable();
             
             abandonedShrine.AddItem(wolfAlter);
@@ -75,7 +76,7 @@ namespace fire_ash_server.World
                 "Its visage is a blend of terror and awe, with eyes that seem to gaze into the void, " +
                 "mouth agape as if to devour the stars. The intricate markings suggest a connection to the cosmos, " +
                 "imbued with an ancient power that whispers of forgotten rites and the inevitable return of its eldritch divinity. " +
-                "Its presence is unsettling, as it exudes a sense of ancient wisdom and an impending sense of cosmic dread.")
+                "Its presence is unsettling, as it exudes a sense of ancient wisdom and an impending sense of cosmic dread.", 41)
                 .Hide(3)
                 .AddMove(new SkillCheck(
                     null,
@@ -101,7 +102,7 @@ namespace fire_ash_server.World
                 "Runed Compass",
                 "An ornate compass, its rim engraved with symbols that resonate with magical energy. " +
                 "Rather than pointing north, the needle spins slowly, only coming to a halt when unseen forces align, " +
-                "suggesting it guides not through geography, but fate itself.")
+                "suggesting it guides not through geography, but fate itself.",3)
                 .Hide(11));
 
             wolfCave.AddExit(new Exit(

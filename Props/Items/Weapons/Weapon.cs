@@ -20,7 +20,7 @@ namespace fire_ash_server.Props.Items.Weapons
         public static Dictionary<Type, List<Func<string, string, Weapon, string>>> HumanoidAttackDescriptionsForType = new Dictionary<Type, List<Func<string, string, Weapon, string>>>();
         public static Dictionary<Type, List<Func<string, string, Weapon, string>>> HumanoidOffHandAttackDescriptionsForType = new Dictionary<Type, List<Func<string, string, Weapon, string>>>();
 
-        public Weapon(string name, string description, Die damageDie, DamageType damageType) : base(name, description)
+        public Weapon(string name, string description, Die damageDie, DamageType damageType, double value) : base(name, description, value)
         {
             DamageDie = damageDie;
             DamageType = damageType;

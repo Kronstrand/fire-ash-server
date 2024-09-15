@@ -10,7 +10,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class BeastClaw : Weapon
     {
-        public BeastClaw() : base("Beast Claw", "Beast Claw", new Die(1, 4), DamageType.Slashing)
+        public BeastClaw() : base("Beast Claw", "Beast Claw", new Die(1, 4), DamageType.Slashing, 0)
         {
             SetGeneralAttackDescriptionsForType();
             SetGeneralOffHandAttackDescriptionsForType();

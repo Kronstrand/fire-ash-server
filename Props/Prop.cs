@@ -622,5 +622,18 @@ namespace fire_ash_server.Props
             }
             return currentLightSate;
         }
+
+        public bool IsHeldByDeadCharacter()
+        {
+            if (this is Item)
+            {
+                Item item = (Item)this;
+                Character? heldByCharacter = item.HeldByCharacter();
+                if (heldByCharacter != null && heldByCharacter.Dead)
+                    return true;
+            }
+            return false;
+
+        }
     }
 }

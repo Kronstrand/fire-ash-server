@@ -9,7 +9,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class ShortBow : Weapon
     {
-        public ShortBow(string name, string description) : base(name, description, new Die(1, 6), DamageType.Piercing)
+        public ShortBow(string name, string description) : base(name, description, new Die(1, 6), DamageType.Piercing, 25)
         {
             TwoHander = true;
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot> {

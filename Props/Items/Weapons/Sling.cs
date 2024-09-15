@@ -9,7 +9,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class Sling : Weapon
     {
-        public Sling(string name, string description) : base(name, description, new Die(1, 4), DamageType.Bludgeoning)
+        public Sling(string name, string description) : base(name, description, new Die(1, 4), DamageType.Bludgeoning, 0.1)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                                                         InventorySlot.Ranged

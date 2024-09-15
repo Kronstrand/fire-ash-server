@@ -11,7 +11,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class Fist : Weapon
     {
-        public Fist() : base("Fist", "Fist", new Die(1, 1), DamageType.Bludgeoning)
+        public Fist() : base("Fist", "Fist", new Die(1, 1), DamageType.Bludgeoning, 0)
         {
             CreateGeneralAttackDescriptions();
             CreateGeneralOffHandAttackDescriptions();

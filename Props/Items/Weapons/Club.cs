@@ -10,7 +10,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class Club : Weapon
     {
-        public Club(string name, string description) : base(name, description, new Die(1, 4), DamageType.Bludgeoning)
+        public Club(string name, string description, double value) : base(name, description, new Die(1, 4), DamageType.Bludgeoning, value)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
             InventorySlot.MainHand,

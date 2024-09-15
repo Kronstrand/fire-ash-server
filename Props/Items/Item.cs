@@ -14,12 +14,14 @@ namespace fire_ash_server.Props.Items
     {
         public Prop? HeldBy;
         public bool IsContainer;
+        public double VendorValue = 0;
         public ThreadSafeList<InventorySlot> CarriableByInventorySlots = new ThreadSafeList<InventorySlot>();
         public List<Effect> EquipEffects = new List<Effect>();
 
-        public Item(string name, string description) : base(name, description)
+        public Item(string name, string description, double value) : base(name, description)
         {
             MakePickable();
+            VendorValue = value;
         }
         public Item(string name, string Context, string description) : base(name, description)
         {
@@ -70,7 +72,7 @@ namespace fire_ash_server.Props.Items
                     foreach (KeyValuePair<InventorySlot, Item> kvp in character.EquippedItems)
                     {
                         if (kvp.Value == this)
-                            character.EquippedItems.Remove(kvp.Key);
+                            character.EquippedItems.TryRemove(kvp.Key, out Item? removedItem);
                     }
                 }
             }

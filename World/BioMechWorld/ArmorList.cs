@@ -18,7 +18,8 @@ namespace fire_ash_server.World.BioMechWorld
             "These biomechanical goggles merge organic tissue with synthetic glass, " +
             "providing the wearer with unparalleled vision in complete darkness. " +
             "Their sleek design ensures that no light escapes, allowing users to see through the deepest shadows " +
-            "while remaining hidden themselves.");
+            "while remaining hidden themselves.",
+            4523);
             nocturnalOptics.AddEquipEffect(EffectKey.Darkvision);
 
             return nocturnalOptics;

@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Props;
+using fire_ash_server.Props.Items;
 using fire_ash_server.World;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace fire_ash_server
 {
@@ -16,7 +18,7 @@ namespace fire_ash_server
         private static int randomIdentifer = 0;
         public static Dictionary<string, string> irregularNouns = new Dictionary<string, string>();
 
-        static Dictionary<int, string> numberWords = new Dictionary<int, string>
+        /*static Dictionary<int, string> numberWords = new Dictionary<int, string>
         {
             {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"},
             {6, "six"}, {7, "seven"}, {8, "eight"}, {9, "nine"}, {10, "ten"},
@@ -47,7 +49,69 @@ namespace fire_ash_server
             {93, "ninety-three"}, {94, "ninety-four"}, {95, "ninety-five"},
             {96, "ninety-six"}, {97, "ninety-seven"}, {98, "ninety-eight"},
             {99, "ninety-nine"}, {100, "one hundred"}
-        };
+        };*/
+
+        static Dictionary<int, string> numberWords = new Dictionary<int, string>
+    {
+        {1, "One"}, {2, "Two"}, {3, "Three"}, {4, "Four"}, {5, "Five"},
+        {6, "Six"}, {7, "Seven"}, {8, "Eight"}, {9, "Nine"}, {10, "Ten"},
+        {11, "Eleven"}, {12, "Twelve"}, {13, "Thirteen"}, {14, "Fourteen"},
+        {15, "Fifteen"}, {16, "Sixteen"}, {17, "Seventeen"}, {18, "Eighteen"},
+        {19, "Nineteen"}, {20, "Twenty"}, {30, "Thirty"}, {40, "Forty"},
+        {50, "Fifty"}, {60, "Sixty"}, {70, "Seventy"}, {80, "Eighty"},
+        {90, "Ninety"}, {100, "One Hundred"}, {1000, "One Thousand"}
+    };
+
+        public static string NumberToWord(int number)
+        {
+            if (number == 0)
+            {
+                return "Zero";
+            }
+            if (numberWords.ContainsKey(number))
+            {
+                return numberWords[number];
+            }
+            if (number < 100)
+            {
+                int tens = number / 10 * 10;
+                int units = number % 10;
+                return numberWords[tens] + "-" + numberWords[units];
+            }
+            if (number < 1000)
+            {
+                int hundreds = number / 100;
+                int remainder = number % 100;
+                return numberWords[hundreds] + " Hundred" + (remainder > 0 ? " and " + NumberToWord(remainder) : "");
+            }
+            if (number < 100000)
+            {
+                int thousands = number / 1000;
+                int remainder = number % 1000;
+
+                // Special handling for multiples of 10,000 (e.g., 10,000, 20,000)
+                if (number % 10000 == 0)
+                {
+                    return NumberToWord(thousands) + " Thousand";
+                }
+
+                // Handling cases like 21,000, 35,000 etc.
+                if (remainder == 0)
+                {
+                    return NumberToWord(thousands) + " Thousand";
+                }
+
+                // General cases like 12,345 etc.
+                return NumberToWord(thousands) + " Thousand" + (remainder > 0 ? " and " + NumberToWord(remainder) : "");
+            }
+
+            return "Number out of range";
+        }
+
+        public static double SilverToGold(int silver)
+        {
+            return silver * 0.1;
+        }
 
         public static int GetNextId()
         {
@@ -190,7 +254,7 @@ namespace fire_ash_server
             }
         }
 
-        public static string NumberToWord(int number)
+        /*public static string NumberToWord(int number)
         {
             if (numberWords.ContainsKey(number))
             {
@@ -200,7 +264,7 @@ namespace fire_ash_server
             {
                 return "" + number;
             }
-        }
+        }*/
 
         public static void SetThreadBasedBufferText(string bufferText)
         {
@@ -227,6 +291,41 @@ namespace fire_ash_server
 
             // Return the original string if there is no '.' at the end
             return input;
+        }
+
+        public static Tuple<int, int> ConvertToGoldAndSilver(double value)
+        {
+            int integerPart = (int)Math.Floor(value);
+            int fractionalPart = (int)((value - integerPart) * 10);
+
+            return Tuple.Create(integerPart, fractionalPart);
+        }
+
+        public static Coins  GenerateCoins(int maxGold)
+        {
+            int gold = GenerateGold(maxGold);
+            int silver = 0; // Default to 0 silver
+
+            if (new Random().Next(0, 10) == 0) // 10% chance to generate silver
+            {
+                silver = GenerateSilver(100);
+            }
+
+            return new Coins(gold, silver);
+        }
+
+        public static int GenerateGold(int maxGold)
+        {
+            Random random = new Random();
+            int gold = random.Next(maxGold / 2, maxGold + 1); // +1 to make maxGold inclusive
+            return gold;
+        }
+
+        public static int GenerateSilver(int maxSilver)
+        {
+            Random random = new Random();
+            int silver = random.Next(maxSilver / 2, maxSilver + 1); // Similar logic to gold generation
+            return silver;
         }
     }
 }

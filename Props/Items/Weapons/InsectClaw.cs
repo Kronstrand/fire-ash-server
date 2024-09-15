@@ -10,7 +10,7 @@ namespace fire_ash_server.Props.Items.Weapons
 {
     internal class InsectClaw : Weapon
     {
-        public InsectClaw() : base("Insect Claw", "Insect Claw", new Die(1, 4), DamageType.Piercing)
+        public InsectClaw() : base("Insect Claw", "Insect Claw", new Die(1, 4), DamageType.Piercing, 0)
         {
             SetGeneralAttackDescriptionsForType();
             SetGeneralOffHandAttackDescriptionsForType();

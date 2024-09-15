@@ -163,6 +163,10 @@ namespace fire_ash_server
 
                         if (isInGroupWithTargert == false)
                             AddPossibleMove(new MoveTo(this, lookAtCharacter));
+                        else if (lookAtCharacter.Dead && isInGroupWithTargert == true)
+                            AddPossibleMove(new LookInventory(this,lookAtCharacter));
+                        
+                        
 
                         if (!Character.IsHidden() && isInGroupWithTargert == true)
                         {
@@ -171,6 +175,20 @@ namespace fire_ash_server
                             if (lookAtCharacter.IsTrader)
                                 AddPossibleMove(new BrowseGoods(this, lookAtCharacter));
                         }
+                    }
+                }
+                else if (Character.LookAt is Inventory)
+                {
+                    Inventory inventory = (Inventory)Character.LookAt;
+                    if (inventory.HeldBy == Character || inventory.IsHeldByDeadCharacter())
+                    {
+                        Character? tagetCharacter = inventory.HeldByCharacter();
+                        if (tagetCharacter != null)
+                            foreach(KeyValuePair<InventorySlot, Item> SlotAndItem in tagetCharacter.EquippedItems)
+                                AddPossibleMove(new LookAt(this, SlotAndItem.Value));
+
+                        foreach (Item item in inventory.Items.Where(item => !item.IsHidden()))
+                                AddPossibleMove(new LookAt(this, item));
                     }
                 }
                 else if (Character.LookAt is Item)
@@ -220,7 +238,7 @@ namespace fire_ash_server
                         AddPossibleUnusedMove(skillCheck.CreatePossibleMove(this, Character.LookAt));
                     }
                 }
-                if (lookAtWithLight || (Character.LookAt is Inventory && ((Inventory)Character.LookAt).HeldBy == Character))
+                if (lookAtWithLight && Character.LookAt is not Inventory)
                 {
                     foreach (Item item in Character.LookAt.Items.Where(item => !item.IsHidden()))
                     {
@@ -229,7 +247,6 @@ namespace fire_ash_server
                         {
                             isClose = Character.IsInGroupWith(item) != false;
                         }
-
 
                         if (isClose)
                         {

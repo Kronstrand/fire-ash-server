@@ -10,6 +10,7 @@ using fire_ash_server.Abstract_Entities;
 using static fire_ash_server.Helpers;
 using fire_ash_server.World;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace fire_ash_server.Props
 {
@@ -40,7 +41,7 @@ namespace fire_ash_server.Props
         public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
 
         public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
-        public Dictionary<InventorySlot, Item> EquippedItems = new Dictionary<InventorySlot, Item>();
+        public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
         public Inventory Inventory = new Inventory();
         public int GP;
         public DialogueManager? DialogueManager;
@@ -391,13 +392,12 @@ namespace fire_ash_server.Props
 
         public bool TryUnequipFromSlot(InventorySlot inventorySlot)
         {
-            if (EquippedItems.ContainsKey(inventorySlot))
+            EquippedItems.TryRemove(inventorySlot, out Item? removedItem);
+            if (removedItem != null)
             {
-                Item equippedItem = EquippedItems[inventorySlot];
-                EquippedItems.Remove(inventorySlot);
-                Inventory.AddItem(equippedItem);
+                Inventory.AddItem(removedItem);
 
-                foreach (Effect effect in equippedItem.EquipEffects)
+                foreach (Effect effect in removedItem.EquipEffects)
                     Effects.Remove(effect);
 
                 return true;
@@ -492,7 +492,8 @@ namespace fire_ash_server.Props
         public void AddEquippedItem(InventorySlot inventorySlot, Item item)
         {
             item.ClearHeldBy();
-            EquippedItems.Add(inventorySlot, item);
+            if (!EquippedItems.TryAdd(inventorySlot, item))
+                throw new Exception($"{Description(inventorySlot)} has already an eqipped item.");
             item.HeldBy = this;
 
             foreach(Effect effect in item.EquipEffects)
