@@ -22,8 +22,8 @@ namespace fire_ash_server.World
         public List<Faction> Factions = new List<Faction>();
         public List<Relationship> Relationships = new List<Relationship>();
         public List<Feat> Features = new List<Feat>();
-        //public BioMechCreator? World;
-        public AncientTemple? World;
+        public BioMechCreator? World;
+        //public AncientTemple? World;
 
         public async Task Open(int port)
         {
@@ -32,8 +32,9 @@ namespace fire_ash_server.World
             GenerateGenericContent();
             //new WorldCreator(this);
             //new CyberworldCreater(this);
-            //World = new BioMechCreator();
-            World = new AncientTemple();
+            World = new BioMechCreator();
+            //World = new AncientTemple();
+            
 
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -131,8 +132,8 @@ namespace fire_ash_server.World
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);                
                 if (World == null)
                     throw new Exception("World is not initiatited and is null");
-                //await soul.MoveCharToRoomAndSendDescriptionAsync(World.CreateIncubator());
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.TempleCourtyard);
+                //await soul.MoveCharToRoomAndSendDescriptionAsync(World.startingRoom.CreateIncubator());
+                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.MainHall);
 
                 while (!soul.Character.Dead)
                 {

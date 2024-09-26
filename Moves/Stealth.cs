@@ -17,7 +17,14 @@ namespace fire_ash_server.Moves
             Character character = soul.Character;
             Action = () =>
             {
-                int countedNonFriends = character.CurrentRoom.Characters.Where(c => character.GetRelationshipStatus(c) != RelationshipStatus.good && c != character).Count();
+                Light lightStateOfCharacter = soul.Character.GetLightState(null, true);
+                List<Character> relevantNonFriends = character.CurrentRoom.Characters.ToList(); 
+                if (lightStateOfCharacter == Light.Darkness)
+                {
+                    List<Character> lookingAtCharacters = soul.Character.GetCharactersLookingAt();
+                    relevantNonFriends = lookingAtCharacters.Where(c => c.HasEffect(EffectKey.Darkvision)).ToList();
+                }
+                int countedNonFriends = relevantNonFriends.Where(c => character.GetRelationshipStatus(c) != RelationshipStatus.good && c != character).Count();
                 if (countedNonFriends == 0)
                 {
                     SetSuccessEffects(soul.Character);
@@ -27,9 +34,11 @@ namespace fire_ash_server.Moves
                 
                 Roll stealthRoll = new Roll(character.GetModifer(Skill.Stealth), RollType.SkillCheck, character);
 
-                if (stealthRoll.GetSum() >= (countedNonFriends * 2 + 5))
-                {
+                if(lightStateOfCharacter == Light.Bright)
+                    countedNonFriends *= 3;
 
+                if (stealthRoll.GetSum() >= (countedNonFriends + 5))
+                {
                     SetSuccessEffects(soul.Character);
                     character.CurrentRoom.BroadcastToSoulsInRoom($"{character.Name} tries to disappear into the shadows and succeeds with a roll of {stealthRoll}.");                        
                 }

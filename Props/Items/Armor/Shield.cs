@@ -7,13 +7,13 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items.Armor
 {
-    internal class Head : Item
+    internal class Shield: Item
     {
-        public Head(string name, string description, double value) : base(name, description, value)
+        public Shield(string name, string description, double value) : base(name, description, value) 
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
-                                                            InventorySlot.Head
-                                                            };
+                InventorySlot.OffHand
+            };
         }
     }
 }

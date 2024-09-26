@@ -16,6 +16,7 @@ namespace fire_ash_server.Enums
         Cyborg,
         Feline,
         Undead,
-        Fay
+        Fay,
+        Serpentine
     }
 }

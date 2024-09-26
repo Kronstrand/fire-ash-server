@@ -11,10 +11,12 @@ namespace fire_ash_server.Enums
         a,  //attack
         aa, //duelwield attack
         ra, //ranged attack
+        ba, //bite attack
         bg, //browse goods
         e,  //equip
         g,  //grap
         i,  //investigate, look own inventory
+        j, //journal
         l,  //lookat
         m,  //move to
         pp, //pick pocket

@@ -144,9 +144,9 @@ namespace fire_ash_server.World
                 .Hide(5);
             whisperingForest.AddItem(stoneknife);
 
-            Character shadecreeper = MonsterCreator.CreateShadecreeper();
+            Character shadecreeper = MonsterCreator.Shadecreeper();
             shadecreeper.GoToRoom(whisperingForest);
-            Character shadecreeper2 = MonsterCreator.CreateShadecreeper();
+            Character shadecreeper2 = MonsterCreator.Shadecreeper();
             shadecreeper2.GoToRoom(whisperingForest);
 
             shadecreeper.MoveToGroup(shadecreeper2);

@@ -24,5 +24,18 @@ namespace fire_ash_server.World.BioMechWorld
 
             return nocturnalOptics;
         }
+
+        public static Shield WornWoodenShield()
+        {
+            Shield wornWoodenShield = new Shield(
+                "Worn Wooden Shield",
+                "This wooden shield is battered and weathered, its surface marred by deep gouges. " +
+                "Cracks run through the grain, and the edges are splintered from countless blows. " +
+                "The straps are worn thin, but it still offers some protection, though far from what it once was.",
+                0.6);
+
+            return wornWoodenShield;
+        }
+
     }
 }

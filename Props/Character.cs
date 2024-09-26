@@ -6,6 +6,7 @@ using fire_ash_server.Moves;
 using fire_ash_server.Moves.Attacks;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
+using fire_ash_server.Props.Items.Armor;
 using fire_ash_server.Abstract_Entities;
 using static fire_ash_server.Helpers;
 using fire_ash_server.World;
@@ -44,6 +45,7 @@ namespace fire_ash_server.Props
         public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
         public Inventory Inventory = new Inventory();
         public int GP;
+        public Journal Journal;
         public DialogueManager? DialogueManager;
         public Character? TradingWith;
         public bool IsTrader = false;
@@ -64,6 +66,7 @@ namespace fire_ash_server.Props
             Soul = soul;
 
             init();
+            Journal = new Journal(this);
 
             types = new List<CreatureType> { CreatureType.Humanoid };
             Kindred = Kindred.Human;
@@ -87,6 +90,7 @@ namespace fire_ash_server.Props
 
             CurrentRoom = Program.WorldSoul.Rooms[Description(RoomKey.Void)];
             init();
+            Journal = new Journal(this);
 
             types = new List<CreatureType> {creatureType};
             Kindred = kindred;
@@ -277,6 +281,12 @@ namespace fire_ash_server.Props
             TestDeath();
         }
 
+        /*public void TakeDamage(Damage damage)
+        {
+            HP -= damage.DmgRoll.GetSum();
+            TestDeath();
+        }*/
+
         public void TestDeath()
         {
             if (HP > 0)
@@ -308,7 +318,15 @@ namespace fire_ash_server.Props
 
         public int GetAC()
         {
-            return 10 + GetModifer(Ability.Dexterity);
+            int ac = 10;
+
+            ac += GetModifer(Ability.Dexterity);
+
+            EquippedItems.TryGetValue(InventorySlot.OffHand, out Item? item);
+            if (item is Shield)
+                ac += 2;
+
+            return ac;
         }
 
         public string? GetRangedAttackDescription(Prop prop)
@@ -332,6 +350,13 @@ namespace fire_ash_server.Props
             return GetOffHand().GetOffHandAttackDescription(Name, prop.Name);
         }
 
+        public string? GetTeethAttackDescription(Prop prop)
+        {
+            return GetTeethWeapon().GetAttackDescription(
+                Name,
+                prop);
+        }
+
         public Roll GetMeleeAttackRoll(Weapon meleeWeapon)
         {
            return new Roll(GetModifer(Skill.CloseCombat) + meleeWeapon.Modifier, RollType.AttackRoll, this);
@@ -349,7 +374,7 @@ namespace fire_ash_server.Props
                 rangedWeapon.DamageType);
         }
 
-        public Damage GetMainHandDamageRoll(Weapon mainHandWeapon)
+        public Damage GetMainMeleeDamageRoll(Weapon mainHandWeapon)
         {
             return new Damage(
                 new Roll(mainHandWeapon.DamageDie, GetModifer(Ability.Strength) + mainHandWeapon.Modifier, RollType.DamageRoll, this),
@@ -386,6 +411,15 @@ namespace fire_ash_server.Props
             if (EquippedItems.TryGetValue(InventorySlot.OffHand, out Item? offHand))
                 if (offHand is Weapon)
                     return (Weapon)offHand;
+
+            return DefaultHand;
+        }
+
+        public Weapon GetTeethWeapon()
+        {
+            if (EquippedItems.TryGetValue(InventorySlot.Teeth, out Item? teeth))
+                if (teeth is Weapon)
+                    return (Weapon)teeth;
 
             return DefaultHand;
         }
@@ -436,7 +470,7 @@ namespace fire_ash_server.Props
             Roll roll = GetMeleeAttackRoll(weapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
-                Damage damage = GetMainHandDamageRoll(weapon);
+                Damage damage = GetMainMeleeDamageRoll(weapon);
                 characterToAttack.TakeDamage(
                     damage,
                     this,
@@ -459,7 +493,6 @@ namespace fire_ash_server.Props
             return 10 + GetModifer(ability);
         }
 
-
         public void AttackWithOffhand(Character characterToAttack)
         {
             string? attack = GetOffHandAttackDescription(characterToAttack);
@@ -467,13 +500,48 @@ namespace fire_ash_server.Props
             Roll roll = GetMeleeAttackRoll(wapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
-                Damage damage = GetMainHandDamageRoll(wapon);
+                Damage damage = GetMainMeleeDamageRoll(wapon);
                 characterToAttack.TakeDamage(
                     damage,
                     this,
                     wapon.Name,
                     attack + SingleHitMessage(roll),
                     true);
+            }
+            else
+            {
+                BroadcastToSoulsInRoom(attack + SingleMissMessage(roll));
+            }
+        }
+
+        public void AttackWithTeeth(Character characterToAttack)
+        {
+            string? attack = GetTeethAttackDescription(characterToAttack);
+            Weapon weapon = GetTeethWeapon();
+            Roll roll = GetMeleeAttackRoll(weapon);
+            if (roll.GetSum() >= characterToAttack.GetAC())
+            {
+                Damage damage = GetMainMeleeDamageRoll(weapon);
+                characterToAttack.TakeDamage(
+                    damage,
+                    this,
+                    weapon.Name,
+                    attack + SingleHitMessage(roll),
+                    true);
+                    
+                //poison damage    
+                Roll savingThrow = new Roll(characterToAttack.GetModifer(Ability.Constitution), RollType.SavingThrow, characterToAttack);
+                if (!savingThrow.BeatsDC(13))
+                {
+                    Roll dmgRoll = new Roll(new Die(1,4), 0, RollType.DamageRoll, this);
+                    Damage poisonDmg = new Damage(dmgRoll, DamageType.Poison);
+                    string preDmgMessage = $"{characterToAttack.Name} fails constitution saving throw against {FormatPossessive(this.Name)} poisonous bite with a roll of {savingThrow}.";
+                    characterToAttack.TakeDamage(poisonDmg, this, "venom", preDmgMessage, true);
+                }
+                else
+                {
+                    BroadcastToSoulsInRoom($"{characterToAttack.Name} succeeds constitution saving throw against {FormatPossessive(this.Name)} poisonous bite with a roll of {savingThrow}.");
+                }   
             }
             else
             {

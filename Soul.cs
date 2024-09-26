@@ -354,6 +354,9 @@ namespace fire_ash_server
 
             //inventory
             AddPossibleMove(new LookInventory(this));
+            //journal
+            //AddPossibleMove(new CheckJournal(this));
+
         }
 
         public void AddPossibleHiddenLookAtMove(Character character)
@@ -710,7 +713,7 @@ namespace fire_ash_server
                 Socket.Close();
                 Socket = null;
             }
-            Console.WriteLine("Soul has been been banished.");
+            Console.WriteLine("Soul has been banished.");
         }
     }
 }

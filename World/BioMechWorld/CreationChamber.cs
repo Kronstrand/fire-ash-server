@@ -126,6 +126,14 @@ namespace fire_ash_server.World.BioMechWorld
                     $"surrounded by the eerie, mechanical environment of the larger chamber.");
                 _ = s.MoveCharToRoomAndSendDescriptionAsync(creationChamber);
                 s.Character.MoveToGroup(emptyIncubatorPod);
+
+                /*s.Character.Journal.AddNewEntry(
+                    JournalKey.TheMecharions, 
+                    "I've escaped the pod. The chamber I'm in is vast, " + 
+                    "filled with more incubation pods, " + 
+                    "all connected to an intricate network of cables and machinery. " + 
+                    "A towering machine looms in the center, tending to the pods. " + 
+                    "I need to figure out where I am and why I was created here.");*/
             };
 
             Item umbilicalTube = new Item(
@@ -144,6 +152,14 @@ namespace fire_ash_server.World.BioMechWorld
             incubator.OnEnterEvent = (s) =>
             {
                 s.Character.MoveToGroup(umbilicalTube);
+                if (s.Socket == null)
+                    return;
+
+                /*s.Character.Journal.AddNewEntry(
+                    JournalKey.TheMecharions, 
+                    "I woke inside a strange incubation pod, half metal, half flesh. " + 
+                    "The air is thick with the sterile scent of machinery and fluids. " + 
+                    "I need to find a way out of this place.");*/
             };
 
             Character ocularSentinel = new Character(

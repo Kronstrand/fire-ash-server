@@ -100,5 +100,16 @@ namespace fire_ash_server.World.BioMechWorld
 
             return tribalShortBow;
         }
+
+        public static Sword RustedSword()
+        {
+            Sword rustedSword = new Sword(
+                "Rusted Sword",
+                "A corroded blade, dulled and pitted with rust. " +
+                "The hilt’s leather is worn and brittle, hinting at better days. " +
+                "Despite its decay, the sword holds a lingering aura of past battles.");
+
+            return rustedSword;
+        }
     }
 }

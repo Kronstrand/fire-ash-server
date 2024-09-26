@@ -9,7 +9,7 @@ namespace fire_ash_server.Props.Items.Armor
 {
     internal class Armor: Item
     {
-        public Armor(string name, string description, int value) : base(name, description, value) 
+        public Armor(string name, string description, double value) : base(name, description, value) 
         {
 
         }

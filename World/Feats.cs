@@ -73,6 +73,16 @@ namespace fire_ash_server.World
                     return feat;
                 }
             }
+            else if (key == Description(FeatKey.BiteAttack))
+            {
+                if (CreateFeatAndSkipMove(key, out feat, skipMove)) return feat;
+
+                if (target is Character character)
+                {
+                    feat.Moves.Add(new BiteAttack(soul, character));
+                    return feat;
+                }
+            }
             else if (key == Description(FeatKey.DarkVision))
             {
                 CreateFeatAndSkipMove(key, out feat, skipMove);

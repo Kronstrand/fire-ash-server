@@ -17,6 +17,7 @@ namespace fire_ash_server.Enums
         OffHand,
         Ranged,
         Waist,
-        Head
+        Head,
+        Teeth
     }
 }

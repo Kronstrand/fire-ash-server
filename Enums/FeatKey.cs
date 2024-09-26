@@ -12,6 +12,7 @@ namespace fire_ash_server.Enums
         MeleeAttack,
         RangedAttack,
         DualWield,
+        BiteAttack,
         PickPocket,
         DarkVision
     }

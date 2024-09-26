@@ -15,13 +15,14 @@ namespace fire_ash_server.World.BioMechWorld
 {
     internal class BioMechCreator
     {
+        public CreationChamber startingRoom;
         public BioMechCreator()
         {
             Relationship.Set(FactionKey.Players, FactionKey.Technomancers, 13);
             Relationship.Set(FactionKey.Technomancers, FactionKey.TechnomancersDefenceSystem, 18);
             Relationship.Set(FactionKey.Players, FactionKey.TechnomancersDefenceSystem, 6);
 
-            new CreationChamber();
+            startingRoom = new CreationChamber();
         }
     }
 }

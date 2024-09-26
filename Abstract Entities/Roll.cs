@@ -33,7 +33,7 @@ namespace fire_ash_server
 
         public bool BeatsDC(int dc)
         {
-            return (GetSum() >= dc || !DieRolls.Contains(1));
+            return (GetSum() >= dc && !DieRolls.Contains(1));
         }
 
         public override string ToString()

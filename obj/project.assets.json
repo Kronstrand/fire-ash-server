@@ -8,26 +8,24 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\jkkn\\.nuget\\packages\\": {}
+    "/Users/moonstone/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
+      "projectUniqueName": "/Users/moonstone/Documents/code/fire-ash-server/fire-ash-server.csproj",
       "projectName": "fire-ash-server",
-      "projectPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
-      "packagesPath": "C:\\Users\\jkkn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\obj\\",
+      "projectPath": "/Users/moonstone/Documents/code/fire-ash-server/fire-ash-server.csproj",
+      "packagesPath": "/Users/moonstone/.nuget/packages/",
+      "outputPath": "/Users/moonstone/Documents/code/fire-ash-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\jkkn\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/moonstone/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -66,7 +64,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.204/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
