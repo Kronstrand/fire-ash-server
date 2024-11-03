@@ -69,8 +69,6 @@ namespace fire_ash_server
                 Character.CurrentRoom.BroadcastToSoulsInRoom(messageToSend);
         }
 
-        
-
         public async Task SendAsync(string messageToSend)
         {
             await SendAsync(messageToSend, SendOption.None);
@@ -187,22 +185,38 @@ namespace fire_ash_server
                             foreach(KeyValuePair<InventorySlot, Item> SlotAndItem in tagetCharacter.EquippedItems)
                                 AddPossibleMove(new LookAt(this, SlotAndItem.Value));
 
-                        foreach (Item item in inventory.Items.Where(item => !item.IsHidden()))
-                                AddPossibleMove(new LookAt(this, item));
+                        foreach (Item item in inventory.Items)
+                            AddPossibleMove(new LookAt(this, item));
                     }
                 }
                 else if (Character.LookAt is Item)
                 {
                     Item item = (Item)Character.LookAt;
-                    
 
                     AddPossibleInvestigationOrLookMove(item);
 
-                    if (Character.IsInGroupWith(item) == false && item.HeldByCharacter() != Character)
+                    if (Character.IsInGroupWith(item) == false && item.HeldByCharacter() == null && item.GetLightState(Character) != Light.Darkness)
                         AddPossibleMove(new MoveTo(this, item));
 
                     if (Character.TradingWith != null && item.HeldByCharacter() != Character && item.IsPickupable())
                         AddPossibleMove(new BuyItem(this, item));
+
+                    if (item.IsPickupable())
+                    {
+                        if (item.HeldByCharacter() != Character)
+                            AddPossibleMove(new Grab(this, (Item)Character.LookAt)); //But you can pickup Props??
+                        else
+                        {
+                            if (!Character.EquippedItems.Values.Contains(item))
+                                foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
+                                    AddPossibleMove(new Equip(this, item, inventorySlot));
+
+                            AddPossibleMove(new DropItem(this, item));
+                        }
+                    }
+
+                    foreach(Effect effect in item.EquipEffects)
+                        AddPossibleMove(new LookEffectDescription(this, effect.Name));
                 }
                 else if (Character.LookAt is Room)
                 {
@@ -215,18 +229,6 @@ namespace fire_ash_server
                     {
                         AddPossibleMove(new LookAt(this, otherChar));
                     }
-                }
-
-                if (Character.LookAt.IsPickupable())
-                {
-                    Item item = (Item)Character.LookAt;
-
-                    if (item.HeldByCharacter() != Character)
-                        AddPossibleMove(new Grab(this, (Item)Character.LookAt)); //But you can pickup Props??
-
-                    if (item.HeldByCharacter() == Character)
-                        foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
-                            AddPossibleMove(new Equip(this, item, inventorySlot));
                 }
 
                 Light characterLookAtLightSate = Character.LookAt.GetLightState(Character);
@@ -264,7 +266,8 @@ namespace fire_ash_server
                             AddPossibleMove(new LookAt(this, item));
                         }
                         else if (!item.Unreachable)
-                            AddPossibleMove(new MoveTo(this, item));
+                            if (item.DynamicDescription || item.GetLightState(character) != Light.Darkness)
+                                AddPossibleMove(new MoveTo(this, item));
                     }
                 }
                 //looking at darkness with flashlight to see all props in group
@@ -420,8 +423,12 @@ namespace fire_ash_server
             }
 
             if (!(prop is Room))
+            {
+                if (!prop.DynamicDescription && propLightState == Light.Darkness)
+                    return;
                 if (prop.DynamicDescription && propLightState == Light.Darkness && !Character.HasPointLight())
                     return;
+            }
 
             if (prop != Character.LookAt)
                 AddPossibleMove(new LookAt(this, prop));
@@ -533,24 +540,27 @@ namespace fire_ash_server
          
             if (move.EnablesCombat)
             {
-                Character? targetCharacer = null;
-                if (move.Prop is Item)
+                if (activeCharacter.EnableCombatWith == null)
                 {
-                    Item item = (Item)move.Prop;
-                    Character? heldByCharacter = item.HeldByCharacter();
-                    if (heldByCharacter != null || heldByCharacter != Character)
+                    Character? targetCharacer = null;
+                    if (move.Prop is Item)
                     {
-                        targetCharacer = heldByCharacter;
+                        Item item = (Item)move.Prop;
+                        Character? heldByCharacter = item.HeldByCharacter();
+                        if (heldByCharacter != null || heldByCharacter != Character)
+                        {
+                            targetCharacer = heldByCharacter;
+                        }
                     }
-                }
-                else if (move.Prop is Character)
-                    targetCharacer = (Character)move.Prop;
+                    else if (move.Prop is Character)
+                        targetCharacer = (Character)move.Prop;
 
-                if (targetCharacer != null && move.EnablesCombat)
-                    if (targetCharacer != activeCharacter)
-                        activeCharacter.EnableCombatWith = new ToxicRelationship(targetCharacer, false);
-                    else
-                        activeCharacter.EnableCombatWith = new ToxicRelationship(Character, true);
+                    if (targetCharacer != null && move.EnablesCombat)
+                        if (targetCharacer != activeCharacter)
+                            activeCharacter.EnableCombatWith = new ToxicRelationship(targetCharacer, false);
+                        else
+                            activeCharacter.EnableCombatWith = new ToxicRelationship(Character, true);
+                }
 
             }
         }

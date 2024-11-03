@@ -17,6 +17,8 @@ using static fire_ash_server.Helpers;
 using fire_ash_server.Props.Items;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 
 namespace fire_ash_server.Props
 {
@@ -73,14 +75,100 @@ namespace fire_ash_server.Props
                     description += exitDescription; //last exit
             }
             
-            string charactersAsString = ListCharactersAsString(lookingCharacter);
+            string charactersAsString = ListPropsAsString(lookingCharacter);
             if (charactersAsString != "")
                 description += "\n\n" + charactersAsString;
+
+            string restOfItemsAsString = ListRestOfItemsAsString(lookingCharacter);
+            if (restOfItemsAsString != "")
+                description += "\n\n" + restOfItemsAsString;
 
             return description;
         }
 
-        private string ListCharactersAsString(Character lookingCharacter)
+        private string ListRestOfItemsAsString(Character lookingCharacter)
+        {
+            List<string> outputStrings = new List<string>();
+            string output = "";
+            string stringContext = "the ground";
+
+            var groups = lookingCharacter.CurrentRoom.Groupings.Where(g => g.GetLightState(lookingCharacter) != Light.Darkness);
+            foreach (Grouping group in groups)
+            {
+                bool characterFound = false;
+                List<Prop> unpickupable = new List<Prop>();
+                List<Item> itemsToPick = new List<Item>();
+                foreach (Prop prop in group.Props.Where(p => !p.IsHidden()))
+                {
+                    if (prop is Character && prop != lookingCharacter)
+                    {
+                        characterFound = true;
+                    }
+                    else if (prop is Item)
+                    {
+                        if (prop.IsPickupable())
+                            itemsToPick.Add((Item)prop);
+                        else
+                            unpickupable.Add(prop);
+                    }
+                    else if (prop is Exit)
+                    {
+                        unpickupable.Add(prop);
+                    }
+                }
+
+                if (!characterFound && itemsToPick.Any())
+                {
+                    if (!unpickupable.Any())
+                    {
+                        if (itemsToPick.Count == 1)
+                            outputStrings.Add($"{itemsToPick.First().Name} lies by itself on ${stringContext}");
+                        else
+                            outputStrings.Add($"In a pile on ${stringContext} lies " + ListToString(itemsToPick));
+                    }
+                    else
+                    {
+                        outputStrings.Add($"Besides {unpickupable.First().Name} lies " + ListToString(itemsToPick));
+                    }
+                }
+            }
+           
+
+            if (lookingCharacter.CurrentRoom.GetLightState(lookingCharacter) != Light.Darkness)
+            {
+                List<Item> ungroupedItems = lookingCharacter.CurrentRoom.Items.Where(i => i.IsPickupable() && i.GetGrouping(lookingCharacter.CurrentRoom) == null && !i.IsHidden()).ToList();
+
+                if (ungroupedItems.Count == 1)
+                    outputStrings.Add($"{ungroupedItems.First().Name} lies by itself on ${stringContext}");
+                else if (ungroupedItems.Count > 1)
+                    outputStrings.Add($"{ListToString(ungroupedItems)} lies scattered on ${stringContext}");
+            }
+
+            for (int i = 0; i < outputStrings.Count; i++)
+            {
+                output += outputStrings[i];
+                if (i == outputStrings.Count - 1)
+                    output += ".";
+                else
+                    output += "; ";
+            }
+
+            return output;
+        }
+        
+
+            private string ListItemsAsString(Character lookingCharacter, Prop? groupProp)
+        {
+            Grouping? grouping = null;
+            if (groupProp != null)
+                grouping = groupProp.GetGrouping(lookingCharacter.CurrentRoom);
+
+            List<Item> items = lookingCharacter.CurrentRoom.Items.Where(e => !e.IsHidden() && e.IsPickupable() && e.GetGrouping(lookingCharacter.CurrentRoom) == grouping).ToList();
+
+            return ListToString(items);
+        }
+
+        private string ListPropsAsString(Character lookingCharacter)
         {
             List<Tuple<Prop?, List<Character>>> groupedCharactersByProp = new List<Tuple<Prop?, List<Character>>>();
 
@@ -164,7 +252,6 @@ namespace fire_ash_server.Props
             foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
             {
                 outerLoopCounter++;
-                //if (groupedCountedProp.Prop != )
                 int i = 0;
                 numberOfItems = groupedCountedProp.CountedCharacters.Count();
                 output += " ";
@@ -202,7 +289,11 @@ namespace fire_ash_server.Props
                         else if (groupedCountedProp.Prop != null)
                             output += " at the " + groupedCountedProp.Prop.Name;
                         else if (groupedCountedProp.Prop == null)
-                            output += $" is also here.";
+                            output += $" is also here";
+
+                        string itemsAsString = ListItemsAsString(lookingCharacter, groupedCountedProp.Prop);
+                        if (itemsAsString != "")
+                            output += " where on the ground lies " + itemsAsString;
 
                         if (outerLoopCounter != groupedCountedProps.Count())
                             output += ';';

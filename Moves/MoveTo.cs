@@ -38,8 +38,42 @@ namespace fire_ash_server.Moves
                     await LookAt.LookAtAction(soul, targetProp);
                 }
 
+                TriggerHostileCombat(soul, targetProp);
+
                 targetProp.RunOnAfterMoveToEvents(soul);
             };
+        }
+
+        private void TriggerHostileCombat(Soul soul, Prop targetProp)
+        {
+            Grouping? grouping = targetProp.GetGrouping();
+            if (grouping != null)
+            {
+                foreach (Prop prop in grouping.Props)
+                {
+                    if (!(prop is Character))
+                        continue;
+
+                    Character character = (Character)prop;
+                    if (character == soul.Character)
+                        continue;
+
+                    if (character.GetRelationShipTo(soul.Character).IsHostile())
+                    {
+                        EnablesCombat = true;
+                        soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
+                    }
+                }
+            }
+            else if (targetProp is Character)
+            {
+                Character character = (Character)targetProp;
+                if (character.GetRelationShipTo(soul.Character).IsHostile())
+                {
+                    EnablesCombat = true;
+                    soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
+                }
+            }
         }
 
         public static string CreateMoveName(Character character, Prop prop)

@@ -15,5 +15,10 @@ namespace fire_ash_server
             NumberOfDies = numberOfDies;
             Sides = numberOfSides;
         }
+
+        public override string ToString()
+        {
+            return $"{NumberOfDies}D{Sides}";
+        }
     }
 }

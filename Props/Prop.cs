@@ -12,6 +12,7 @@ using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
 using fire_ash_server.Props.Items;
+using fire_ash_server.Props.Items.Weapons;
 using fire_ash_server.World;
 using static fire_ash_server.Helpers;
 
@@ -87,6 +88,65 @@ namespace fire_ash_server.Props
             if (this is Character)
             {
                 Character character = (Character)this;
+                if (character.Description == "")
+                {
+                    Weapon mainHand = character.GetMainHand();
+                    Weapon offHand = character.GetOffHand();
+                    Weapon? ranged = character.GetRangedWeapon();
+
+                    description = $"{character.Name}";
+
+                    // Check if the character has any weapons equipped
+                    bool hasMainHand = mainHand != character.DefaultHand;
+                    bool hasOffHand = offHand != character.DefaultHand;
+                    bool hasRanged = ranged != null;
+
+                    if (hasMainHand || hasOffHand || hasRanged)
+                    {
+                        if (character.Dead)
+                            description += $", a dead {character.GetType()}, equipped with";
+                        else
+                            description += $", a {character.Kindred}, equipped with";
+
+                        // Handle main hand and off-hand weapon description
+                        if (hasMainHand && hasOffHand)
+                        {
+                            description += $" {mainHand.Name} and {offHand.Name}";
+                        }
+                        else if (hasMainHand)
+                        {
+                            description += $" {mainHand.Name}";
+                        }
+                        else if (hasOffHand)
+                        {
+                            description += $" {offHand.Name} as off-hand";
+                        }
+
+                        // Handle ranged weapon description
+                        if (ranged != null)
+                        {
+                            if (hasMainHand || hasOffHand)
+                            {
+                                description += $", along with {ranged.Name}";
+                            }
+                            else
+                            {
+                                description += $" {ranged.Name}";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // If no weapons are equipped, provide a generic fallback description
+                        description += $", an unarmed {character.Kindred}";
+                    }
+
+                    if (character.Dead)
+                        description += ", lies on the ground";
+                    description += ".";
+
+                    return description;
+                }
                 if (character.Dead)
                     return character.DeathDescription;
             }
@@ -634,6 +694,34 @@ namespace fire_ash_server.Props
             }
             return false;
 
+        }
+        public string ListItemsAsString(Character lookingCharacter)
+        {
+            List<string> outputStrings = new List<string>();
+            string output = "";
+
+            Prop lookingAtProp;
+            if (lookingCharacter.LookAt != null)
+                lookingAtProp = lookingCharacter.LookAt;
+            else
+                return "";
+
+            if (lookingAtProp.GetLightState(lookingCharacter) != Light.Darkness)
+            {
+                List<Item> Items = lookingAtProp.Items.Where(i => i.IsPickupable() && !i.IsHidden()).ToList();
+                outputStrings.Add($"{ListToString(Items)} lies on the {lookingAtProp.Name}");
+            }
+
+            for (int i = 0; i < outputStrings.Count; i++)
+            {
+                output += outputStrings[i];
+                if (i == outputStrings.Count - 1)
+                    output += ".";
+                else
+                    output += "; ";
+            }
+
+            return output;
         }
     }
 }

@@ -28,14 +28,14 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 brokenBridge);
             serpentsSpine.AddExit(toBrokenBridge);
 
-            UndergroundCavePath.Create(brokenBridge);
-
             Exit toSerpentsSpine = new Exit(
                 "A plateau, connected to the fractured remnants of the two bridges",
                 "A steep ascent begins here, where slick, worn stone stairs wind upwards, " +
                 "leading out of the shadows toward the imposing heights of the Serpent's Spine.",
                 serpentsSpine);
             brokenBridge.AddExit(toSerpentsSpine);
+
+            UndergroundCavePath.Create(brokenBridge);
 
             return brokenBridge;
         }

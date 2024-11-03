@@ -18,11 +18,15 @@ namespace fire_ash_server.World.BioMechWorld
         public CreationChamber startingRoom;
         public BioMechCreator()
         {
+            startingRoom = new CreationChamber();
+        }
+
+        public static void SetFactions()
+        {
             Relationship.Set(FactionKey.Players, FactionKey.Technomancers, 13);
             Relationship.Set(FactionKey.Technomancers, FactionKey.TechnomancersDefenceSystem, 18);
             Relationship.Set(FactionKey.Players, FactionKey.TechnomancersDefenceSystem, 6);
-
-            startingRoom = new CreationChamber();
+            Relationship.Set(FactionKey.Players, FactionKey.Wilders, -1);
         }
     }
 }

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using fire_ash_server.Props;
 using static fire_ash_server.Helpers;
 using fire_ash_server.Enums;
+using fire_ash_server.Props.Items;
+using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves
 {
@@ -76,6 +79,77 @@ namespace fire_ash_server.Moves
             {
                 Character character = (Character)prop;
                 await soul.SendAsync(prop.GetDescription(soul.Character) + "\n\n" + $"The relationship to {character.Name} is {Description(soul.Character.GetRelationshipStatus(character))}.");
+                return;
+            }
+            else if (prop is Armor)
+            {
+                Armor armor = (Armor)prop;
+                await soul.SendAsync(prop.GetDescription(soul.Character)  + 
+                    "\n\n" + "Type: Armor" + 
+                    "\n" + $"Armor Class: {armor.AC}");
+                return;
+            }
+            else if (prop is Shield)
+            {
+                Shield shield = (Shield)prop;
+                await soul.SendAsync(prop.GetDescription(soul.Character) +
+                    "\n\n" + "Type: Shield" +
+                    "\n" + "Armor Bonus: +2");
+                return;
+            }
+            else if (prop is Weapon)
+            {
+                Weapon weapon = (Weapon)prop;
+
+                string equipable = "";
+                foreach (InventorySlot slot in weapon.CarriableByInventorySlots)
+                {
+                    if (equipable == "")
+                        equipable += "Equipable as ";
+                    else
+                        equipable += ", ";
+                    equipable += Helpers.Description(slot);
+                }
+
+                string output = 
+                    prop.GetDescription(soul.Character) +
+                    "\n\n" + "Type: Weapon" +
+                    "\n" + $"Damage: {weapon.GetDmgAsString()}" +
+                    "\n" + $"Damage Type: {weapon.DamageType}" +
+                    "\n" + equipable;
+
+
+                if (weapon.EquipEffects.Any())
+                {
+                    string effects = "";
+                    foreach (Effect effect in weapon.EquipEffects)
+                    {
+                        if (effects == "")
+                            effects = "Effects: ";
+                        else
+                            effects += ", ";
+                        effects += effect.Name;
+                    }
+                    output += "\n" + effects;
+                }
+
+                await soul.SendAsync(output);
+                return;
+            }
+            else if (prop is Armor)
+            {
+                Armor armor = (Armor)prop;
+                await soul.SendAsync(prop.GetDescription(soul.Character) + "\n\n" + $"Armor Class: {armor.AC}");
+                return;
+            }
+            else if (prop is Item && !prop.IsPickupable())
+            {
+                Item character = (Item)prop;
+                string output = prop.GetDescription(soul.Character);
+                string items = prop.ListItemsAsString(soul.Character);
+                if (items != "")
+                    output += "\n\n" + items;
+                await soul.SendAsync(output);
                 return;
             }
             await soul.SendAsync(prop.GetDescription(soul.Character));

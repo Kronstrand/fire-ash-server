@@ -37,5 +37,18 @@ namespace fire_ash_server.World.BioMechWorld
             return wornWoodenShield;
         }
 
+        public static Armor WardensScales()
+        {
+            return new Armor(
+                "Warden's Scales",
+                "A set of scale mail crafted from dark, " +
+                "gleaming metal plates, each shaped like the scales of a serpent. " +
+                "Brass accents form intricate snake motifs along the shoulders and chest, " +
+                "and the faint glint of ruby inlays gives it a watchful, protective aura. ",
+                ac: 15,
+                value: 120
+            );
+        }
+
     }
 }

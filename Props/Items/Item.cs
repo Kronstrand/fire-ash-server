@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
 using fire_ash_server.World;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items
 {
@@ -41,10 +44,10 @@ namespace fire_ash_server.Props.Items
             {
                 if (itemPointer.HeldBy == null)
                     return null;
-                
-                if (itemPointer is Inventory && itemPointer.HeldBy is Character)               
+
+                if (itemPointer.HeldBy is Character)
                     return (Character)itemPointer.HeldBy;
-                
+
                 if (itemPointer.HeldBy is Inventory)
                 {
                     Inventory inventory = (Inventory)itemPointer.HeldBy;
@@ -56,11 +59,10 @@ namespace fire_ash_server.Props.Items
 
                 if (!(itemPointer.HeldBy is Item))
                     return null;
-                
+
                 itemPointer = (Item)itemPointer.HeldBy;
             }
         }
-
         public void ClearHeldBy()
         {
             if (HeldBy != null)
@@ -97,12 +99,14 @@ namespace fire_ash_server.Props.Items
                 if (itemPointer.HeldBy is Exit)
                     return ((Exit)itemPointer.HeldBy).LocatedInRoom;
 
-                if (itemPointer.HeldBy is Item)             
+                if (itemPointer.HeldBy is Item)
                     itemPointer = (Item)itemPointer.HeldBy;
-                
+
                 if (itemPointer.HeldBy is Character)
                     return ((Character)itemPointer.HeldBy).CurrentRoom;
             }
         }
+
+        
     }
 }

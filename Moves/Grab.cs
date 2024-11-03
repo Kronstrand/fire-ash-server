@@ -37,7 +37,7 @@ namespace fire_ash_server.Moves
                 }
 
                 Character? heldByCharacter = item.HeldByCharacter();
-                if (heldByCharacter != null)
+                if (heldByCharacter != null && !heldByCharacter.Dead)
                 {
                     Roll strRoll = new Roll(soul.Character.GetModifer(Ability.Strength), RollType.SkillCheck, soul.Character);
                     if (strRoll.GetSum() >= heldByCharacter.GetPassiveDC(Ability.Strength))

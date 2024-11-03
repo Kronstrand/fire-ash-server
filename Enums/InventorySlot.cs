@@ -18,6 +18,7 @@ namespace fire_ash_server.Enums
         Ranged,
         Waist,
         Head,
-        Teeth
+        Teeth,
+        Body
     }
 }

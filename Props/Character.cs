@@ -30,7 +30,8 @@ namespace fire_ash_server.Props
         public int Wisdom { get; set; }
         public int Intelligence { get; set; }
         public int Charisma { get; set; }
-        public int HP { get; set; }
+        private int hp { get; set; }
+        public int CurrentHP { get; set; }
 
         public Weapon DefaultHand = new Fist();
 
@@ -45,6 +46,7 @@ namespace fire_ash_server.Props
         public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
         public Inventory Inventory = new Inventory();
         public int GP;
+        public int Silver;
         public Journal Journal;
         public DialogueManager? DialogueManager;
         public Character? TradingWith;
@@ -69,7 +71,7 @@ namespace fire_ash_server.Props
             Journal = new Journal(this);
 
             types = new List<CreatureType> { CreatureType.Humanoid };
-            Kindred = Kindred.Human;
+            Kindred = Kindred.Mecharion;
             Gender = RollGender();
             Strength = Roll(3, 6).Sum();
             Dexterity = Roll(3, 6).Sum();
@@ -135,6 +137,61 @@ namespace fire_ash_server.Props
             }
 
             return newPlayerFaction;
+        }
+
+        public int HP
+        {
+            get
+            {
+                return hp;
+            }
+            set
+            {
+                if (CurrentHP == 0)
+                    CurrentHP = value;
+                else if (CurrentHP > 0)
+                    CurrentHP += value - hp;
+                hp = value;
+            }
+        }
+
+        public double GetTotalCoin()
+        {
+            return GP + (Silver * 0.1);
+        }
+        public void TransferCoinTo(Character toCharacter, int gp, int silver)
+        {
+            //antagelse: der er nok total
+            if(GP >= gp && Silver >= silver)
+            {
+                TransferExactCoinTo(toCharacter, gp, silver);
+            }
+            else if(GP < gp)
+            {
+                int gpTransfered = GP;
+                int silverTransfered = silver + ((gp - gpTransfered) * 10);
+
+                TransferExactCoinTo(toCharacter, gpTransfered, silverTransfered);
+            }
+            else if (Silver < silver)
+            {
+                int silverTransfered = Silver;
+                double result = gp + ((silver - silverTransfered) * 0.1);                
+                int gpTransfered = (int)Math.Ceiling(result);
+                int fractionalSilverPart = (int)((gpTransfered - result) * 10);
+                silverTransfered -= fractionalSilverPart;
+
+                TransferExactCoinTo(toCharacter, gpTransfered, silverTransfered);
+            }
+
+        }
+
+        private void TransferExactCoinTo(Character toCharacter, int gp, int silver)
+        {
+            toCharacter.GP += gp;
+            toCharacter.Silver += silver;       
+            GP -= gp;
+            Silver -= silver;
         }
 
         public void SetEnableCombatWith(Character enemy)
@@ -234,9 +291,17 @@ namespace fire_ash_server.Props
             return Roll(1, 20).Sum() + GetModifer(Ability.Dexterity);
         }
 
+        public void SendCurrentHpSate()
+        {
+            if (Soul.Socket == null)
+                return;
+
+            _ = Soul.SendAsync($"$[hp]{CurrentHP}/{HP}$[hpend]");
+        }
+
         public void TakeDamage(Damage damage, Character sourceChar, string sourceName, string preDmgMessage, bool fromAttack)
         {
-            HP -= damage.DmgRoll.GetSum();
+            CurrentHP -= damage.DmgRoll.GetSum();
 
             if (preDmgMessage != null || preDmgMessage != "")
                 preDmgMessage += "\n";
@@ -260,11 +325,12 @@ namespace fire_ash_server.Props
             }
 
             BroadcastToSoulsInRoom(message);
+            SendCurrentHpSate();
             TestDeath();
         }
         public void TakeDamage(Damage damage, string sourceName)
         {
-            HP -= damage.DmgRoll.GetSum();
+            CurrentHP -= damage.DmgRoll.GetSum();
 
             string message = "";
             if (IsHidden())
@@ -278,18 +344,14 @@ namespace fire_ash_server.Props
             }
 
             BroadcastToSoulsInRoom(message);
+            SendCurrentHpSate();
             TestDeath();
+            
         }
-
-        /*public void TakeDamage(Damage damage)
-        {
-            HP -= damage.DmgRoll.GetSum();
-            TestDeath();
-        }*/
 
         public void TestDeath()
         {
-            if (HP > 0)
+            if (CurrentHP > 0)
                 return;
 
             if (!Dead)
@@ -319,11 +381,14 @@ namespace fire_ash_server.Props
         public int GetAC()
         {
             int ac = 10;
+            EquippedItems.TryGetValue(InventorySlot.Body, out Item? armor);
+            if (armor is Armor)
+                ac = ((Armor)armor).AC;
+            else  
+                ac += GetModifer(Ability.Dexterity);
 
-            ac += GetModifer(Ability.Dexterity);
-
-            EquippedItems.TryGetValue(InventorySlot.OffHand, out Item? item);
-            if (item is Shield)
+            EquippedItems.TryGetValue(InventorySlot.OffHand, out Item? shield);
+            if (shield is Shield)
                 ac += 2;
 
             return ac;

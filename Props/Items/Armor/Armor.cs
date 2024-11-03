@@ -9,9 +9,13 @@ namespace fire_ash_server.Props.Items.Armor
 {
     internal class Armor: Item
     {
-        public Armor(string name, string description, double value) : base(name, description, value) 
+        public int AC;
+        public Armor(string name, string description, int ac, double value) : base(name, description, value)
         {
-
+            CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
+                InventorySlot.Body
+            };
+            AC = ac;
         }
     }
 }

@@ -57,5 +57,18 @@ namespace fire_ash_server.Props.Items.Weapons
             int rndIndex = rand.Next(attackDescriptions.Count);
             return attackDescriptions[rndIndex].Invoke(attacker, target, this) + " and... ";
         }
+
+        public string GetDmgAsString()
+        {
+            string output = $"{DamageDie}";
+
+            if (Modifier > 0)
+                output += $"+{Modifier}";
+            else if (Modifier < 0) 
+                output += $"{Modifier}";
+
+            return output;
+
+        }
     }
 }

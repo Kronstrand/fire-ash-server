@@ -119,8 +119,7 @@ namespace fire_ash_server.Props.Items.Weapons
                 descriptions.Add((a, r, w) => { return $"{a} surprises {r} with a sudden reversal, the {w.Name} snapping back in a reverse grip"; });
                 descriptions.Add((a, r, w) => { return $"{a} sweeps the {w.Name} in a deceptive curve, cloaking its true target until it nears {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} crafts a sharp angle with the {w.Name}, its blade plotting a precise route to {r}"; });
-                descriptions.Add((a, r, w) => { return $"{a} with a burst of agility, drives the {w.Name} in a vertical slash down towards {r}"; });
-                descriptions.Add((a, r, w) => { return $"{a} enacts a swift parry with one hand, the other thrusting the {w.Name} towards {r}"; });
+                descriptions.Add((a, r, w) => { return $"{a} with a burst of streangth, drives the {w.Name} in a vertical slash down towards {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} veils their intent with a cloak of feints before the {w.Name} strikes towards {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} sets the {w.Name} ablaze with motion, casting a deadly shadow before striking {r}"; });
                 descriptions.Add((a, r, w) => { return $"{a} unleashes a rapid succession of thrusts, each one a promise of peril to {r}"; });
