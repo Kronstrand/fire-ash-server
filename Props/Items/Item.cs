@@ -18,6 +18,7 @@ namespace fire_ash_server.Props.Items
         public Prop? HeldBy;
         public bool IsContainer;
         public double VendorValue = 0;
+        public bool Sellable = true;
         public ThreadSafeList<InventorySlot> CarriableByInventorySlots = new ThreadSafeList<InventorySlot>();
         public List<Effect> EquipEffects = new List<Effect>();
 
@@ -107,6 +108,15 @@ namespace fire_ash_server.Props.Items
             }
         }
 
-        
+        public double GetBuyPriceFromVendor(Character buyFrom)
+        {
+            return Math.Round(VendorValue * (1 + buyFrom.tradeModifier), 2);
+        }
+
+        public double GetSellPriceFromVendor(Character buyFrom)
+        {
+            return Math.Round(VendorValue * (1 - buyFrom.tradeModifier), 2);
+        }
+
     }
 }

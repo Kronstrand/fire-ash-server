@@ -24,7 +24,7 @@ namespace fire_ash_server.Moves
             return $"Examine {prop.Name}. (Investigation)";
         }
 
-        private Action CreateAction(Soul soul, Prop prop)
+        private Func<Task> CreateAction(Soul soul, Prop prop)
         {
             return async () =>
             {
@@ -48,7 +48,7 @@ namespace fire_ash_server.Moves
                     await soul.SendAsync($"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
                 else
                     await soul.SendAsync(
-                        $"{tagetProp.GetDescription(soul.Character)}\n\n" +
+                        //$"{tagetProp.GetDescription(soul.Character)}\n\n" +
                         $"{soul.Character.Name} rolls {investigationRoll} and finds {ListToString(foundProps)}.");
             }
             else

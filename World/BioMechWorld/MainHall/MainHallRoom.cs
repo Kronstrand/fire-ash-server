@@ -144,14 +144,15 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             // Add the stage item to the Main Hall
             mainHall.AddItem(stage);
 
-            //Characters
-            Character ezekielTheMechanomancer = Ezekiel.Create();
-            ezekielTheMechanomancer.GoToRoom(mainHall);
-            ezekielTheMechanomancer.MoveToGroup(stage);
-
-            Character elaraTheDefender = Elara.Create();
+            DialogueNode eleraStartNode;
+            Character elaraTheDefender = Elara.Create(out eleraStartNode);
             elaraTheDefender.GoToRoom(mainHall);
             elaraTheDefender.MoveToGroup(stage);
+
+            //Characters
+            Character ezekielTheMechanomancer = Ezekiel.Create(elaraTheDefender, eleraStartNode);
+            ezekielTheMechanomancer.GoToRoom(mainHall);
+            ezekielTheMechanomancer.MoveToGroup(stage);
 
             ShadowyTemple.Create(mainHall);
         }

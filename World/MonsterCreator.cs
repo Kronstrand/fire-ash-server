@@ -30,7 +30,7 @@ namespace fire_ash_server.World
                 12, // wisdom - has a natural cunning and awareness of its surroundings
                 8,  // charisma - not charismatic, tends to induce fear or unease
                 "The Shadecreeper lies still, its shadowy form now lifeless. Even in death, its presence seems to cast a darkness around it, " +
-                "as if the shadows cling to its body. The primitive bow rests by its side, a reminder of the unseen dangers lurking in the darkness."
+                "as if the shadows cling to its body."
             );
             shadecreeper.AddEquippedItem(InventorySlot.MainHand, WeaponList.StoneKnife());
             shadecreeper.AddEquippedItem(InventorySlot.Ranged, WeaponList.TribalShortBow());
@@ -87,7 +87,8 @@ namespace fire_ash_server.World
         {
             Character skeleton = new Character(
                 "Skeleton",
-                "A humanoid figure made entirely of bones, moving with an unnatural clatter. Its hollow eye sockets glow faintly with an eerie light, and it creaks with each motion, driven by a silent, unseen force.",
+                "A humanoid figure made entirely of bones, moving with an unnatural clatter. " +
+                "Its hollow eye sockets glow faintly with an eerie light, and it creaks with each motion, driven by a silent, unseen force.",
                 Kindred.Undead,
                 CreatureType.Humanoid, // Skeletal but retains a humanoid structure
                 10,  // strength - average strength for an undead animated by dark forces
@@ -167,9 +168,6 @@ namespace fire_ash_server.World
             giantSnake.AddFeat(FeatKey.BiteAttack); // Strong melee attack from its bite
             giantSnake.AddEquippedItem(InventorySlot.Teeth, new VenomousSnakeBite());
 
-            // Add a few inventory items for flavor (if needed)
-            //giantSnake.AddToInventory(Coins.GenerateCoins(2)); // Perhaps it's guarding a small amount of treasure
-
             if (!Character.hitReactions.ContainsKey(giantSnake.Name))
             {
                 List<Func<string, string, string>> hitDescriptions = new List<Func<string, string, string>>();
@@ -196,6 +194,113 @@ namespace fire_ash_server.World
             }
 
             return giantSnake;
+        }
+
+        public static Character SerpentDevil()
+        {
+            Character serpentDevil = new Character(
+                "Serpent Devil",
+                "A nightmarish fusion of man and serpent, the Serpent Devil towers with its grotesque form of scaled flesh, " +
+                "a venomous tail coiled and ready to strike. Its glowing, slitted eyes radiate malice. " +
+                "The beast moves with unnatural fluidity, blending demonic cunning with predatory instinct.",
+                Kindred.Demon,
+                CreatureType.Monstrosity, // Monstrous hybrid of serpent and demon
+                15,  // strength - immense physical power for crushing and ripping apart prey
+                12,  // dexterity - swift and serpentine movements, capable of quick strikes
+                14,  // constitution - resilient against attacks, fortified by demonic energy
+                10,  // intelligence - cunning and strategic, with a predatory intellect
+                12,  // wisdom - heightened awareness of its surroundings
+                8,   // charisma - terrifying rather than charming, its presence inspires dread
+                "The Serpent Devil collapses into a heap of twisted scales and claws, its venom pooling in dark puddles around its coiled form. " +
+                "Even in death, its malevolent gaze seems to linger, searing terror into the minds of those who dared face it."
+            );
+
+            // Set the creature's health
+            serpentDevil.HP = 28;
+            serpentDevil.DefaultHand = new BeastClaw();
+            serpentDevil.AddFeat(FeatKey.DarkVision); // Can see clearly in low-light conditions
+            serpentDevil.AddFeat(FeatKey.DualWield);
+            serpentDevil.AddFeat(FeatKey.BiteAttack); //snakebit
+
+            serpentDevil.AddEquippedItem(InventorySlot.Teeth, new TailSnakeBite());
+
+            // Optional: Add loot or inventory
+            serpentDevil.AddToInventory(TempleTrinketList.GetRandom()); // Mystical loot item
+
+            // Serpent Devil hit reactions
+            if (!Character.hitReactions.ContainsKey(serpentDevil.Name))
+            {
+                List<Func<string, string, string>> hitDescriptions = new List<Func<string, string, string>>();
+                hitDescriptions.Add((a, r) => { return $"{r} snarls, its venom-coated fangs snapping dangerously at {a}."; });
+                hitDescriptions.Add((a, r) => { return $"{r} recoils briefly, its scaled tail thrashing with deadly intent."; });
+                hitDescriptions.Add((a, r) => { return $"{r} hisses furiously, its glowing eyes narrowing with pain and anger."; });
+                hitDescriptions.Add((a, r) => { return $"{r} stiffens, its muscular coils rippling as it absorbs the blow."; });
+                hitDescriptions.Add((a, r) => { return $"{r} lashes out instinctively, its claws scraping against the ground in frustration."; });
+                hitDescriptions.Add((a, r) => { return $"{r} emits a guttural growl, venom dripping from its elongated fangs."; });
+                hitDescriptions.Add((a, r) => { return $"{r} momentarily retreats, its serpentine body twisting with unnerving grace."; });
+                hitDescriptions.Add((a, r) => { return $"{r} bares its fangs at {a}, venom seeping as it coils tighter."; });
+                hitDescriptions.Add((a, r) => { return $"{r} snarls, its forked tongue flicking angrily as it readjusts."; });
+                hitDescriptions.Add((a, r) => { return $"{r} thrashes violently, its barbed tail whipping through the air in fury."; });
+                hitDescriptions.Add((a, r) => { return $"{r} momentarily falters, its demonic form bristling with restrained rage."; });
+                hitDescriptions.Add((a, r) => { return $"{r} emits a guttural hiss, its tail striking the ground with a deafening crack."; });
+
+                Character.hitReactions.Add(serpentDevil.Name, hitDescriptions);
+            }
+
+            return serpentDevil;
+        }
+
+        public static Character Ratrocity()
+        {
+            Character ratrocity = new Character(
+                "Ratrocity",
+                "A grotesque amalgamation of rat and machine, its patchy fur barely conceals the exposed gears and wires along its back. " +
+                "Its glowing red eyes flicker with an unsettling intelligence, and its jagged, metal-tipped claws scrape ominously against the ground.",
+                Kindred.None,
+                CreatureType.Monstrosity, // Hybrid creature, not fully beast or machine
+                10,  // strength - capable of powerful swipes
+                12,  // dexterity - quick and nimble, despite its unnatural build
+                8,  // constitution - resilient, with reinforced mechanical parts
+                6,   // intelligence - driven by primal and programmed instincts
+                9,  // wisdom - sharp survival instincts
+                7,   // charisma - induces fear rather than charm
+                "The Ratrocity collapses into a heap of fur and scrap, its mechanical components sparking weakly."
+            );
+
+            BeastClaw beastClaw = new BeastClaw();
+            beastClaw.DamageDie = new Die(1, 2);
+
+            ratrocity.AddEquippedItem(InventorySlot.MainHand, beastClaw);
+            ratrocity.HP = 2;
+
+            // Abilities
+            ratrocity.AddFeat(FeatKey.MeleeAttack);
+            ratrocity.AddFeat(FeatKey.DarkVision); // Perfect for lurking in shadows
+
+            // Hit reactions
+            if (!Character.hitReactions.ContainsKey(ratrocity.Name))
+            {
+                List<Func<string, string, string>> hitDescriptions = new List<Func<string, string, string>>
+                    {
+                        (a, r) => $"{r} lets out a screech, sparks flying as its metal parts jolt from the impact.",
+                        (a, r) => $"{r} staggers briefly, its claws scraping against the floor with an ear-piercing screech.",
+                        (a, r) => $"{r} jerks its head, a mechanical whir accompanying its low growl of pain.",
+                        (a, r) => $"{r} emits a guttural hiss, its gears grinding audibly as it absorbs the hit.",
+                        (a, r) => $"{r} snarls, its red eyes flickering violently as sparks cascade from its exposed wiring.",
+                        (a, r) => $"{r} skitters backward, leaving a trail of jagged scratches on the ground as it regains balance.",
+                        (a, r) => $"{r} shudders, its patchy fur bristling as a burst of steam hisses from its mechanical joints.",
+                        (a, r) => $"{r} lets out a metallic screech, the sound resonating like nails on rusted steel.",
+                        (a, r) => $"{r} slams its tail into the ground with a loud clang, trying to steady its twitching frame.",
+                        (a, r) => $"{r} emits a distorted growl, its jagged claws flexing as it shakes off the blow.",
+                        (a, r) => $"{r} sparks wildly, its damaged servos emitting a high-pitched whine of protest.",
+                        (a, r) => $"{r} snarls as one of its mechanical limbs jams briefly, forcing it to lurch awkwardly.",
+                        (a, r) => $"{r} reels from the hit, its tail whipping around in a sharp, metallic arc.",
+                        (a, r) => $"{r} growls deeply, the faint sound of grinding gears adding an unsettling undertone."
+                    };
+                Character.hitReactions.Add(ratrocity.Name, hitDescriptions);
+            }
+
+            return ratrocity;
         }
 
     }

@@ -20,7 +20,8 @@ namespace fire_ash_server.Moves
                 if (soul.Character.TradingWith == null)
                     return;
                 await soul.SendAsync($"You finished trading with {soul.Character.TradingWith.Name}.");
-                soul.Character.SetLookAt(soul.Character.TradingWith);
+                //soul.Character.SetLookAt(soul.Character.TradingWith);
+                soul.Character.LookBack();
                 soul.Character.TradingWith = null;
             };
         }

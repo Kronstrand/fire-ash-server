@@ -63,6 +63,14 @@ namespace fire_ash_server.Moves
 
         public static async Task LookAtAction(Soul soul, Prop? prop)
         {
+            await HandleLookAtAction(soul, prop);
+
+            if (prop != null && prop.OnAfterLookAt != null)
+                    prop.OnAfterLookAt(soul);
+        }
+
+        private static async Task HandleLookAtAction(Soul soul, Prop? prop)
+        {
             if (prop == null)
             {
                 await soul.SendAsync($"{soul.Character.Name} are staring absentmindedly into the air...");

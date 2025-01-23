@@ -17,6 +17,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
         {
             // Define the new underground study
             Room undergroundStudy = new Room(
+                RoomKey.UndergroundStudy,
                 "Underground Study",
                 "The underground study is hidden beneath the temple courtyard. " +
                 "Its walls are lined with tall, dust-covered bookshelves, filled with thick, leather-bound tomes and ancient scrolls. " +
@@ -69,8 +70,15 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             );
 
             eriska.UniqueName = true;
+            eriska.IsTrader = true;
+            eriska.tradeModifier = 0.2;
             eriska.HP = 24;
             eriska.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
+
+            eriska.AddToInventory(ArmorList.NocturnalOptics());
+            eriska.AddToInventory(ConsumableList.HealthPotion());
+            eriska.AddToInventory(ConsumableList.HealthPotion());
+            eriska.AddToInventory(ConsumableList.HealthPotion());
 
             DialogueNode eriskaIntroNode = new DialogueNode(
                 "I see you have met Lily... Such a fragile thing, isn't she? A pity, truly, what has become of her. But pity does little to mend what is broken."
@@ -230,7 +238,6 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             // Choices to further explore the concept of madness or transition to other nodes
             eriskaMadnessNode.AddChoice("Tell me more about how you plan to heal Lily.", eriskaMissionNode);
 
-            eriska.CreateDialogueManager(eriskaIntroNode);
             eriska.GoToRoom(undergroundStudy);
             eriska.MoveToGroup(desk);
 
@@ -241,28 +248,175 @@ namespace fire_ash_server.World.BioMechWorld.Temple
 
             "Serpent's Tear" + "\n\n" +
 
-            "Within the hallowed walls of the Temple of Coiled Fate lies the Serpent's Tear " +
+            "Within the hallowed walls of the Temple of Coiled Fate lies the Serpent's Tear. " +
             "Legend tells that the Tear was shed when the Serpent foresaw the coming of an age where flesh and metal would merge, " +
             "disrupting the natural order." +
             "The Tear holds the essence of the Serpent's wisdom, " +
             "a bridge between the physical and spiritual realms. " +
-            "It is said that only those who understand" +
+            "It is said that only those who understand " +
             "the true balance of these forces may wield its power, " +
             "capable of mending the deepest of rifts within a soul." + "\n\n" +
 
             "The Chrono Serpent" + "\n\n" +
 
-            "Guarding the Serpent's Tear is the Chrono Serpent, a being woven from the very fabric of time." +
-            "This ethereal creature is a manifestation of the eternal cycle, its form constantly shifting between the past, present, and future." +
-            "The Chrono Serpent possesses the power to manipulate time within the temple, slowing or accelerating its flow to protect the Tear." +
-            "It is said that the serpent's gaze can see all possible futures, and it will allow only those who are truly worthy to approach the Tear." +
+            "Guarding the Serpent's Tear is the Chrono Serpent, a being woven from the very fabric of time. " +
+            "This ethereal creature is a manifestation of the eternal cycle, its form constantly shifting between the past, present, and future. " +
+            "The Chrono Serpent possesses the power to manipulate time within the temple, slowing or accelerating its flow to protect the Tear. " +
+            "It is said that the serpent's gaze can see all possible futures, and it will allow only those who are truly worthy to approach the Tear. " +
             "Those who fail its test are said to be lost in time, their fate forever sealed within the coils of the Serpent's domain.";
 
             Item book = new Item("An Account of the Nine Serpents", bookDescription, 13);
 
             desk.AddItem(book);
 
+            bool SerpentsTearHandedOverToEriska = false;
+
+            DialogueNode eriskaTearReceivedNode = new DialogueNode(
+                "You've done it. The Serpent's Tear... it is beautiful, isn't it? A fragment of something ancient, something powerful. " +
+                "This relic holds the essence of balance, a perfect equilibrium of opposing forces. It is exactly what we need to begin the ritual."
+            );
+
+            DialogueNode eriskaRitualExplanationNode = new DialogueNode(
+                "The ritual will not be simple, nor will it be without risk. The Serpent's Tear is a conduit, a bridge, but I must guide it, " +
+                "channeling its energy to realign Lily's spirit with her mechanical form. The process will test her, and it will test me. " +
+                "There is no guarantee of success. If I falter, the imbalance could worsen, leaving her in even greater agony. " +
+                "But if we succeed, she may finally know peace."
+            );
+
+            DialogueNode eriskaRiskAcknowledgmentNode = new DialogueNode(
+                "I wish there were another way, but there isn't. Her suffering will only grow if we do nothing. " +
+                "The Tear is our one chance to restore harmony to her being. I must see this through, no matter the cost. " +
+                "If you have doubts, now is the time to voice them, for once the ritual begins, there is no turning back."
+            );
+
+            // New node where the player decides not to give the Tear
+            DialogueNode playerDeclinesRitualNode = new DialogueNode(
+                "I understand your hesitation. The path ahead is fraught with uncertainty. " +
+                "I will not force your hand, but know that Lily's pain will persist, " +
+                "and this opportunity may not come again. Should you change your mind, return to me, and we can reconsider."
+            );
+
+            DialogueNode eriskaFinalPreparationNode = new DialogueNode("");
+            eriskaFinalPreparationNode.OnAfterEvent = (DialogueManager dm) => { SerpentsTearHandedOverToEriska = true; };
+
+            // Adjust eriskaTearReceivedNode choices if needed
+            eriskaTearReceivedNode.AddChoice("What happens now?", eriskaRitualExplanationNode);
+            eriskaTearReceivedNode.AddChoice("I'm having second thoughts about this.", eriskaRiskAcknowledgmentNode);
+
+            // Update choices in eriskaRiskAcknowledgmentNode
+            eriskaRiskAcknowledgmentNode.AddChoice("Let's begin. [Hand over Serpent's Tear]", eriskaFinalPreparationNode);
+            eriskaRiskAcknowledgmentNode.AddChoice("I can't go through with this. I'm sorry.", playerDeclinesRitualNode);
+
+            // Update eriskaRitualExplanationNode to remove direct progression to final preparation        
+            eriskaRitualExplanationNode.AddChoice("I understand the risks. [Hand over Serpent's Tear]", eriskaFinalPreparationNode);
+            eriskaRitualExplanationNode.AddChoice("What risks are involved?", eriskaRiskAcknowledgmentNode);
+
+            eriska.CreateDialogueManager(eriskaTearReceivedNode);
+
+            eriska.OnBeforeSpeakTo = (Soul soul, Character SpeakToCharacter) => 
+            {
+                if (soul.Character.Inventory.ContainsItemWithName("Serpent's Tear"))
+                    eriska.CreateDialogueManager(eriskaTearReceivedNode);
+                else
+                    eriska.CreateDialogueManager(eriskaIntroNode);
+            };
+
+            eriska.OnAfterSpeakTo = (Soul soul, Character SpeakToCharacter) =>
+            {
+                if (SerpentsTearHandedOverToEriska)
+                {
+                    _ = soul.SendAsync(GetEndText());
+                }
+            };
+
+            Item st = new Item("Serpent's Tear", "lol", 0);
+            undergroundStudy.AddItem(st);
+
             return undergroundStudy;
+        }
+
+        private static string GetEndText()
+        {
+            string sceneDescription =
+                    "Eriska cradles the Serpent's Tear, its eerie green light reflecting off her metallic skin.\n" +
+                    "She nods solemnly, her voice steady but tinged with apprehension. " +
+                    "She says: \"Come. It is time to end this suffering, one way or another.\"\n\n" +
+
+                    "Lily walks beside Eriska, her fragile form dwarfed by the towering walls of the sanctum. " +
+                    "She clutches her arm, her movements stiff, her expression one of quiet resignation. " +
+                    "You follow closely as they ascend the staircase into the temple, finding their way to the Serpent Sanctum.\n\n" +
+
+                    "The room's oppressive atmosphere settles over the group. The massive serpent statue looms above, its stone gaze both inviting and menacing. " +
+                    "Around the altar, the ritual bowls seem to hum faintly, as if aware of the ancient energies about to be awakened. " +
+                    "The air feels heavier, charged with an unseen force.\n\n" +
+
+                    "Eriska places the Serpent's Tear in a socket at the center of the altar. The gem glows brighter, casting long shadows that dance across the walls. " +
+                    "She begins to chant, her voice melodic yet alien, weaving an incantation that reverberates through the room.\n\n" +
+
+                    "Lily steps forward hesitantly. Eriska gestures for her to kneel before the altar.\n\n" +
+
+                    "Eriska whispers: \"This will hurt,\" her voice soft but unyielding. \"But it must.\"\n\n" +
+
+                    "You watch as the Tear's light envelops Lily, the glow intensifying until it becomes blinding. " +
+                    "A low hum grows into a deafening roar, and the room itself seems to tremble. " +
+                    "Lily screams, a sound that is both human and something far more primal.\n\n" +
+
+                    "The light recedes, and the silence that follows is absolute. Lily rises from the altar, her frail form replaced by something both beautiful and terrifying. " +
+                    "Her skin shimmers with an iridescent sheen, veins of molten light coursing beneath. " +
+                    "Her eyes, now glowing orbs, pierce the room with an unearthly gaze. " +
+                    "She exudes a presence that feels too large for the space, as if the sanctum struggles to contain her.\n\n" +
+
+                    "You step back instinctively, your breath caught in your throat. " +
+                    "Lily says: \"I see it all now,\" her tone devoid of the fragility it once held. " +
+                    "\"What was done to me, what was stolen. I was a child... I was helpless... And you-\"\n\n" +
+
+                    "She turns to Eriska, her expression unreadable. For a moment, it seems like she might embrace her savior. " +
+                    "Instead, her hand moves in a blur, and a surge of energy erupts from her palm. " +
+                    "Eriska collapses, her body crumpling to the floor, lifeless.\n\n" +
+
+                    "Lily says: \"-you made me this.\"\n\n" +
+
+                    "Lily strides toward the exit of the sanctum, her every step reverberating through the ground. " +
+                    "You hesitate, caught between the urge to intervene and the paralyzing weight of what you have just witnessed.\n\n" +
+
+                    "She pauses at the threshold, glancing over her shoulder. " +
+                    "Lily says: \"Come,\" she commands. \"There is more to be done.\"\n\n" +
+
+                    "You follow, helpless to stop the events unfolding. In the main hall, Ezekiel stands waiting, his imposing frame shadowed by the flickering lights. " +
+                    "He takes one look at Lily and his confident grin falters.\n\n" +
+
+                    "Ezekiel murmurs: \"Lily?\" disbelief mingling with awe. \"What have you become?\"\n\n" +
+
+                    "Lily's response is swift and merciless. She raises a hand, and Ezekiel is wrenched forward by an invisible force. " +
+                    "His body contorts as light pierces through his cybernetic implants. His scream is short-lived.\n\n" +
+
+                    "Lily whispers: \"For your perfection,\" as Ezekiel falls, his lifeless form a twisted shadow of its former self.\n\n" +
+
+                    "The stronghold is in chaos. Mecharions scatter as Lily dismantles the facility with precise, unrelenting force. " +
+                    "You follow her through the destruction, each step revealing the depths of her newfound power.\n\n" +
+
+                    "At last, they reach Elias, his expression is stoic, though a flicker of regret crosses his face as he looks at Lily.\n\n" +
+
+                    "Elias says: \"I wanted to save you,\" his voice quiet. \"What I did was wrong, but this… This is not salvation.\"\n\n" +
+
+                    "Lily hesitates for the first time, her glowing eyes dimming slightly. Her voice softens, and for a moment, the child she once was seems to resurface.\n\n" +
+
+                    "Lily says: \"Father,\" her tone almost tender. But the light in her chest flares, and her voice hardens. \"You abandoned me.\"" +
+                    "She raises her hand, and Elias drops to his knees. His body convulses, and with a final gasp, he collapses, his lifeless eyes staring into the void.\n\n" +
+
+                    "Lily stands amidst the ruins of the stronghold, her expression inscrutable. She turns to you, the light within her flickering as if struggling to stay contained.\n\n" +
+
+                    "Lily says: \"I have no place here. Not among the living, not among the machines.\"\n\n" +
+
+                    "She steps onto the remains of a dismantled platform, her form glowing brighter and brighter until it is impossible to look at her directly. " +
+                    "With a final surge of light, she vanishes, leaving you alone in the silent wreckage.\n\n" +
+
+                    "The stronghold lies in ruins. The Mecharions are scattered, their leaders gone. " +
+                    "And Lily, no longer bound by flesh, machine, or mortality, has become something beyond comprehension.\n\n" +
+
+                    "As you survey the devastation, a single thought lingers: Was this justice, or merely another form of revenge?";
+
+            return sceneDescription;
         }
     }
 }

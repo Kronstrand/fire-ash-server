@@ -89,6 +89,7 @@ namespace fire_ash_server.World.BioMechWorld
             rustBeetle.AddFeat(FeatKey.MeleeAttack);
             rustBeetle.GoToRoom(undergroundCavePath);
             rustBeetle.MoveToGroup(abandonedGuardPost);
+            rustBeetle.InitAttack = false;
             Events.AddCharacterMoveFromCharacterAndIsAttacked(rustBeetle);
 
             TempleCourtyard.Create(undergroundCavePath);

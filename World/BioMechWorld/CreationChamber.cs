@@ -79,6 +79,7 @@ namespace fire_ash_server.World.BioMechWorld
             motherMachine.DefaultHand = new InsectClaw();
             motherMachine.GoToRoom(creationChamber);
             motherMachine.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
+            motherMachine.DynamicDescription = false;
 
             // Create dialogue nodes for the Mother-Machine
             DialogueNode mm_startNode = new DialogueNode("Ah, a child returns... speak... listen...");
@@ -211,7 +212,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Attempt to remove the umbilical tube.",
                 new SkillNumber(Skill.Intelligence, 13),
                 false,
-                (s) =>
+                async (s) =>
                 {
                     s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
                     $"{s.Character.Name} notices the intricate mechanical elements, " +
@@ -220,7 +221,7 @@ namespace fire_ash_server.World.BioMechWorld
                     incubatorRelease(s);
                     return "";
                 },
-                (s) =>
+                async (s) =>
                 {
                     s.Character.BroadcastToSoulsInRoom(
                         $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
@@ -241,7 +242,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Attempt to remove the umbilical tube by force.",
                 new SkillNumber(Skill.Strength, 12),
                 false,
-                (s) =>
+                async (s) =>
                 {
                     s.Character.BroadcastToSoulsInRoom(
                         $"{s.Character.Name} grips the tube firmly and yanks it away with a surge of brute strength. " +
@@ -252,7 +253,7 @@ namespace fire_ash_server.World.BioMechWorld
                     incubatorRelease(s);
                     return "";
                 },
-                (s) =>
+                async (s) =>
                 {
                     s.Character.BroadcastToSoulsInRoom(
                         $"{s.Character.Name} grasps the tube and pulls with all their might, but the connection holds firm. " +

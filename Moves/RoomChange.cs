@@ -10,7 +10,7 @@ namespace fire_ash_server.Moves
 {
     internal class RoomChange : Move
     {
-        public RoomChange(Soul soul, Exit exit) : base(MoveKey.c.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
+        public RoomChange(Soul soul, Exit exit) : base(MoveKey.r.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
         {
         }
 
@@ -19,14 +19,13 @@ namespace fire_ash_server.Moves
             return $"Enter {room.Name}.";
         }
 
-        private static Action CreateAction(Soul soul, Exit exit)
+        private static Func<Task> CreateAction(Soul soul, Exit exit)
         {
             return async () =>
-            {
-                
+            {                
                 if (exit.OnBeforeExitEvent != null)
                 {
-                    bool isHandled = exit.OnBeforeExitEvent(soul);
+                    bool isHandled = await exit.OnBeforeExitEvent(soul);
                     if (isHandled)
                         return;
                 }

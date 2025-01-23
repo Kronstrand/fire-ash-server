@@ -188,7 +188,7 @@ namespace fire_ash_server
                 else
                     result = $"one {elementName}";
             else
-                result = $"{NumberToWord(countedName.Count)} {GetPluralizedName(elementName)}";
+                result = $"{NumberToWord(countedName.Count).ToLower()} {GetPluralizedName(elementName)}";
 
             return result;
         }
@@ -275,6 +275,21 @@ namespace fire_ash_server
             Random random = new Random();
             int silver = random.Next(maxSilver / 2, maxSilver + 1); // Similar logic to gold generation
             return silver;
+        }
+
+        public static string PriceToString(Tuple<int, int> price)
+        {
+            //item1 = gold
+            //item2 = silver
+            string priceString;
+            if (price.Item2 == 0)
+                priceString = $"{price.Item1} gp";
+            else if (price.Item1 == 0)
+                priceString = $"{price.Item2} sp";
+            else
+                priceString = $"{price.Item1} gp, {price.Item2} sp";
+            
+            return priceString;
         }
     }
 }

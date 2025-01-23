@@ -15,7 +15,7 @@ namespace fire_ash_server.Moves
         {
             Range = RangeType.None;
             Character character = soul.Character;
-            Action = () =>
+            Action = async () =>
             {
                 Light lightStateOfCharacter = soul.Character.GetLightState(null, true);
                 List<Character> relevantNonFriends = character.CurrentRoom.Characters.ToList(); 

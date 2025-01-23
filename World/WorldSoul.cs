@@ -11,6 +11,7 @@ using fire_ash_server.World.BioMechWorld;
 using System.Diagnostics.Metrics;
 using fire_ash_server.Moves;
 using System.Threading;
+using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.World
 {
@@ -22,8 +23,8 @@ namespace fire_ash_server.World
         public List<Faction> Factions = new List<Faction>();
         public List<Relationship> Relationships = new List<Relationship>();
         public List<Feat> Features = new List<Feat>();
-        //public BioMechCreator? World;
-        public AncientTemple? World;
+        public BioMechCreator? World;
+        //public AncientTemple? World;
 
         public async Task Open(int port)
         {
@@ -32,8 +33,8 @@ namespace fire_ash_server.World
             GenerateGenericContent();
             //new WorldCreator(this);
             //new CyberworldCreater(this);
-            //World = new BioMechCreator();
-            World = new AncientTemple();
+            World = new BioMechCreator();
+            //World = new AncientTemple();
             
 
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -112,7 +113,7 @@ namespace fire_ash_server.World
                 Console.WriteLine("A soul entered the world.");
 
                 soul.Character = new Character(soul, "Player" + Souls.Count);
-                soul.Character.AddFeat(FeatKey.Stealth);
+                //soul.Character.AddFeat(FeatKey.Stealth);
                 soul.Character.AddFeat(FeatKey.MeleeAttack);
                 soul.Character.AddFeat(FeatKey.DualWield);
                 soul.Character.AddFeat(FeatKey.RangedAttack);
@@ -122,6 +123,7 @@ namespace fire_ash_server.World
                 soul.Character.AddToInventory(WeaponList.LuminarBaton());
                 soul.Character.AddToInventory(ArmorList.NocturnalOptics());
                 soul.Character.AddToInventory(ArmorList.WardensScales());
+                soul.Character.AddToInventory(new Coins(7000, 30));             
 
                 string messageToSoul =
                 "Welcome to Fire & Ashes.\n\n" +
@@ -133,10 +135,12 @@ namespace fire_ash_server.World
                 //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.AbandonedArcade);                
                 if (World == null)
                     throw new Exception("World is not initiatited and is null");
-                //await soul.MoveCharToRoomAndSendDescriptionAsync(World.startingRoom.CreateIncubator());
-                await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.TempleCourtyard);
+                await soul.MoveCharToRoomAndSendDescriptionAsync(World.startingRoom.CreateIncubator());
+                //await soul.MoveCharToRoomAndSendDescriptionAsync(RoomKey.NexusBridge);
 
                 BioMechCreator.SetFactions();
+
+                soul.InitToolTipCounters();
 
                 while (!soul.Character.Dead)
                 {

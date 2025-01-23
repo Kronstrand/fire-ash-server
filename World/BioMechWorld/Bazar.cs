@@ -15,7 +15,7 @@ namespace fire_ash_server.World.BioMechWorld
 {
     internal class Bazar
     {
-        public Bazar(Room backAlley)
+        public static Room Create(Room backAlley)
         {
             // Define the bazar area as a room
             Room bazar = new Room(
@@ -27,14 +27,6 @@ namespace fire_ash_server.World.BioMechWorld
                 "The air is thick with the scent of oil and metal, mingling with the hushed whispers of bartering Mecharions. " +
                 "Shadows dance across the walls as vendors showcase their wares, from weaponry and armor to mysterious artifacts and rare components."
             );
-
-            // Back Alley -> Bazar
-            Exit entranceToBazarFromBackAlley = new Exit(
-                "To the north, where the alley opens up",
-                "A bustling bazar, filled with vibrant activity.",
-                bazar
-            );
-            backAlley.AddExit(entranceToBazarFromBackAlley);
 
             // Bazar -> Back Alley
             Exit exitFromBazarToBackAlley = new Exit(
@@ -74,12 +66,14 @@ namespace fire_ash_server.World.BioMechWorld
                 "Kael's form collapsed, his once imposing figure now lies still."
             );
             weaponsTrader.IsTrader = true;
+            weaponsTrader.tradeModifier = 0.1;
             weaponsTrader.UniqueName = true;
             weaponsTrader.HP = 21;
             weaponsTrader.AddFeat(FeatKey.MeleeAttack);
             weaponsTrader.AddFeat(FeatKey.RangedAttack);
             weaponsTrader.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
             weaponsTrader.GoToRoom(weaponStallRoom);
+            weaponStallRoom.propsInImage.Add(weaponsTrader);
 
             weaponsTrader.AddOnAfterMoveToEvent(
                 (Soul soul, Prop movedToProp) =>
@@ -95,6 +89,8 @@ namespace fire_ash_server.World.BioMechWorld
             weaponsTrader.AddToInventory(WeaponList.ColtARFifteen());
             weaponsTrader.AddToInventory(WeaponList.HolographicBlade());
             weaponsTrader.AddToInventory(WeaponList.LuminarBaton());
+
+
 
             //Armor Stall
             Room armorStallRoom = new Room(
@@ -131,6 +127,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "His helmet, once concealing his identity, now reveals an empty gaze."
             );
             armorTrader.IsTrader = true;
+            armorTrader.tradeModifier = 0.1;
             armorTrader.UniqueName = true;
             armorTrader.HP = 15;
             armorTrader.AddFeat(FeatKey.MeleeAttack);
@@ -193,6 +190,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "His tired eyes are closed forever, and the many secrets he guarded with such care are now silent."
             );
             artifactTrader.IsTrader = true;
+            artifactTrader.tradeModifier = 0.1;
             artifactTrader.UniqueName = true;
             artifactTrader.HP = 16;
             artifactTrader.AddFeat(FeatKey.MeleeAttack);
@@ -202,6 +200,8 @@ namespace fire_ash_server.World.BioMechWorld
             artifactTrader.AddToInventory(WeaponList.FlashLight());
 
             new MainHallRoom(bazar);
+
+            return bazar;
         }
     }
 }

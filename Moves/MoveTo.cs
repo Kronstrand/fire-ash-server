@@ -21,7 +21,7 @@ namespace fire_ash_server.Moves
                 bool interruptMove = false;
                 Grouping? grouping = soul.Character.GetGrouping();
                 if (grouping != null)
-                    interruptMove = grouping.RunAllOnBeforeMoveFromEventsInGroup(soul);
+                    interruptMove = await grouping.RunAllOnBeforeMoveFromEventsInGroup(soul);
 
                 if (interruptMove)
                     return;
@@ -55,20 +55,21 @@ namespace fire_ash_server.Moves
                         continue;
 
                     Character character = (Character)prop;
-                    if (character == soul.Character)
+                    if (character == soul.Character || !character.InitAttack)
                         continue;
 
                     if (character.GetRelationShipTo(soul.Character).IsHostile())
                     {
                         EnablesCombat = true;
                         soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
+                        return;
                     }
                 }
             }
             else if (targetProp is Character)
             {
                 Character character = (Character)targetProp;
-                if (character.GetRelationShipTo(soul.Character).IsHostile())
+                if (character.InitAttack && character.GetRelationShipTo(soul.Character).IsHostile())
                 {
                     EnablesCombat = true;
                     soul.Character.EnableCombatWith = new ToxicRelationship(character, false);

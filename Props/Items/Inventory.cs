@@ -13,6 +13,12 @@ namespace fire_ash_server.Props.Items
         {
             IsContainer = true;
             MakeUnpickupable();
+            Sellable = false;
+        }
+
+        public bool ContainsItemWithName(string name)
+        {
+            return Items.Where(i => i.Name == name).Any();
         }
     }
 }

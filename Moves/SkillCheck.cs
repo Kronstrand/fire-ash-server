@@ -12,11 +12,11 @@ namespace fire_ash_server.Moves
     internal class SkillCheck : Move
     {
         public SkillNumber SkillNumber { get; set; }
-        private Func<Soul, string?> successFunc;
-        private Func<Soul, string?>? failFunc;
+        private Func<Soul, Task<string>?> successFunc;
+        private Func<Soul, Task<string>?>? failFunc;
         public bool IsPersonal = true;
 
-        public SkillCheck(string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), description)
+        public SkillCheck(string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, Task<string>?> successFunc, Func<Soul, Task<string>?>? failFunc) : base(GetKey(key, skillNumber.Skill), description)
         {
             Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
@@ -37,7 +37,7 @@ namespace fire_ash_server.Moves
             else return "s";
         }
 
-        public SkillCheck(Soul soul, Prop prop, string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, string?> successFunc, Func<Soul, string?>? failFunc) : base(GetKey(key, skillNumber.Skill), CreateDescription(description, skillNumber.Skill))
+        public SkillCheck(Soul soul, Prop prop, string? key, string description, SkillNumber skillNumber, bool isPersonal, Func<Soul, Task<string>?> successFunc, Func<Soul, Task<string>?>? failFunc) : base(GetKey(key, skillNumber.Skill), CreateDescription(description, skillNumber.Skill))
         {
             Range = RangeType.RangeSingleTarget;
             SkillNumber = skillNumber;
@@ -63,7 +63,7 @@ namespace fire_ash_server.Moves
             return $"{description} ({skill})";
         }
 
-        private Action CreateAction(Soul soul)
+        private Func<Task> CreateAction(Soul soul)
         {
 
             return async () =>
@@ -83,19 +83,23 @@ namespace fire_ash_server.Moves
             else
                 rollMessage = $"{soul.Character.Name} rolls {roll} and fails.";
 
-           await soul.SendAsync(rollMessage, IsPersonal);
+            await soul.SendAsync(rollMessage, IsPersonal);
 
 
-           string ? result = null;
+            Task<string>? result = null;
             if (success)
                 result = successFunc(soul);
             else if (failFunc != null)
                 result = failFunc(soul);
-            else         
+            else
                 return;
 
-            if (result != null && result != "")
-                await soul.SendAsync(result, IsPersonal);
+            if (result != null) { 
+                string resultString = await result;
+                if (resultString != "")
+                    await soul.SendAsync(resultString, IsPersonal);
+            }
+            
         }
     }
 }

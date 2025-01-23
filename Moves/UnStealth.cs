@@ -15,7 +15,7 @@ namespace fire_ash_server.Moves
             Range = RangeType.None;
 
             Character character = soul.Character;
-            Action = () =>
+            Action = async () =>
             {
                 soul.Character.Unhide();
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} steps out of the shadows...");

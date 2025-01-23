@@ -8,6 +8,7 @@ namespace fire_ash_server.Enums
 {
     internal enum RollType
     {
+        None,
         AttackRoll,
         DamageRoll,
         AbilityCheck,

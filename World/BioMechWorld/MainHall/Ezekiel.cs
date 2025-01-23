@@ -12,7 +12,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
 {
     internal class Ezekiel
     {
-        public static Character Create()
+        public static Character Create(Character elara, DialogueNode elaraStartNode)
         {
             Character ezekielTheMechanomancer = new Character(
                 "Ezekiel",
@@ -42,20 +42,14 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                     "Recall lore about Ezekiel.",
                     new SkillNumber(Skill.Religion, 8),
                     true,
-                    (s) =>
+                    async (s) =>
                     {
                         return
-                        "Ezekiel the Mechanomancer, a high priest of the cult of the Machine God, " +
-                        "stands tall and imposing. He is both revered and feared by his followers. " +
-                        "Known for his ruthless pursuit of knowledge and power, " +
-                        "Ezekiel seeks to merge the divine and the mechanical, " +
-                        "creating a new form of life that transcends both. His cult, " +
-                        "known as the Cult of Technomancers, is dedicated to worshiping the Machine God, " +
-                        "believing in the ultimate union of flesh and technology. " +
-                        "Ezekiel's position as a leader is cemented by his formidable presence " +
-                        "and unwavering dedication to this singular vision.";
+                        "Ezekiel the Mechanomancer, an enigmatic and commanding figure, is whispered to be a high priest of the so-called 'Cult of Technomancers,' " +
+                        "a term coined by his detractors to vilify his vision. To his followers, he is the guiding force of the Mecharions, " +
+                        "a people who embrace the unity of flesh and technology as the next stage of evolution.";
                     },
-                    (s) =>
+                    async (s) =>
                     {
                         if (s.Character.Kindred == Kindred.Mecharion)
                         {
@@ -68,17 +62,38 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                     }
                     ));
 
+            // Assign dialogue to Ezekiel the Mechanomancer
+            ezekielTheMechanomancer.CreateDialogueManager(
+                    InitEzekielDialogue(elara, elaraStartNode));
+            
+            ezekielTheMechanomancer.OnAfterSpeakTo = (Soul soul, Character character) => 
+            { 
+                ezekielTheMechanomancer.CreateDialogueManager(
+                    InitEzekielDialogue(elara, elaraStartNode)); 
+            };
+
+            return ezekielTheMechanomancer;
+        }
+
+        private static DialogueNode InitEzekielDialogue(Character elara, DialogueNode elaraStartNode)
+        {
             // Create dialogue nodes for Ezekiel the Mechanomancer
-            DialogueNode startNode = new DialogueNode("Ah, fresh from the Mother Machine's embrace! Welcome, welcome! We have much to do, and little time.");
+            DialogueNode startNode = new DialogueNode("Ah, fresh from the Mother-Machine's embrace! Welcome, welcome! We have much to do, and little time.");
             DialogueNode whoAreYouNode = new DialogueNode("Yes, I am the conductor of this grand symphony of synthetic life. Known as Ezekiel, I crafted and govern this haven of progress. It fills me with pride to see the fruits of my labor, beings like you, emerging from our work. Intriguing, isn't it?");
-            DialogueNode whatHappenedNode1 = new DialogueNode("Ah, you were reborn! The Mother Machine took you, reshaped you, and now you are one of us. You are a Mecharion, forged from the union of flesh and steel.");
-            DialogueNode motherMachineNode = new DialogueNode("Ah, the Mother Machine, a marvel of sinew and steel! She takes us, reshapes us. Some were sold, some were prisoners, but all are reborn here. Now, you're a Mecharion, part of this grand design.");
-            DialogueNode attackNode = new DialogueNode("The facility is under siege! The Purists have come, a fanatical group that condemns our beautiful union of flesh and technology. They seek to destroy the Mother Machine and all her creations.");
+            DialogueNode whatHappenedNode1 = new DialogueNode("Ah, you were reborn! The Mother-Machine took you, reshaped you, and now you are one of us. You are a Mecharion, forged from the union of flesh and steel.");
+            DialogueNode motherMachineNode = new DialogueNode("Ah, the Mother-Machine, a marvel of sinew and steel! She takes us, reshapes us. Some were sold, some were prisoners, but all are reborn here. Now, you're a Mecharion, part of this grand design.");
+            DialogueNode attackNode = new DialogueNode("The facility is under siege! The Purists have come, a fanatical group that condemns our beautiful union of flesh and technology. They seek to destroy the Mother-Machine and all her creations.");
             DialogueNode puristsNode = new DialogueNode("The Purists, zealots who believe our existence is an abomination. They think they can 'cleanse' us by tearing down everything we've become. Fools, the lot of them.");
-            DialogueNode identityNode = new DialogueNode("Your story? Ha! Each of us has a unique tale, a reason we ended up here. But the Mother Machine doesn't care for our pasts, only for what we become.");
-            DialogueNode missionNode = new DialogueNode("Ah, my precious, we face dire times. The Purists, with their cold, unyielding ideology, have breached our sanctum. They seek to destroy the Mother Machine, our ancient lifeline that maintains the balance between technology and nature. To them, it's a blasphemy they must purge to create their vision of purity. Without it, our world would wither, and chaos would reign.\n\nLeading them is the Vicar of Purity—once my closest ally, now my most bitter adversary. His name was Elias, a brilliant mind twisted by fanaticism. He believes that only by destroying the Mother Machine can he cleanse the world. His mastery over mind and matter makes him a perilous foe.\n\nWe must defend what we hold dear. Find Elias, disrupt his plans, and show him we will not be undone.");
-            DialogueNode eliasNode = new DialogueNode("Elias and I were once visionaries, united by our desire to blend technology and nature harmoniously. We spent countless nights debating, designing, and dreaming. He was brilliant, passionate, and relentless in his pursuit of knowledge.\n\nBut then, tragedy struck. As we were working on the Mother Machine, Elias's daughter, Lily, fell gravely ill. Desperate to save her, Elias submitted her to the Mother Machine before we had fully tested its capabilities. He believed it could cure her, melding her illness away through a perfect synthesis of organic and synthetic life.\n\nHowever, the result was horrific. The machine malfunctioned, and instead of healing her, it twisted her into a grotesque fusion of flesh and metal. Consumed by guilt and grief, Elias became convinced that the Mother Machine was an abomination, a monstrous creation that must be destroyed.\n\nOur bond shattered when he declared his intention to eradicate it. I opposed him, believing it was the cornerstone of our world's harmony. He saw my resistance as a betrayal, and I, his fanaticism as madness. He left, vowing to return and cleanse our world by any means necessary. Now, he leads the Purists, driven by his tragic past and a warped sense of purpose.");
-            DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path. We will meet again.");
+            DialogueNode identityNode = new DialogueNode("Your story? Ha! Each of us has a unique tale, a reason we ended up here. But the Mother-Machine doesn't care for our pasts, only for what we become.");
+            DialogueNode missionNode = new DialogueNode("Ah, my precious, we face dire times. The Purists, with their cold, unyielding ideology, have breached our sanctum. They seek to destroy the Mother-Machine, our ancient lifeline that maintains the balance between technology and nature. To them, it's a blasphemy they must purge to create their vision of purity. Without it, our world would wither, and chaos would reign.\n\nLeading them is the Vicar of Purity. Once my closest ally, now my most bitter adversary. His name was Elias, a brilliant mind twisted by fanaticism. He believes that only by destroying the Mother-Machine can he cleanse the world. His mastery over mind and matter makes him a perilous foe.\n\nWe must defend what we hold dear. Find Elias, disrupt his plans, and show him we will not be undone.");
+            DialogueNode eliasNode = new DialogueNode("Elias and I were once visionaries, united by our desire to blend technology and nature harmoniously. We spent countless nights debating, designing, and dreaming. He was brilliant, passionate, and relentless in his pursuit of knowledge.\n\nBut then, tragedy struck. As we were working on the Mother-Machine, Elias's daughter, Lily, fell gravely ill. Desperate to save her, Elias submitted her to the Mother-Machine before we had fully tested its capabilities. He believed it could cure her, melding her illness away through a perfect synthesis of organic and synthetic life.\n\nHowever, the result was horrific. The machine malfunctioned, and instead of healing her, it twisted her into a grotesque fusion of flesh and metal. Consumed by guilt and grief, Elias became convinced that the Mother-Machine was an abomination, a monstrous creation that must be destroyed.\n\nOur bond shattered when he declared his intention to eradicate it. I opposed him, believing it was the cornerstone of our world's harmony. He saw my resistance as a betrayal, and I, his fanaticism as madness. He left, vowing to return and cleanse our world by any means necessary. Now, he leads the Purists, driven by his tragic past and a warped sense of purpose.");
+            //DialogueNode goodbyeNode = new DialogueNode("Depart then, and may the spectral glow of the Machine God illuminate your path. We will meet again.");
+            DialogueNode goodbyeNode = new DialogueNode("Before you go, speak with Elara, she have details about how you can help defeat the Purists.");
+            goodbyeNode.OnAfterEvent = (DialogueManager dm) =>
+            {
+                // Assign dialogue to Elara the Defender
+                elara.CreateDialogueManager(elaraStartNode);
+            };
             DialogueNode smallTalkNode1 = new DialogueNode(
                 "This place is no ordinary structure of metal and circuits; it is a hive, teeming with life, a sanctuary crafted by my own hands. " +
                 "Here, the essence of our bond with the machine is palpable. The walls throb with the energy of new life being forged. " +
@@ -110,7 +125,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
 
             whatHappenedNode1.OnAfterEvent = (dm) =>
             {
-                startNode.AddChoice("The Mother Machine?", motherMachineNode);
+                startNode.AddChoice("The Mother-Machine?", motherMachineNode);
                 dm.CurrentNode = startNode;
             };
 
@@ -125,7 +140,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             attackNode.OnAfterEvent = (dm) =>
             {
                 startNode.AddChoice("Who are the Purists?", puristsNode);
-                startNode.AddChoice("The Mother Machine?", motherMachineNode);
+                startNode.AddChoice("The Mother-Machine?", motherMachineNode);
                 dm.CurrentNode = startNode;
             };
 
@@ -149,15 +164,17 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             missionNode.OnAfterEvent = (dm) =>
             {
                 bool addAsLastChoice = true;
-                startNode.AddChoice("How was Elias your closest ally – what happened?", eliasNode);
+                startNode.AddChoice("How was Elias your closest ally. What happened?", eliasNode);
                 startNode.AddChoice("Goodbye.", goodbyeNode, addAsLastChoice); //adding as last choice because it will end the dialogue
                 dm.CurrentNode = startNode;
             };
 
-            // Assign dialogue to Ezekiel the Mechanomancer
-            ezekielTheMechanomancer.CreateDialogueManager(startNode);
+            eliasNode.OnAfterEvent = (dm) =>
+            {
+                dm.CurrentNode = startNode;
+            };
 
-            return ezekielTheMechanomancer;
+            return startNode;
         }
     }
 }

@@ -14,16 +14,16 @@ namespace fire_ash_server.Moves
     {
         public LookInventory(Soul soul) : this(soul, soul.Character, "Iventory")
         {
-
         }
 
         public LookInventory(Soul soul, Character targetCharacter) : this(soul, targetCharacter, $"Loot {targetCharacter.Name}")
         {
-
         }
         private LookInventory(Soul soul, Character targetCharacter, string description) : base(MoveKey.i.ToString(), description)
         {
             Type = MoveType.MinorAction;
+            AllowedInTrade = false;
+
             if (targetCharacter == soul.Character) //is iventory
                 Hidden = true;
             else //is Loot

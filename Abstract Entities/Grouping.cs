@@ -23,12 +23,12 @@ namespace fire_ash_server.Abstract_Entities
             return prop.GetLightState(lookingCharacter);
         }
 
-        public bool RunAllOnBeforeMoveFromEventsInGroup(Soul soul)
+        public async Task<bool> RunAllOnBeforeMoveFromEventsInGroup(Soul soul)
         {
             bool interruptMove = false;
             foreach (Prop prop in Props)
             {
-                if (prop.RunOnBeforeMoveFromEvents(soul))
+                if (await prop.RunOnBeforeMoveFromEvents(soul))
                     interruptMove = true;
             }
             return interruptMove;

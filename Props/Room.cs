@@ -51,6 +51,13 @@ namespace fire_ash_server.Props
         {
         }
 
+        public List<Prop> GetPropsInRoom()
+        {
+            return Characters.Cast<Prop>().ToList()
+                .Concat(Items.Cast<Prop>()).ToList()
+                .Concat(Exits.Cast<Prop>()).ToList();
+        }
+
         public void AddExit(Exit exit)
         {
             Exits.Add(exit);
@@ -61,7 +68,6 @@ namespace fire_ash_server.Props
             string description = "";
 
             List<Exit> exitList = Exits.Where(e => !e.IsHidden()).ToList();
-
             for (int i = 0; i < exitList.Count; i++)
             {
                 if (i != 0)
@@ -122,7 +128,7 @@ namespace fire_ash_server.Props
                     if (!unpickupable.Any())
                     {
                         if (itemsToPick.Count == 1)
-                            outputStrings.Add($"{itemsToPick.First().Name} lies by itself on ${stringContext}");
+                            outputStrings.Add($"{itemsToPick.First().Name} lies by itself on {stringContext}");
                         else
                             outputStrings.Add($"In a pile on ${stringContext} lies " + ListToString(itemsToPick));
                     }
@@ -139,9 +145,9 @@ namespace fire_ash_server.Props
                 List<Item> ungroupedItems = lookingCharacter.CurrentRoom.Items.Where(i => i.IsPickupable() && i.GetGrouping(lookingCharacter.CurrentRoom) == null && !i.IsHidden()).ToList();
 
                 if (ungroupedItems.Count == 1)
-                    outputStrings.Add($"{ungroupedItems.First().Name} lies by itself on ${stringContext}");
+                    outputStrings.Add($"{ungroupedItems.First().Name} lies by itself on {stringContext}");
                 else if (ungroupedItems.Count > 1)
-                    outputStrings.Add($"{ListToString(ungroupedItems)} lies scattered on ${stringContext}");
+                    outputStrings.Add($"{ListToString(ungroupedItems)} lies scattered on {stringContext}");
             }
 
             for (int i = 0; i < outputStrings.Count; i++)
@@ -210,7 +216,6 @@ namespace fire_ash_server.Props
             }
 
             List<Character> ungroupedcharacters = Characters.Where(c => !allGroupedCharacters.Contains(c)).ToList();
-
             List<GroupedCountedProp> groupedCountedProps = new List<GroupedCountedProp>();
             foreach (Tuple<Prop?, List<Character>> propCharacters in groupedCharactersByProp)
             {
@@ -248,7 +253,7 @@ namespace fire_ash_server.Props
             int numberOfItems = 0;
             int outerLoopCounter = 0;
 
-            string output = "As you look around you see";     
+            string output = "As you look around you also see";     
             foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
             {
                 outerLoopCounter++;
@@ -288,8 +293,8 @@ namespace fire_ash_server.Props
                             output += " close at hand";
                         else if (groupedCountedProp.Prop != null)
                             output += " at the " + groupedCountedProp.Prop.Name;
-                        else if (groupedCountedProp.Prop == null)
-                            output += $" is also here";
+                        /*else if (groupedCountedProp.Prop == null)
+                            output += $" is also here";*/
 
                         string itemsAsString = ListItemsAsString(lookingCharacter, groupedCountedProp.Prop);
                         if (itemsAsString != "")
@@ -557,7 +562,7 @@ namespace fire_ash_server.Props
                                     playerTurnBroadcasted = true;
                                 }
                                 Move? nextMove = await character.Soul.ReceiveAndHandleMoveAsync(false);
-                                ActionUsed = ExecuteCombatAction(character, nextMove);
+                                ActionUsed = await ExecuteCombatAction(character, nextMove);
                                 character.TryEnableCombat();
                             }
                             catch (OperationCanceledException)
@@ -576,7 +581,7 @@ namespace fire_ash_server.Props
                             Move? nextMove = character.Soul.DaemonChoosesNextMove();
                             if (nextMove != null && nextMove.Type != MoveType.MinorAction)
                                 await Task.Delay(1500);
-                            ActionUsed = ExecuteCombatAction(character, nextMove);
+                            ActionUsed = await ExecuteCombatAction(character, nextMove);
                             character.TryEnableCombat();
                         }                       
                     }
@@ -606,12 +611,13 @@ namespace fire_ash_server.Props
             onCombatEndEventsToBeRemoved.Add(action);
         }
 
-        private bool ExecuteCombatAction(Character character, Move? move)
+        private async Task<bool> ExecuteCombatAction(Character character, Move? move)
         {          
             if (move == null)
                 return true;
 
-            character.Soul.Execute(ref move);
+            //character.Soul.Execute(ref move);
+            await move.Execute(character.Soul);
             
             bool actionUsed = (move.Type != MoveType.MinorAction);
 

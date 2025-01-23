@@ -29,6 +29,7 @@ namespace fire_ash_server
         public CancellationTokenSource CancelTokenSource = new CancellationTokenSource();
         public string BufferText = "";
         public bool AddToBufferText = false;
+        public int InventoryToolTip = 0;
 
         public Soul(Socket soulSocket)
         {
@@ -54,6 +55,11 @@ namespace fire_ash_server
             {
                 character = value;
             }
+        }
+
+        public void InitToolTipCounters()
+        {
+            InventoryToolTip = 0;
         }
 
         public void AddToWorldSoul()
@@ -106,6 +112,11 @@ namespace fire_ash_server
             await SendAsync("$[invalid]");
         }
 
+        public async Task SendChoiceFlagAsync()
+        {
+            await SendAsync("$[choice]");
+        }
+
         public void CancelAndResetTokenSource()
         {
             CancelTokenSource.Cancel();
@@ -130,7 +141,16 @@ namespace fire_ash_server
             return messageReceived;
         }
 
-        public void GeneratePossibleMoves()
+        public async Task<bool> AwaitYesNo()
+        {
+            await SendChoiceFlagAsync();
+            string input = await ReceiveAsync();
+            await SendAsync(InputOk());
+            input = input.ToLower();
+            return (input == "y" || input == "yes");
+        }
+
+        public async void GeneratePossibleMoves()
         {
             if (Character.SpeakingTo != null && Character.SpeakingTo.DialogueManager != null && Character.SpeakingTo.DialogueManager.Initiater == Character)
             {
@@ -171,22 +191,26 @@ namespace fire_ash_server
                             if (lookAtCharacter.DialogueManager != null)
                                 AddPossibleMove(new SpeakTo(this, lookAtCharacter));
                             if (lookAtCharacter.IsTrader)
+                            {
                                 AddPossibleMove(new BrowseGoods(this, lookAtCharacter));
+                                AddPossibleMove(new ShowItemsToSell(this, lookAtCharacter));
+                            }
                         }
                     }
                 }
                 else if (Character.LookAt is Inventory)
                 {
                     Inventory inventory = (Inventory)Character.LookAt;
-                    if (inventory.HeldBy == Character || inventory.IsHeldByDeadCharacter())
-                    {
-                        Character? tagetCharacter = inventory.HeldByCharacter();
-                        if (tagetCharacter != null)
-                            foreach(KeyValuePair<InventorySlot, Item> SlotAndItem in tagetCharacter.EquippedItems)
-                                AddPossibleMove(new LookAt(this, SlotAndItem.Value));
+                    Character? tagetCharacter = inventory.HeldByCharacter();
+                    if (tagetCharacter != null)
+                        foreach(KeyValuePair<InventorySlot, Item> SlotAndItem in tagetCharacter.EquippedItems)
+                            AddPossibleMove(new LookAt(this, SlotAndItem.Value));
 
-                        foreach (Item item in inventory.Items)
-                            AddPossibleMove(new LookAt(this, item));
+                    foreach (Item item in inventory.Items)
+                    {
+                        if (item is Coins && inventory.HeldBy == Character.TradingWith)
+                            continue;
+                        AddPossibleMove(new LookAt(this, item));
                     }
                 }
                 else if (Character.LookAt is Item)
@@ -195,11 +219,16 @@ namespace fire_ash_server
 
                     AddPossibleInvestigationOrLookMove(item);
 
-                    if (Character.IsInGroupWith(item) == false && item.HeldByCharacter() == null && item.GetLightState(Character) != Light.Darkness)
+                    if (Character.IsInGroupWith(item) == false && item.HeldByCharacter() == null && item.GetLightState(Character) != Light.Darkness && !item.Unreachable)
                         AddPossibleMove(new MoveTo(this, item));
 
-                    if (Character.TradingWith != null && item.HeldByCharacter() != Character && item.IsPickupable())
-                        AddPossibleMove(new BuyItem(this, item));
+                    if (Character.TradingWith != null && item.Sellable)
+                    {
+                        if (item.HeldByCharacter() == Character.TradingWith)
+                            AddPossibleMove(new BuyItem(this, item, Character.TradingWith));
+                        else if (item.HeldByCharacter() == Character)
+                            AddPossibleMove(new SellItem(this, item, Character.TradingWith));
+                    }
 
                     if (item.IsPickupable())
                     {
@@ -211,6 +240,8 @@ namespace fire_ash_server
                                 foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
                                     AddPossibleMove(new Equip(this, item, inventorySlot));
 
+                            if (item is Consumable)
+                                AddPossibleMove(new Consume(this, (Consumable)item));
                             AddPossibleMove(new DropItem(this, item));
                         }
                     }
@@ -283,8 +314,7 @@ namespace fire_ash_server
 
                             AddPossibleMove(new LookAt(this, prop));
                         }
-                    }
-                    
+                    }                    
                 }
             }
 
@@ -329,13 +359,13 @@ namespace fire_ash_server
                                 $"Flee combat and enter {exit.GoToRoom.Name}.",
                                 new SkillNumber(Skill.Acrobatics, DC),
                                 true, //should be a nonpersonal process?
-                                (Soul s) =>
+                                async (Soul s) =>
                                 {
                                     RoomChange roomChange = new RoomChange(this, exit);
-                                    roomChange.Action();
+                                    await roomChange.Action();
                                     return null;
                                 },
-                                (Soul s) =>
+                                async (Soul s) =>
                                 {
                                     return $"{Character.Name} failed to flee combat...";
                                 }));
@@ -346,14 +376,14 @@ namespace fire_ash_server
                 {                       
                     AddPossibleMove(new MoveTo(this, exit));
                 }
-            }           
+            }
+
+            //stop trading
+            if (Character.TradingWith != null && Character.LookAt is Inventory)
+                AddPossibleMove(new StopBrowseGoods(this));
 
             //Back..
             AddPossibleBackMove();
-
-            //stop trading
-            if (Character.TradingWith != null && Character.LookAt == Character.TradingWith.Inventory)
-                AddPossibleMove(new StopBrowseGoods(this));
 
             //inventory
             AddPossibleMove(new LookInventory(this));
@@ -375,12 +405,10 @@ namespace fire_ash_server
                     new Move(
                         "" + i + 1,
                         choice.Text,
-                        () =>
+                        async () =>
                         {
-                            dialogueManager.SetCurrentNodeBasedOnChoice(choice);
-
-                            if (dialogueManager.CurrentNode.Dialogue)                            
-                                dialogueManager.SpeakCurrentNode();
+                            dialogueManager.SetCurrentNodeBasedOnChoice(choice);                        
+                            dialogueManager.SpeakCurrentNode();
                             if (!dialogueManager.CurrentNodeHasChoices())
                                 dialogueManager.EndSpeakWith();
                         }
@@ -389,6 +417,10 @@ namespace fire_ash_server
 
         private void AddPossibleBackMove()
         {
+
+            if (AllPossibleMoves.ContainsKey(MoveKey.bg.ToString())) //use stop trading instead of back
+                return;
+
             int lookedAtIndex = Character.LookedAt.Count - 1;
             if (!(lookedAtIndex > 0 && Character.LookAt != null))
                 return;
@@ -468,18 +500,19 @@ namespace fire_ash_server
             {
                 string input = await ReceiveAsync();
 
-                Move? nextMove = GetMoveFromInput(input);
-                if (nextMove != null)
+                Move? moveToExecute = GetMoveFromInput(input);
+                if (moveToExecute != null)
                 {
                     if (execute)
-                        Execute(ref nextMove);
+                        //Execute(ref moveToExecute);
+                        await moveToExecute.Execute(this);
                     await SendAsync(InputOk());
-                    return nextMove;
+                    return moveToExecute;
                 }
                 else
                 {
                     if (Socket == null)
-                        return nextMove;
+                        return moveToExecute;
                     await SendInvalidInputAsync();
                 }
             }
@@ -499,7 +532,7 @@ namespace fire_ash_server
             return null;
         }
 
-        public void Execute(ref Move move)
+        /*public void Execute(ref Move move)
         {
             Execute(ref move, Character);
         }
@@ -564,6 +597,7 @@ namespace fire_ash_server
 
             }
         }
+        */
 
         public void ClearMoves()
         {

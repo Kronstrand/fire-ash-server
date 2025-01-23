@@ -19,7 +19,7 @@ namespace fire_ash_server.Moves
             Type = MoveType.MinorAction;
             //AllowedInCombat = false;
             Hidden = true;
-            Action = () =>
+            Action = async () =>
             {
                 string message = "";
                 foreach(KeyValuePair<JournalKey,List<JournalEntry>> kvp in soul.Character.Journal.Entries)
@@ -39,6 +39,8 @@ namespace fire_ash_server.Moves
                     }
                 }
                 _ = soul.SendAsync(message);
+
+                await Task.CompletedTask;
             };
         }
     }

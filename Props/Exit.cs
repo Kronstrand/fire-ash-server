@@ -10,7 +10,7 @@ namespace fire_ash_server.Props
     {
         public Room GoToRoom;
         public Room? LocatedInRoom;
-        public Func<Soul, bool>? OnBeforeExitEvent;
+        public Func<Soul, Task<bool>>? OnBeforeExitEvent;
         public Exit(string description, Room goToRoom) : base(CreateName(goToRoom), description)
         {
             GoToRoom = goToRoom;

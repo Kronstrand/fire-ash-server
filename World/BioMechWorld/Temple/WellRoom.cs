@@ -20,6 +20,13 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "The stillness in the room is palpable, the air heavy with the weight of abandonment, " +
                 "amplifying the quiet presence of the space.");
 
+            Exit wellRoomToTempleAscent = new Exit(
+                "To the south",
+                "Through the entrance, a wide staircase begins its descent.",
+                grandTempleAscent
+            );
+            wellRoom.AddExit(wellRoomToTempleAscent);
+
             Item emptyBasin = new Item(
                 "Hollow Basin",
                 "At the center of the room",
@@ -27,13 +34,16 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "Its surface is cracked and weathered, a remnant of its forgotten purpose.");
             wellRoom.AddItem(emptyBasin);
 
-            Character giantSnake = MonsterCreator.GiantSnake();
+            /*Character giantSnake = MonsterCreator.GiantSnake();
             giantSnake.GoToRoom(wellRoom);
-            giantSnake.MoveToGroup(emptyBasin);
+            giantSnake.MoveToGroup(emptyBasin);*/
 
             Armor wardensScales = ArmorList.WardensScales();
             wellRoom.AddItem(wardensScales);
             wardensScales.MoveToGroup(emptyBasin);
+
+            SerpentSanctum.Create(wellRoom);
+            AncientHallway.Create(wellRoom);
 
             return wellRoom;
         }

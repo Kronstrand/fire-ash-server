@@ -23,10 +23,11 @@ namespace fire_ash_server.Moves
             return "Equip " + item.Name + " at " + Description(inventorySlot) + ".";
         }
 
-        private static Action CreateAction(Soul soul, Item item, InventorySlot inventorySlot)
+        private static Func<Task> CreateAction(Soul soul, Item item, InventorySlot inventorySlot)
         {
             if (item.HeldBy == null) throw new ArgumentNullException(nameof(item.HeldBy), "Item has to be held when grabbed.");
 
+            bool roomWasDark = soul.Character.CurrentRoom.GetLightState(soul.Character) == Light.Darkness;
             string GrabFrom = item.HeldBy.Name;
 
             return async () =>
@@ -41,6 +42,8 @@ namespace fire_ash_server.Moves
                     soul.Character.AddEquippedItem(inventorySlot, item);
 
                     soul.Character.BroadcastToSoulsInRoom($"{soul.Character.Name} eqiupped {item.Name}.");
+                    if (roomWasDark && soul.Character.CurrentRoom.GetLightState(soul.Character) > Light.Darkness)
+                        _ = LookAt.LookAtAction(soul, soul.Character.CurrentRoom);
                 }
                 else
                 {

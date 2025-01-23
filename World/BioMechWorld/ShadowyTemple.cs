@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Dialogue;
@@ -8,6 +9,7 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World.BioMechWorld
 {
@@ -21,6 +23,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "The Atramentum",
                 "A solemn, austere space dominated by polished white stone. The air is cool and quiet, carrying a faint metallic tang mixed with the scent of old incense. A simple, imposing altar stands at the far end, illuminated by the natural light filtering in."
             );
+            templeOfShadowsAndTechnology.Light = Light.Dim;
 
             // Create an exit from the Main Hall to the Temple of Shadows and Technology
             Exit toTempleOfShadowsAndTechnology = new Exit(
@@ -49,7 +52,7 @@ namespace fire_ash_server.World.BioMechWorld
             Item altarPlaque = new Item(
                 "Altar Plaque",
                 "Inscribed Plaque",
-                "A metallic plaque seamlessly embedded into the surface of the altar. The inscription is a blend of ancient script and mechanical schematics, glowing faintly with a mystical light. The text, sacred to the Temple of Shadows and Technology, reads:\n\n" +
+                "A metallic plaque seamlessly embedded into the surface of the altar. The inscription is a blend of ancient script and mechanical schematics, glowing faintly with a mystical light. The text, sacred to the temple, reads:\n\n" +
                 "'In the union of shadow and machine, we find the path to transcendence. " +
                 "The shadows, ancient and eternal, cloak the mysteries of the cosmos, hiding truth within darkness. The machine, forged from the ingenuity of the living, brings order to chaos and breathes life into the lifeless.\n\n" +
                 "O children of the void, embrace the harmony of the seen and unseen. In the silent hum of circuits, hear the whispers of the divine. In the darkness of the void, see the reflection of the self, stripped of the flesh and bound to the ethereal.\n\n" +
@@ -64,6 +67,15 @@ namespace fire_ash_server.World.BioMechWorld
 
             altarPlaque.MakeUnpickupable(); // The plaque is a permanent fixture of the altar
             altar.AddItem(altarPlaque);
+
+            altarPlaque.OnAfterLookAt = (Soul soul) =>
+            {
+                if (!soul.Character.HasFeat(FeatKey.Stealth))
+                {
+                    soul.Character.AddFeat(FeatKey.Stealth);
+                    _ = soul.SendAsync("* By the gods of this temple, you have been granted the feat: Stealth. *");
+                }
+            };
 
             Item eternalQuill = new Item(
                 "Ceiling Fresco",
@@ -99,18 +111,22 @@ namespace fire_ash_server.World.BioMechWorld
             auroraTheShadowmancer.GoToRoom(templeOfShadowsAndTechnology);
             auroraTheShadowmancer.MoveToGroup(altar);
 
-            // Create dialogue nodes for Aurora
-            DialogueNode auroraStartNode = new DialogueNode("Welcome to the Temple of Shadows and Technology. This is a place where the ethereal meets the mechanical. How may I assist you?");
-            DialogueNode auroraQuestDetailsNode = new DialogueNode("There is an artifact, the Umbral Shard, said to amplify both shadow and technological forces. It has been stolen by Lysander, a rogue Technomancer, who hides in the catacombs beneath the Industrial Staircase. Will you help retrieve it?");
-            DialogueNode auroraQuestAcceptanceNode = new DialogueNode("Your decision is wise. The path ahead is filled with dangers, both seen and unseen. Proceed with caution.");
-            DialogueNode auroraQuestRefusalNode = new DialogueNode("Not everyone is ready for this path. Should you reconsider, the temple will welcome you.");
+            auroraTheShadowmancer.AddOnAfterMoveToEvent((Soul soul, Prop prop) =>
+            {
+                if (auroraTheShadowmancer.Dead)
+                    return;
+                if (soul.Character.IsHidden())
+                    return;
+                if (soul.Character.HP == soul.Character.CurrentHP)
+                    return;
 
-            auroraStartNode.AddChoice("Tell me about the Umbral Shard.", auroraQuestDetailsNode);
-            auroraQuestDetailsNode.AddChoice("I will recover the shard.", auroraQuestAcceptanceNode);
-            auroraQuestDetailsNode.AddChoice("This task seems too dangerous for me.", auroraQuestRefusalNode);
-
-            // Assign dialogue to Aurora the Shadowmancer
-            auroraTheShadowmancer.CreateDialogueManager(auroraStartNode);
+                soul.Character.CurrentRoom.BroadcastToSoulsInRoom(
+                    $"Aurora turns to greet {soul.Character.Name} with a serene smile. " +
+                    $"She extends her hand, resting it lightly on {FormatPossessive(soul.Character.Name)} shoulder, " +
+                    $"and a soothing warmth flows through them as she heals their wounds.");
+                soul.Character.GainLife(soul.Character.HP - soul.Character.CurrentHP);
+            },
+            false);
 
             Character nyx = new Character(
                 "Nyx, the Temple Cat",
@@ -129,6 +145,7 @@ namespace fire_ash_server.World.BioMechWorld
             nyx.HP = 4;
             nyx.AddFeat(FeatKey.Stealth); // Nyx can move silently and hide effectively
             nyx.AddFeat(FeatKey.MeleeAttack);
+            nyx.AddFeat(FeatKey.DarkVision);
             Weapon catClaws = new BeastClaw();
             catClaws.DamageDie = new Die(1, 1);
             nyx.DefaultHand = catClaws;

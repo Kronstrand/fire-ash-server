@@ -3,100 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\buyitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\buyitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\soul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:soul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\helpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:helpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\bazar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\bazar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\stealth.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\stealth.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\items\\weapons\\dagger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\weapons\\dagger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\dialogue\\dialoguemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:dialogue\\dialoguemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\temple\\templecourtyard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\temple\\templecourtyard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\grab.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\grab.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\lookeffectdescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\lookeffectdescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\shadowytemple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\shadowytemple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\enums\\effectkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:enums\\effectkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\consumablelist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\consumablelist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\investigate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\investigate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\lookat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\lookat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\browsegoods.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\browsegoods.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\checkjournal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\checkjournal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\dropitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\dropitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\moves\\equip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\equip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\weaponlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\weaponlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\items\\weapons\\weapon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\weapons\\weapon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\abstract entities\\die.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:abstract entities\\die.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\worldsoul.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\items\\armor\\armor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\armor\\armor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\temple\\wellroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\temple\\wellroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\world\\biomechworld\\armorlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:world\\biomechworld\\armorlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\items\\armor\\shield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\armor\\shield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\props\\items\\armor\\head.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\armor\\head.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server\\events.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:events.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -106,298 +46,116 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "BuyItem.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\BuyItem.cs",
-              "RelativeDocumentMoniker": "Moves\\BuyItem.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\BuyItem.cs",
-              "RelativeToolTip": "Moves\\BuyItem.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAowCYAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "DialogueManager.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Dialogue\\DialogueManager.cs",
+              "RelativeDocumentMoniker": "Dialogue\\DialogueManager.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Dialogue\\DialogueManager.cs",
+              "RelativeToolTip": "Dialogue\\DialogueManager.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAewDcAAABQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T14:49:48.146Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-17T10:44:31.488Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Helpers.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Helpers.cs",
-              "RelativeDocumentMoniker": "Helpers.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Helpers.cs",
-              "RelativeToolTip": "Helpers.cs",
-              "ViewState": "AgIAAJwAAAAAAAAAAAAkwK8AAAA1AAAAAAAAAA==",
+              "Title": "Stealth.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Stealth.cs",
+              "RelativeDocumentMoniker": "Moves\\Stealth.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Stealth.cs",
+              "RelativeToolTip": "Moves\\Stealth.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAewD4AAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T10:25:14.024Z"
+              "WhenOpened": "2025-01-17T10:44:31.499Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Bazar.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Bazar.cs",
-              "RelativeDocumentMoniker": "World\\BioMechWorld\\Bazar.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Bazar.cs",
-              "RelativeToolTip": "World\\BioMechWorld\\Bazar.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAgwE0AAAAiAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T09:36:16.347Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Dagger.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Weapons\\Dagger.cs",
-              "RelativeDocumentMoniker": "Props\\Items\\Weapons\\Dagger.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Weapons\\Dagger.cs",
-              "RelativeToolTip": "Props\\Items\\Weapons\\Dagger.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHkAAACWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T08:33:51.56Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Investigate.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Investigate.cs",
-              "RelativeDocumentMoniker": "Moves\\Investigate.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Investigate.cs",
-              "RelativeToolTip": "Moves\\Investigate.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T07:31:12.35Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "LookEffectDescription.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookEffectDescription.cs",
-              "RelativeDocumentMoniker": "Moves\\LookEffectDescription.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookEffectDescription.cs",
-              "RelativeToolTip": "Moves\\LookEffectDescription.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAA6wBkAAABJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T06:51:43.576Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "BrowseGoods.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\BrowseGoods.cs",
-              "RelativeDocumentMoniker": "Moves\\BrowseGoods.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\BrowseGoods.cs",
-              "RelativeToolTip": "Moves\\BrowseGoods.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T06:51:00.077Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "CheckJournal.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\CheckJournal.cs",
-              "RelativeDocumentMoniker": "Moves\\CheckJournal.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\CheckJournal.cs",
-              "RelativeToolTip": "Moves\\CheckJournal.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABgAAABqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T06:49:23.018Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "DropItem.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\DropItem.cs",
-              "RelativeDocumentMoniker": "Moves\\DropItem.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\DropItem.cs",
-              "RelativeToolTip": "Moves\\DropItem.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T06:49:13.296Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "Equip.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Equip.cs",
-              "RelativeDocumentMoniker": "Moves\\Equip.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Equip.cs",
-              "RelativeToolTip": "Moves\\Equip.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-28T06:49:11.698Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "EffectKey.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\EffectKey.cs",
-              "RelativeDocumentMoniker": "Enums\\EffectKey.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Enums\\EffectKey.cs",
-              "RelativeToolTip": "Enums\\EffectKey.cs",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAkwBIAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T10:22:52.85Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "Weapon.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Weapons\\Weapon.cs",
-              "RelativeDocumentMoniker": "Props\\Items\\Weapons\\Weapon.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Weapons\\Weapon.cs",
-              "RelativeToolTip": "Props\\Items\\Weapons\\Weapon.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAowEUAAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T09:26:07.968Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "WeaponList.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\WeaponList.cs",
-              "RelativeDocumentMoniker": "World\\BioMechWorld\\WeaponList.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\WeaponList.cs",
-              "RelativeToolTip": "World\\BioMechWorld\\WeaponList.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAAgwDAAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T09:39:49.749Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "Die.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Abstract Entities\\Die.cs",
-              "RelativeDocumentMoniker": "Abstract Entities\\Die.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Abstract Entities\\Die.cs",
-              "RelativeToolTip": "Abstract Entities\\Die.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T09:24:02.582Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "LookAt.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookAt.cs",
-              "RelativeDocumentMoniker": "Moves\\LookAt.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\LookAt.cs",
-              "RelativeToolTip": "Moves\\LookAt.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAAAowBIAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T08:34:22.435Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "WorldSoul.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
-              "RelativeDocumentMoniker": "World\\WorldSoul.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
-              "RelativeToolTip": "World\\WorldSoul.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAuwHsAAABJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T08:15:41.656Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Character.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
               "RelativeDocumentMoniker": "Props\\Character.cs",
               "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Character.cs",
               "RelativeToolTip": "Props\\Character.cs",
-              "ViewState": "AgIAAK0AAAAAAAAAAAAkwL4AAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAM0AAAAAAAAAAIAwwNsAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:43:36.013Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-17T09:54:12.158Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "WellRoom.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Temple\\WellRoom.cs",
-              "RelativeDocumentMoniker": "World\\BioMechWorld\\Temple\\WellRoom.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Temple\\WellRoom.cs",
-              "RelativeToolTip": "World\\BioMechWorld\\Temple\\WellRoom.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAB4AAAAqAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "Grab.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Grab.cs",
+              "RelativeDocumentMoniker": "Moves\\Grab.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Moves\\Grab.cs",
+              "RelativeToolTip": "Moves\\Grab.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAwwCwAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:31:02.049Z"
+              "WhenOpened": "2025-01-17T09:53:17.621Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "ArmorList.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ArmorList.cs",
-              "RelativeDocumentMoniker": "World\\BioMechWorld\\ArmorList.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ArmorList.cs",
-              "RelativeToolTip": "World\\BioMechWorld\\ArmorList.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAQwCcAAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:25:33.482Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "Shield.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Shield.cs",
-              "RelativeDocumentMoniker": "Props\\Items\\Armor\\Shield.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Shield.cs",
-              "RelativeToolTip": "Props\\Items\\Armor\\Shield.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:18:35.587Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "Head.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Head.cs",
-              "RelativeDocumentMoniker": "Props\\Items\\Armor\\Head.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Head.cs",
-              "RelativeToolTip": "Props\\Items\\Armor\\Head.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:18:43.804Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "Armor.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Armor.cs",
-              "RelativeDocumentMoniker": "Props\\Items\\Armor\\Armor.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Props\\Items\\Armor\\Armor.cs",
-              "RelativeToolTip": "Props\\Items\\Armor\\Armor.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBEAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:18:42.047Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "TempleCourtyard.cs",
-              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Temple\\TempleCourtyard.cs",
-              "RelativeDocumentMoniker": "World\\BioMechWorld\\Temple\\TempleCourtyard.cs",
-              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\Temple\\TempleCourtyard.cs",
-              "RelativeToolTip": "World\\BioMechWorld\\Temple\\TempleCourtyard.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABkAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T07:11:59.996Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Soul.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Soul.cs",
               "RelativeDocumentMoniker": "Soul.cs",
               "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Soul.cs",
               "RelativeToolTip": "Soul.cs",
-              "ViewState": "AgIAAMIAAAAAAAAAAAAswNQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABEAAAAAAAAAAIAwwB8AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-26T09:23:11.098Z",
+              "WhenOpened": "2025-01-17T09:51:45.421Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WorldSoul.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
+              "RelativeDocumentMoniker": "World\\WorldSoul.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\WorldSoul.cs",
+              "RelativeToolTip": "World\\WorldSoul.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAYwIQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-08T22:13:36.579Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ConsumableList.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ConsumableList.cs",
+              "RelativeDocumentMoniker": "World\\BioMechWorld\\ConsumableList.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ConsumableList.cs",
+              "RelativeToolTip": "World\\BioMechWorld\\ConsumableList.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABsAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-08T22:11:23.671Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Events.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Events.cs",
+              "RelativeDocumentMoniker": "Events.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\Events.cs",
+              "RelativeToolTip": "Events.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-08T21:59:43.224Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ShadowyTemple.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ShadowyTemple.cs",
+              "RelativeDocumentMoniker": "World\\BioMechWorld\\ShadowyTemple.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\World\\BioMechWorld\\ShadowyTemple.cs",
+              "RelativeToolTip": "World\\BioMechWorld\\ShadowyTemple.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAgwC0AAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-08T21:58:32.918Z"
             }
           ]
         }

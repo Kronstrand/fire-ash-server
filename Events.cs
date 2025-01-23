@@ -13,18 +13,14 @@ namespace fire_ash_server
     {
         public static void AddCharacterMoveFromCharacterAndIsAttacked(Character attackingCharacter)
         {
-            attackingCharacter.AddOnBeforeMoveFromEvent((soul) => {
+            attackingCharacter.AddOnBeforeMoveFromEvent(async (soul) => {
                 if (attackingCharacter.InCombat)
                     return false;
                 if (attackingCharacter.Dead)
                     return false;
 
                 Move move = new MeleeAttack(attackingCharacter.Soul, soul.Character);
-                attackingCharacter.Soul.Execute(ref move, soul.Character);
-
-                //attackingCharacter.AttackWithMainHand(soul.Character);
-
-                //soul.Character.EnableCombatWith = attackingCharacter;
+                await move.Execute(attackingCharacter.Soul, soul.Character);
 
                 return true; 
             }, 

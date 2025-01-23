@@ -13,9 +13,9 @@ namespace fire_ash_server.Moves
 
     internal class Grab : Move
     {
-        public Grab(Soul soul, Item prop) : base(MoveKey.g.ToString(), CreateDescription(prop), prop, () => { })
+        public Grab(Soul soul, Item prop) : base(MoveKey.g.ToString(), CreateDescription(prop), prop, async () => { })
         {            
-            AllowedInTrade = true;
+            AllowedInTrade = false;
             EnablesCombat = true;
             Action = CreateAction(soul, prop);
         }
@@ -25,9 +25,9 @@ namespace fire_ash_server.Moves
             return "Grab " + item.Name + ".";
         }
 
-        private Action CreateAction(Soul soul, Item item)
+        private Func<Task> CreateAction(Soul soul, Item item)
         {
-            return () => 
+            return async () => 
             {
                 if (!item.IsPickupable())
                 {
@@ -58,6 +58,8 @@ namespace fire_ash_server.Moves
                         soul.Character.BroadcastToSoulsInRoom(grabDescriptions);
                     EnablesCombat = false;
                 }
+
+                await Task.CompletedTask;
             };
         }
         

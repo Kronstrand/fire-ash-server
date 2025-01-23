@@ -12,7 +12,7 @@ namespace fire_ash_server.Moves
 {
     internal class DropItem : Move
     {
-        public DropItem(Soul soul, Item prop) : base(MoveKey.d.ToString(), CreateDescription(prop), prop, () => { })
+        public DropItem(Soul soul, Item prop) : base(MoveKey.d.ToString(), CreateDescription(prop), prop, async () => { })
         {
             EnablesCombat = false;
             Action = CreateAction(soul, prop);
@@ -23,9 +23,9 @@ namespace fire_ash_server.Moves
             return "Drop " + item.Name + ".";
         }
 
-        private Action CreateAction(Soul soul, Item item)
+        private Func<Task> CreateAction(Soul soul, Item item)
         {
-            return () =>
+            return async () =>
             {
                 RemoveItemFromCharacter(soul.Character, item);
                 soul.Character.CurrentRoom.AddItem(item);
@@ -34,6 +34,8 @@ namespace fire_ash_server.Moves
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} dropped {item.Name}.");
 
                 soul.Character.LookBackFromItem(item);
+
+                await Task.CompletedTask;
             };
         }
 

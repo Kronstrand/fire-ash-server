@@ -10,12 +10,20 @@ namespace fire_ash_server.Props.Items
 {
     internal class Coins : Item
     {
-        int Gold;
-        int Silver;
+        public int Gold {  get; private set ; }
+        public int Silver {  get; private set; }
         public Coins(int gold, int silver) : base(CreateName(gold, silver), CreateName(gold, silver) + ", so shiny.", gold + SilverToGold(silver))
         {
             Gold = gold;
             Silver = silver;
+            Sellable = false;
+        }
+
+        public void SetValues(int gold, int silver)
+        {
+            Gold = gold;
+            Silver = silver;                                                            
+            Name = CreateName(gold, silver);
         }
 
         private static string CreateName(int gold, int silver)

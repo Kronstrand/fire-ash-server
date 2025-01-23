@@ -39,7 +39,22 @@ namespace fire_ash_server.World.BioMechWorld
             );
             backAlley.AddExit(backAlleyToStaircaseExit);
 
-            new Bazar(backAlley);
+            Room bazar = Bazar.Create(backAlley);
+
+            // Back Alley -> Bazar
+            Exit entranceToBazarFromBackAlley = new Exit(
+                "To the north, where the alley opens up",
+                "A bustling bazar, filled with vibrant activity.",
+                bazar
+            );
+            backAlley.AddExit(entranceToBazarFromBackAlley);
+
+            Character rat1 = MonsterCreator.Ratrocity();
+            Character rat2 = MonsterCreator.Ratrocity();
+            rat1.GoToRoom(backAlley);
+            rat1.MoveToGroup(entranceToBazarFromBackAlley);
+            rat2.GoToRoom(backAlley);
+            rat2.MoveToGroup(rat1);
 
             return backAlley;
         }

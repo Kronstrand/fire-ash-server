@@ -36,16 +36,25 @@ namespace fire_ash_server.Dialogue
 
         public void SpeakCurrentNode()
         {
-            SpeakingCharacter.Speak(CurrentNode.GetText(this));
+            if (CurrentNode.Dialogue)
+                SpeakingCharacter.Speak(CurrentNode.GetText(this));
             CurrentNode.RunOnAfterEvent(this);
         }
 
         public void EndSpeakWith()
         {
+            Character? xSpeakingTo = null;
+
             Initiater = null;
             if (SpeakingCharacter.SpeakingTo != null)
+            {
+                xSpeakingTo = SpeakingCharacter.SpeakingTo;
                 SpeakingCharacter.SpeakingTo.SpeakingTo = null;
+            }            
             SpeakingCharacter.SpeakingTo = null;
+
+            if (SpeakingCharacter.OnAfterSpeakTo != null && xSpeakingTo != null)
+                SpeakingCharacter.OnAfterSpeakTo(xSpeakingTo.Soul, SpeakingCharacter);
         }
 
         public void SetCurrentNodeBasedOnChoice(DialogueChoice choice)

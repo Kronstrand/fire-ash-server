@@ -14,7 +14,7 @@ namespace fire_ash_server.Moves
     {
         public LookEffectDescription(Soul soul, string effectName) : base(MoveKey.le.ToString(), $"Check {effectName}.")
         {
-            //minor
+            AllowedInTrade = true;
             Type = MoveType.MinorAction;
             Action = async () => { 
                 await soul.SendAsync(GetEffectDescription(effectName)); 

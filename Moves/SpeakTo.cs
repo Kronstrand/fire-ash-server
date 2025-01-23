@@ -10,13 +10,17 @@ namespace fire_ash_server.Moves
 {
     internal class SpeakTo : Move
     {
-        public SpeakTo(Soul soul, Character targetProp) : base(MoveKey.sp.ToString(), $"Speak to {targetProp.Name}", targetProp)
+        public SpeakTo(Soul soul, Character targetCharacter) : base(MoveKey.sp.ToString(), $"Speak to {targetCharacter.Name}", targetCharacter)
         {
-            Action = () =>
+            Action = async () =>
             {
-                if (targetProp.DialogueManager == null)
+                if (targetCharacter.OnBeforeSpeakTo != null)
+                    targetCharacter.OnBeforeSpeakTo(soul, targetCharacter);
+
+                if (targetCharacter.DialogueManager == null)
                     return;
-                targetProp.DialogueManager.InitSpeakWith(soul.Character);
+
+                targetCharacter.DialogueManager.InitSpeakWith(soul.Character);
             };
         }
     }

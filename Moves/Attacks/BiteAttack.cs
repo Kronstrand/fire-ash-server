@@ -14,7 +14,7 @@ namespace fire_ash_server.Moves.Attacks
         {
             Character character = soul.Character;
 
-            Action = () =>
+            Action = async () =>
             {
                 if (!TryAttack(character, characterToAttack, character.AttackWithTeeth)) return;
                 //add poison

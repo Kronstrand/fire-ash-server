@@ -47,9 +47,9 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 wellRoom);
             grandTempleAscent.AddExit(toMainTemple);
 
-            Character shadecreeper = MonsterCreator.Shadecreeper();
+            /*Character shadecreeper = MonsterCreator.Shadecreeper();
             shadecreeper.GoToRoom(grandTempleAscent);
-            shadecreeper.MoveToGroup(toMainTemple);
+            shadecreeper.MoveToGroup(toMainTemple);*/
 
             return grandTempleAscent;
         }

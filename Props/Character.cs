@@ -45,14 +45,14 @@ namespace fire_ash_server.Props
         public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
         public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
         public Inventory Inventory = new Inventory();
-        public int GP;
-        public int Silver;
         public Journal Journal;
         public DialogueManager? DialogueManager;
         public Character? TradingWith;
         public bool IsTrader = false;
+        public double tradeModifier = 0.0;
         public Character? SpeakingTo;
         private Dictionary<Prop, ThreadSafeList<string>> UsedMovesOnProp = new Dictionary<Prop, ThreadSafeList<string>>();
+        public bool InitAttack = true;
 
         public ToxicRelationship? EnableCombatWith = null;
         public bool InCombat;
@@ -61,6 +61,9 @@ namespace fire_ash_server.Props
         public Soul Soul;
 
         public static Dictionary<string, List<Func<string, string, string>>> hitReactions = new Dictionary<string, List<Func<string, string, string>>>();
+
+        public Action<Soul, Character>? OnBeforeSpeakTo;
+        public Action<Soul, Character>? OnAfterSpeakTo;
 
         public Character(Soul soul, string name) : base(name, "")
         {
@@ -155,27 +158,34 @@ namespace fire_ash_server.Props
             }
         }
 
-        public double GetTotalCoin()
+        public double GetTotalCoinValue()
         {
-            return GP + (Silver * 0.1);
+            Coins? coins = GetCoins();
+            if (coins == null)
+                return 0.0;
+            return coins.Gold + (coins.Silver * 0.1);
         }
         public void TransferCoinTo(Character toCharacter, int gp, int silver)
         {
+            Coins? coins = GetCoins();
+            if (coins == null)
+                coins = new Coins(0, 0);
+
             //antagelse: der er nok total
-            if(GP >= gp && Silver >= silver)
+            if (coins.Gold >= gp && coins.Silver >= silver)
             {
                 TransferExactCoinTo(toCharacter, gp, silver);
             }
-            else if(GP < gp)
+            else if(coins.Gold < gp)
             {
-                int gpTransfered = GP;
+                int gpTransfered = coins.Gold;
                 int silverTransfered = silver + ((gp - gpTransfered) * 10);
 
                 TransferExactCoinTo(toCharacter, gpTransfered, silverTransfered);
             }
-            else if (Silver < silver)
+            else if (coins.Silver < silver)
             {
-                int silverTransfered = Silver;
+                int silverTransfered = coins.Silver;
                 double result = gp + ((silver - silverTransfered) * 0.1);                
                 int gpTransfered = (int)Math.Ceiling(result);
                 int fractionalSilverPart = (int)((gpTransfered - result) * 10);
@@ -188,10 +198,49 @@ namespace fire_ash_server.Props
 
         private void TransferExactCoinTo(Character toCharacter, int gp, int silver)
         {
-            toCharacter.GP += gp;
-            toCharacter.Silver += silver;       
-            GP -= gp;
-            Silver -= silver;
+            toCharacter.AddCoins(new Coins(gp, silver));
+            RemoveCoins(new Coins(gp, silver));
+        }
+
+        private Coins? GetCoins()
+        {
+            foreach(Item item in Inventory.Items)
+            {
+                if (item is Coins)
+                    return (Coins)item;
+            }
+
+            return null;
+        }
+
+        private void AddCoins(Coins coins)
+        {
+            Coins? charCoins = GetCoins();
+            if (charCoins == null)
+                AddToInventory(coins, true);
+            else
+            {
+                charCoins.SetValues(
+                    charCoins.Gold + coins.Gold,
+                    charCoins.Silver + coins.Silver);
+            }
+        }
+
+        private void RemoveCoins(Coins coins)
+        {
+            Coins? charCoins = GetCoins();
+            if (charCoins == null)
+                throw new Exception("no coin to remove");
+            else
+            {
+                charCoins.SetValues(
+                    charCoins.Gold - coins.Gold,
+                    charCoins.Silver - coins.Silver);
+                if (charCoins.Gold == 0 && charCoins.Silver == 0)
+                    Items.Remove(charCoins);
+
+
+            }
         }
 
         public void SetEnableCombatWith(Character enemy)
@@ -345,8 +394,13 @@ namespace fire_ash_server.Props
 
             BroadcastToSoulsInRoom(message);
             SendCurrentHpSate();
-            TestDeath();
-            
+            TestDeath();           
+        }
+
+        public void GainLife(int addHp)
+        {
+            CurrentHP += addHp;
+            SendCurrentHpSate();
         }
 
         public void TestDeath()
@@ -429,7 +483,10 @@ namespace fire_ash_server.Props
 
         public Roll GetRangedAttackRoll(Weapon rangedWeapon)
         {
-            return new Roll(GetModifer(Skill.RangedCombat) + rangedWeapon.Modifier, RollType.AttackRoll, this);
+            int modifier = GetModifer(Skill.RangedCombat) + rangedWeapon.Modifier;
+            if (lookAt is Character && IsInGroupWith((Character)lookAt) == true)
+                modifier -= 5;
+            return new Roll(modifier, RollType.AttackRoll, this);
         }
 
         public Damage GetRangedDamageRoll(Weapon rangedWeapon)
@@ -616,10 +673,27 @@ namespace fire_ash_server.Props
 
         public string AddToInventory(Item itemToAdd)
         {
+            return AddToInventory(itemToAdd, false);
+        }
+
+        private string AddToInventory(Item itemToAdd, bool newCoins)
+        {
             itemToAdd.RemoveFromCurrentGrouping();
-            Inventory.AddItem(itemToAdd);
+            if (itemToAdd is Coins && !newCoins)
+            {
+                itemToAdd.ClearHeldBy();
+                AddCoins((Coins)itemToAdd);              
+            }
+            else
+                Inventory.AddItem(itemToAdd);
             LookBackFromItem(itemToAdd);
-            return $"{Name} added {itemToAdd.Name} to their inventory.";
+            string toolTip = "";
+            if (Soul.InventoryToolTip < 4)
+            {
+                toolTip = " (Type 'i' and press Enter to open inventory)";
+                Soul.InventoryToolTip++;
+            }
+            return $"{Name} added {itemToAdd.Name} to their inventory.{toolTip}";
         }
 
         public void AddEquippedItem(InventorySlot inventorySlot, Item item)
@@ -957,7 +1031,7 @@ namespace fire_ash_server.Props
             Feats.Add(Description(key));
         }
 
-        public bool HasFeat(EffectKey key)
+        public bool HasFeat(FeatKey key)
         {
             return Feats.Contains(Description(key));
         }

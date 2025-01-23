@@ -20,7 +20,7 @@ namespace fire_ash_server.Enums
         l,  //lookat
         m,  //move to
         pp, //pick pocket
-        c,  //room change
+        r,  //room change
         s,  //stealth
         sp, //speak to
         f,  //flee
@@ -29,5 +29,7 @@ namespace fire_ash_server.Enums
         lo,
         d,
         le,
+        st,
+        c, //consume
     }
 }

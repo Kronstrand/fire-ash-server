@@ -36,11 +36,15 @@ namespace fire_ash_server.Props
 
         public ThreadSafeList<Effect> Effects = new ThreadSafeList<Effect>();
 
-        private ThreadSafeList<Func<Soul, bool>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, bool>>();
-        private ThreadSafeList<Func<Soul, bool>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, bool>>();
+        public Action<Soul>? OnAfterLookAt;
+
+        private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
+        private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
 
         private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul, Prop>>();
         private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul, Prop>>();
+
+        public List<Prop> propsInImage = new List<Prop>();
 
         public Prop(string name, string description)
         {
@@ -176,6 +180,20 @@ namespace fire_ash_server.Props
 
             if (!showImage)
                 return description;
+
+            //show only image if all props in image are ok
+            foreach(Prop imageProp in propsInImage)
+            {
+                if (lookingCharacter != null && lookingCharacter.CurrentRoom != imageProp.GetRoomLocation())
+                    return description;
+
+                if (imageProp is Character)
+                {
+                    Character imageCharProp = (Character)imageProp;
+                    if (imageCharProp.Dead)
+                        return description;
+                }
+            }
 
             string Imagename = (exitImagePrefix + Name).ToLower().Replace(" ", "");
 
@@ -448,11 +466,11 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public bool RunOnBeforeMoveFromEvents(Soul soul)
+        public async Task<bool> RunOnBeforeMoveFromEvents(Soul soul)
         {
             bool interruptMove = false;
-            foreach (Func<Soul, bool> beforeMoveEvent in OnBeforeMoveFromEvents)
-                if (beforeMoveEvent(soul))
+            foreach (Func<Soul, Task<bool>> beforeMoveEvent in OnBeforeMoveFromEvents)
+                if (await beforeMoveEvent(soul))
                     interruptMove = true;
 
             OnBeforeMoveFromEvents.RemoveAll(OnBeforeMoveFromEventsToBeRemoved);
@@ -461,7 +479,7 @@ namespace fire_ash_server.Props
             return interruptMove;
         }
 
-        public void AddOnBeforeMoveFromEvent(Func<Soul, bool> action, bool runOnce)
+        public void AddOnBeforeMoveFromEvent(Func<Soul, Task<bool>> action, bool runOnce)
         {
             OnBeforeMoveFromEvents.Add(action);
             if (runOnce)
@@ -530,6 +548,19 @@ namespace fire_ash_server.Props
             {
                 if (effect.LightRadiusModifer > light)
                     light = effect.LightRadiusModifer;
+            }
+
+            if (this is Room)
+            {
+                Room room = (Room)this;
+                foreach (Prop prop in room.GetPropsInRoom())
+                {
+                    Light propLight = prop.GetPropLight();
+                    if (propLight > light)
+                        light = propLight;
+                    if (light == Light.Bright)
+                        return light;
+                }
             }
 
             return light;
@@ -708,8 +739,9 @@ namespace fire_ash_server.Props
 
             if (lookingAtProp.GetLightState(lookingCharacter) != Light.Darkness)
             {
-                List<Item> Items = lookingAtProp.Items.Where(i => i.IsPickupable() && !i.IsHidden()).ToList();
-                outputStrings.Add($"{ListToString(Items)} lies on the {lookingAtProp.Name}");
+                List<Item> items = lookingAtProp.Items.Where(i => i.IsPickupable() && !i.IsHidden()).ToList();
+                if (items.Any())
+                    outputStrings.Add($"{ListToString(items)} lies on the {lookingAtProp.Name}");
             }
 
             for (int i = 0; i < outputStrings.Count; i++)

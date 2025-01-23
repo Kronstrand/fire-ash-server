@@ -17,6 +17,7 @@ namespace fire_ash_server.Enums
         Feline,
         Undead,
         Fay,
-        Serpentine
+        Serpentine,
+        Demon
     }
 }

@@ -4,8 +4,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
+using fire_ash_server.Moves.Attacks;
 using fire_ash_server.Props;
+using fire_ash_server.Props.Items;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
@@ -13,7 +17,8 @@ namespace fire_ash_server.Moves
     {
         public string Key;
         public string Description;
-        public Action Action;
+        //public Action Action;
+        public Func<Task> Action;
         public bool Repeatable = true;
         public bool AllowedInTrade = false;
         public bool AllowedInCombat = true;
@@ -24,14 +29,14 @@ namespace fire_ash_server.Moves
         public bool EnablesCombat;
         public RangeType Range = RangeType.CloseSingleTarget;
 
-        public Move(string key, string description, Action action)
+        public Move(string key, string description, Func<Task> action)
         {
             Key = key;
             Description = description;
             Action = action;
 
         }
-        public Move(string key, string description, Prop prop, Action action)
+        public Move(string key, string description, Prop prop, Func<Task> action)
         {
             Key = key;
             Description = description;
@@ -132,6 +137,72 @@ namespace fire_ash_server.Moves
         public virtual bool IsValid(Soul soul)
         {
             return true;
+        }
+
+        public async Task Execute(Soul soul)
+        {
+            await Execute(soul, soul.Character);
+        }
+        public async Task Execute(/*ref Move move,*/Soul soul, Character activeCharacter)
+        {
+            if (!soul.Character.PropTargetIsValid(this))
+                return;
+
+            soul.Character.RegisterUsedMoveOnProp(this);
+
+
+            if (this is Attack)
+                if (soul.Character.GetLightState(null) == Light.Darkness)
+                {
+                    if (Prop != null)
+                        SetThreadBasedBufferText($"From the darkness, ");
+                    else
+                        SetThreadBasedBufferText($"Within the darkness, ");
+                    Console.WriteLine("Buffer is set at " + DateTime.Now);
+                }
+
+
+            if (EnablesCombat)
+            {
+                if (soul.Character.IsHidden())
+                    soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} reveals themselves from the shadows...");
+
+                await Action();
+                RemoveBufferTextForThread();
+
+                if (soul.Character.IsHidden())
+                    soul.Character.Unhide();
+            }
+            else
+                await Action();
+
+            ExecutePostAction(soul.Character);
+
+            if (EnablesCombat)
+            {
+                if (activeCharacter.EnableCombatWith == null)
+                {
+                    Character? targetCharacer = null;
+                    if (Prop is Item)
+                    {
+                        Item item = (Item)Prop;
+                        Character? heldByCharacter = item.HeldByCharacter();
+                        if (heldByCharacter != null || heldByCharacter != soul.Character)
+                        {
+                            targetCharacer = heldByCharacter;
+                        }
+                    }
+                    else if (Prop is Character)
+                        targetCharacer = (Character)Prop;
+
+                    if (targetCharacer != null && EnablesCombat)
+                        if (targetCharacer != activeCharacter)
+                            activeCharacter.EnableCombatWith = new ToxicRelationship(targetCharacer, false);
+                        else
+                            activeCharacter.EnableCombatWith = new ToxicRelationship(soul.Character, true);
+                }
+
+            }
         }
     }
 }

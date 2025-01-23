@@ -15,54 +15,39 @@ namespace fire_ash_server.Moves
 
     internal class BuyItem : Move
     {
-        public BuyItem(Soul soul, Item prop) : base(MoveKey.bi.ToString(), CreateDescription(prop), prop, () => { })
+        public BuyItem(Soul soul, Item prop, Character buyFrom) : base(MoveKey.bi.ToString(), CreateDescription(prop, buyFrom), prop, async () => { })
         {            
             AllowedInTrade = true;
-            Action = CreateAction(soul, prop);
+            Action = CreateAction(soul, prop, buyFrom);
         }
 
-        private static string CreateDescription(Item item)
+        private static string CreateDescription(Item item, Character buyFrom)
         {
-            string priceString;
-            Tuple<int, int> price = ConvertToGoldAndSilver(item.VendorValue);
-            if (price.Item2 == 0)
-                priceString = $"{price.Item1} gp";
-            else if (price.Item1 == 0)
-                priceString = $"{price.Item2} sp";
-            else
-                priceString = $"{price.Item1} gp, {price.Item2} sp";
-
-            return $"Buy {item.Name} ({priceString}).";
+            double vendorValue = item.GetBuyPriceFromVendor(buyFrom);
+            Tuple<int, int> price = ConvertToGoldAndSilver(vendorValue);
+            return $"Buy {item.Name} ({PriceToString(price)}).";
         }
 
-        private Action CreateAction(Soul soul, Item item)
+        private Func<Task> CreateAction(Soul soul, Item item, Character buyFrom)
         {
-            return () => 
+            return async () => 
             {
-                /*
-                if (!item.IsPickupable())
-                {
-                    _ =  soul.SendAsync($"{item.Name} can't be picked up.");
-                    EnablesCombat = false;
-                    return;
-                }*/
+                double vendorValue = item.GetBuyPriceFromVendor(buyFrom);
 
-                Character? heldByCharacter = item.HeldByCharacter();
-                if (heldByCharacter != null)
-                {
-                    Tuple<int, int> price = ConvertToGoldAndSilver(item.VendorValue); 
+                Tuple<int, int> price = ConvertToGoldAndSilver(vendorValue); 
 
-                    if (soul.Character.GetTotalCoin() >= item.VendorValue)
-                    {
-                        soul.Character.TransferCoinTo(heldByCharacter, price.Item1, price.Item2);
-                        soul.Character.AddToInventory(item);
-                        _ = soul.SendAsync($"You buy {item.Name} from {heldByCharacter.Name} for {price.Item1} gold and {price.Item2} silver.");
-                    }
-                    else
-                    {
-                        _ = soul.SendAsync($"You can't afford {item.Name}.");
-                    }
+                if (soul.Character.GetTotalCoinValue() >= vendorValue)
+                {
+                    soul.Character.TransferCoinTo(buyFrom, price.Item1, price.Item2);
+                    soul.Character.AddToInventory(item);
+                    _ = soul.SendAsync($"You buy {item.Name} from {buyFrom.Name} for {price.Item1} gold and {price.Item2} silver.");
                 }
+                else
+                {
+                    _ = soul.SendAsync($"You can't afford {item.Name}.");
+                }
+
+                await Task.CompletedTask;
             };
         }
     }
