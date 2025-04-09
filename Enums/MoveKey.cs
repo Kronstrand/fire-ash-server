@@ -22,6 +22,8 @@ namespace fire_ash_server.Enums
         pp, //pick pocket
         r,  //room change
         s,  //stealth
+        sg, //save game
+        lg, //load game
         sp, //speak to
         f,  //flee
         b,  //back

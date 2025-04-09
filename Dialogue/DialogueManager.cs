@@ -8,6 +8,7 @@ using fire_ash_server.Moves;
 
 namespace fire_ash_server.Dialogue
 {
+    [Serializable]
     internal class DialogueManager
     {
         public DialogueNode CurrentNode;

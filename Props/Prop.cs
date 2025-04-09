@@ -18,6 +18,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props
 {
+    [Serializable]
     internal abstract class Prop
     {
         public string Name { get; set; }
@@ -41,8 +42,8 @@ namespace fire_ash_server.Props
         private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
         private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
 
-        private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEvents = new ThreadSafeList<Action<Soul, Prop>>();
-        private ThreadSafeList<Action<Soul, Prop>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Action<Soul, Prop>>();
+        private ThreadSafeList<Func<Soul, Task<bool>>> OnAfterMoveToEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
+        private ThreadSafeList<Func<Soul, Task<bool>>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
 
         public List<Prop> propsInImage = new List<Prop>();
 
@@ -84,7 +85,9 @@ namespace fire_ash_server.Props
         {
             string description = Description;
             if (GetLightState(lookingCharacter) == Light.Darkness)
+            {
                 description = "There is darkness.";
+            }
             if (lookingCharacter.LookAt != this && ContextDescription != null)
                 description = ContextDescription + ", " + ToLowerFirstChar(description);
 
@@ -486,16 +489,26 @@ namespace fire_ash_server.Props
                 OnBeforeMoveFromEventsToBeRemoved.Add(action);
         }
 
-        public void RunOnAfterMoveToEvents(Soul soul)
+        public async Task RunOnAfterMoveToEvents(Soul soul)
         {
-            foreach (Action<Soul,Prop> afterMoveEvent in OnAfterMoveToEvents)
-                afterMoveEvent(soul, this);
+            List<Func<Soul, Task<bool>>> afterMoveEventsThatRanSuccessfuly = new List<Func<Soul, Task<bool>>>();
+            foreach (Func<Soul, Task<bool>> afterMoveEvent in OnAfterMoveToEvents)
+            {
+                if(await afterMoveEvent(soul))
+                    afterMoveEventsThatRanSuccessfuly.Add(afterMoveEvent);
+            }
 
-            OnAfterMoveToEvents.RemoveAll(OnAfterMoveToEventsToBeRemoved);
-            OnAfterMoveToEventsToBeRemoved.Clear();
+            foreach(Func<Soul, Task<bool>> evnt in afterMoveEventsThatRanSuccessfuly)
+            {
+                if (OnAfterMoveToEventsToBeRemoved.Contains(evnt))
+                {
+                    OnAfterMoveToEvents.Remove(evnt);
+                    OnAfterMoveToEventsToBeRemoved.Remove(evnt);
+                }
+            }
         }
 
-        public void AddOnAfterMoveToEvent(Action<Soul,Prop> action, bool runOnce)
+        public void AddOnAfterMoveToEvent(Func<Soul, Task<bool>> action, bool runOnce)
         {
             OnAfterMoveToEvents.Add(action);
             if (runOnce)
@@ -533,8 +546,22 @@ namespace fire_ash_server.Props
                     return null;
             }
 
+            Prop prop = this;
+
+            //if prop is an item in an inventory, use the character holding it as prop for group
+            if (this is Item)
+            {
+                Item item = (Item)this;
+                if (item.HeldBy is Inventory)
+                {
+                    Inventory inventoryHoldingItem = (Inventory)item.HeldBy;
+                    if (inventoryHoldingItem.HeldBy != null)
+                        prop = inventoryHoldingItem.HeldBy; //this would be a character
+                }
+            }
+
             foreach (Grouping group in currentRoom.Groupings)
-                if (group.Props.Contains(this))
+                if (group.Props.Contains(prop))
                     return group;
 
             return null;

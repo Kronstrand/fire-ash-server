@@ -26,6 +26,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "its dark eyes gleaming with an unsettling presence. " +
                 "Fireflies float lazily through the air, their soft glow providing the only light in this otherwise shadowed space."
             );
+            templeCourtyard.Light = Light.Bright;
 
             Exit toTempleCourtyard = new Exit(
                 "A large tree root, twisted and warped into the shape of a serpent, coils around a dark opening ahead. " +
@@ -106,13 +107,24 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             DialogueNode lilyAliveResponseNode = new DialogueNode("A-alive...? B-but... I... I th-thought... m-maybe... th-this w-was... h-hell...");
             DialogueNode lilyUncertaintyResponseNode = new DialogueNode("D-don't... kn-know...");
             DialogueNode lilyFinalNode = new DialogueNode("Th-thank... y-you...? Wh-what... was... I... s-saying...? G-goodbye...?");
-            lilyFinalNode.OnAfterEvent = async (DialogueManager dm) => {
+
+            DialogueNode lilyEliasDidntForget = new DialogueNode("H-he... he didn't...? B-but... wh-why... wh-why am I... s-so... a-alone...? H-he... pr-promised... to... s-save me...");
+            DialogueNode lilyTimeToLetGo = new DialogueNode("L-let... go...? B-but... I... wh-what... do I... d-do...? H-he... he was... all I... h-had...");
+
+            async Task MoveLilyIfInGroup()
+            {
                 if (lily.IsInGroupWith(toSubterraneanPassage) == true)
                 {
                     MoveTo move = new MoveTo(lily.Soul, serpentStatue);
                     await move.Action();
                 }
-            };
+            }
+
+            lilyAliveResponseNode.OnAfterEvent = async _ => await MoveLilyIfInGroup();
+            lilyUncertaintyResponseNode.OnAfterEvent = async _ => await MoveLilyIfInGroup();
+            lilyEliasDidntForget.OnAfterEvent = async _ => await MoveLilyIfInGroup();
+            lilyTimeToLetGo.OnAfterEvent = async _ => await MoveLilyIfInGroup();
+            lilyFinalNode.OnAfterEvent = async _ => await MoveLilyIfInGroup();
 
             // Initial Choices
             lilyStartNode.AddChoice("What happened to you?", lilyMemoryNode);
@@ -122,14 +134,8 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             lilyMemoryNode.AddChoice("You are Elias' daughter, do you remember your father?", lilyEliasLucidNode);
 
             // Choices for lilyEliasLucidNode
-            lilyEliasLucidNode.AddChoice(
-                "He didn't forget you, Lily.",
-                new DialogueNode("H-he... he didn't...? B-but... wh-why... wh-why am I... s-so... a-alone...? H-he... pr-promised... to... s-save me...")
-            );
-            lilyEliasLucidNode.AddChoice(
-                "It's time to let go, Lily.",
-                new DialogueNode("L-let... go...? B-but... I... wh-what... do I... d-do...? H-he... he was... all I... h-had...")
-            );
+            lilyEliasLucidNode.AddChoice("He didn't forget you, Lily.", lilyEliasDidntForget);
+            lilyEliasLucidNode.AddChoice("It's time to let go, Lily.", lilyTimeToLetGo);
             lilyEliasLucidNode.AddChoice("Goodbye, Lily.", lilyFinalNode);
 
             // Choices for other nodes
@@ -156,7 +162,8 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             DialogueNode lilyStartNodeTear = new DialogueNode("W-who... a-are... y-you? I... c-can't see...");
             DialogueNode serpentTearOfferedNode = new DialogueNode("W-what... wh-what's... th-this...? It... f-feels... familiar...");
             DialogueNode lilyAdviceNode = new DialogueNode("I... I... I c-can't... but maybe... Eriska... she knows... s-she'll understand...");           
-            DialogueNode lilyFinalNodeTear = new DialogueNode("G-goodbye... s-stranger... I h-hope... you f-find... y-your light... t-too...");
+            DialogueNode lilyFinalNodeTear = new DialogueNode("G-goodbye... s-stranger... I h-hope... you f-find... y-your light...");
+            lilyFinalNodeTear.OnAfterEvent = async _ => await MoveLilyIfInGroup();
             DialogueNode lilyAcceptanceNode = new DialogueNode("");
             lilyAcceptanceNode.OnAfterEvent = (DialogueManager dm) => { SerpentsTearHandedOverToLily = true; };
 
@@ -169,7 +176,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             serpentTearOfferedNode.AddChoice("What should I do with it, Lily? ", lilyAdviceNode);
 
             lilyAdviceNode.AddChoice("Ok, goodbye Lily.", lilyFinalNodeTear, true);
-            lilyAdviceNode.AddChoice("I think you should take it? [Hand over Serpent's Tear]", lilyAcceptanceNode);
+            lilyAdviceNode.AddChoice("I think you should take it? [Hand over Serpent's Tear]", lilyAcceptanceNode); 
 
             lily.OnBeforeSpeakTo = (Soul soul, Character SpeakToCharacter) =>
             {
@@ -184,6 +191,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 if (SerpentsTearHandedOverToLily)
                 {
                     _ = soul.SendAsync(GetLilyTransformationScene());
+                    soul.CompletedGame = true;
                 }
             };
 

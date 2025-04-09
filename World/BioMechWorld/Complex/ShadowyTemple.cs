@@ -11,7 +11,7 @@ using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
 using static fire_ash_server.Helpers;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class ShadowyTemple
     {
@@ -23,7 +23,6 @@ namespace fire_ash_server.World.BioMechWorld
                 "The Atramentum",
                 "A solemn, austere space dominated by polished white stone. The air is cool and quiet, carrying a faint metallic tang mixed with the scent of old incense. A simple, imposing altar stands at the far end, illuminated by the natural light filtering in."
             );
-            templeOfShadowsAndTechnology.Light = Light.Dim;
 
             // Create an exit from the Main Hall to the Temple of Shadows and Technology
             Exit toTempleOfShadowsAndTechnology = new Exit(
@@ -68,13 +67,17 @@ namespace fire_ash_server.World.BioMechWorld
             altarPlaque.MakeUnpickupable(); // The plaque is a permanent fixture of the altar
             altar.AddItem(altarPlaque);
 
-            altarPlaque.OnAfterLookAt = (Soul soul) =>
+            altarPlaque.OnAfterLookAt = (soul) =>
             {
                 if (!soul.Character.HasFeat(FeatKey.Stealth))
                 {
                     soul.Character.AddFeat(FeatKey.Stealth);
                     _ = soul.SendAsync("* By the gods of this temple, you have been granted the feat: Stealth. *");
                 }
+                /*if (!soul.Character.HasFeat(FeatKey.PickPocket))
+                {
+                    soul.Character.AddFeat(FeatKey.PickPocket);
+                }*/
             };
 
             Item eternalQuill = new Item(
@@ -111,20 +114,22 @@ namespace fire_ash_server.World.BioMechWorld
             auroraTheShadowmancer.GoToRoom(templeOfShadowsAndTechnology);
             auroraTheShadowmancer.MoveToGroup(altar);
 
-            auroraTheShadowmancer.AddOnAfterMoveToEvent((Soul soul, Prop prop) =>
+            auroraTheShadowmancer.AddOnAfterMoveToEvent((soul) =>
             {
                 if (auroraTheShadowmancer.Dead)
-                    return;
+                    return Task.FromResult(false);
                 if (soul.Character.IsHidden())
-                    return;
+                    return Task.FromResult(false);
                 if (soul.Character.HP == soul.Character.CurrentHP)
-                    return;
+                    return Task.FromResult(false);
 
                 soul.Character.CurrentRoom.BroadcastToSoulsInRoom(
                     $"Aurora turns to greet {soul.Character.Name} with a serene smile. " +
                     $"She extends her hand, resting it lightly on {FormatPossessive(soul.Character.Name)} shoulder, " +
                     $"and a soothing warmth flows through them as she heals their wounds.");
                 soul.Character.GainLife(soul.Character.HP - soul.Character.CurrentHP);
+
+                return Task.FromResult(true);
             },
             false);
 
@@ -149,6 +154,7 @@ namespace fire_ash_server.World.BioMechWorld
             Weapon catClaws = new BeastClaw();
             catClaws.DamageDie = new Die(1, 1);
             nyx.DefaultHand = catClaws;
+            nyx.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
             nyx.IsInfluencer = false;
             nyx.GoToRoom(templeOfShadowsAndTechnology);
 

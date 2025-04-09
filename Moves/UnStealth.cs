@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class UnStealth : Move
     {
         public UnStealth(Soul soul) : base ("sh", "Leave shadows.")

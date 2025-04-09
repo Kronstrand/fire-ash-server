@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace fire_ash_server.Props
 {
+    [Serializable]
     internal class Exit : Prop
     {
         public Room GoToRoom;

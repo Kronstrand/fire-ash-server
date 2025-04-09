@@ -7,6 +7,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
+    [Serializable]
     internal class Sling : Weapon
     {
         public Sling(string name, string description) : base(name, description, new Die(1, 4), DamageType.Bludgeoning, 0.1)

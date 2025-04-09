@@ -30,12 +30,6 @@ namespace fire_ash_server.World.BioMechWorld
             );
             undergroundCavePath.Light = Light.Dim;
 
-            Exit exitToUndergroundCavePath = new Exit(
-                "Along the jagged stone walls, the last intact stretch of another bridge clings desperately, its stone slabs worn and cracked yet still forming a narrow passage.This precarious path leads to",
-                 "A set of stairs that descend deeper into the cavern's depths.",
-                 undergroundCavePath);
-            brokenBridge.AddExit(exitToUndergroundCavePath);
-
             Exit exitToBorkenBridge = new Exit(
                 "Through the cave wall",
                 "A tunnel, with carved stairs guiding the way, ascends upwards.",

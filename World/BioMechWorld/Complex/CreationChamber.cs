@@ -11,14 +11,14 @@ using fire_ash_server.Props;
 using static fire_ash_server.Helpers;
 using fire_ash_server.Dialogue;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class CreationChamber
     {
         private Room creationChamber;
         private Item emptyIncubatorPod;
 
-        public CreationChamber() 
+        public CreationChamber()
         {
             creationChamber = new Room(
                 Description(RoomKey.CreationChamber),
@@ -36,6 +36,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Soft, rhythmic humming fills the room, punctuated by the occasional hiss of escaping steam and the mechanical whirring of the Mother-Machine. " +
                 "This chamber is both a birthplace and a factory, a grotesque testament to the blending of technology and biology."
             );
+            creationChamber.Light = Light.Bright;
 
             emptyIncubatorPod = new Item(
                 "Incubator Pod",
@@ -105,8 +106,8 @@ namespace fire_ash_server.World.BioMechWorld
             Room incubator = new Room(
                 "Incubator" + GetNextId(),
                 "Incubator",
-                "You awaken in the confines of a small, enclosed space. The interior is soft and warm, " +
-                "lined with a flesh-like material that pulsates gently, mimicking the rhythm of a heartbeat. " +
+                //"You awaken in the confines of a small, enclosed space. The interior is soft and warm, " +
+                //"lined with a flesh-like material that pulsates gently, mimicking the rhythm of a heartbeat. " +
                 "The walls are covered with a translucent membrane, through which you can see the shadowy outlines " +
                 "of mechanical arms tending to other enclosures. The air inside is humid " +
                 "and carries the faint scent of antiseptic mixed with a more organic, almost comforting aroma. " +
@@ -120,10 +121,16 @@ namespace fire_ash_server.World.BioMechWorld
                 if (s.Character.CurrentRoom != incubator)
                     return;
 
-                _ = s.SendAsync($"Suddenly, the floor beneath {s.Character.Name} begins to shift and open. " +
+                /*_ = s.SendAsync($"Suddenly, the floor beneath {s.Character.Name} begins to shift and open. " +
                     $"The membrane tears away, and {s.Character.Name} is flushed out of the enclosed space in a rush of fluids, " +
                     $"tumbling into the larger chamber beyond. The fluid is warm and viscous, carrying {s.Character.Name} with surprising force. " +
                     $"As {s.Character.Name} emerges, they find themselves lying on a slick, metallic surface, " +
+                    $"surrounded by the eerie, mechanical environment of the larger chamber.");*/
+
+                _ = s.SendAsync($"Suddenly, the floor beneath you begins to shift and open. " +
+                    $"The membrane tears away, and you are flushed out of the enclosed space in a rush of fluids, " +
+                    $"tumbling into the larger chamber beyond. The fluid is warm and viscous, carrying you with surprising force. " +
+                    $"As you emerge, you find yourself lying on a slick, metallic surface, " +
                     $"surrounded by the eerie, mechanical environment of the larger chamber.");
                 _ = s.MoveCharToRoomAndSendDescriptionAsync(creationChamber);
                 s.Character.MoveToGroup(emptyIncubatorPod);
@@ -193,10 +200,14 @@ namespace fire_ash_server.World.BioMechWorld
 
             Action<Soul> releaseSentry = (s) =>
             {
-                s.Character.BroadcastToSoulsInRoom(
+                /*s.Character.BroadcastToSoulsInRoom(
                 $"As {s.Character.Name} struggles with the umbilical tube, an alarm sounds and a panel in the wall slides open. " +
                 $"From the darkness, a {ocularSentinel.Name} emerges, its single, red eye locking onto {s.Character.Name}. " +
-                "The living tube moves with a disturbing, serpentine grace, ready to attack.");
+                "The living tube moves with a disturbing, serpentine grace, ready to attack.");*/
+                s.Character.BroadcastToSoulsInRoom(
+                    $"As you struggle with the umbilical tube, an alarm sounds and a panel in the wall slides open. " +
+                    $"From the darkness, a {ocularSentinel.Name} emerges, its single red eye locking onto you. " +
+                    "The living tube moves with a disturbing, serpentine grace, ready to attack.");
                 ocularSentinel.GoToRoom(incubator);
                 ocularSentinel.MoveToGroup(s.Character);
 
@@ -214,24 +225,32 @@ namespace fire_ash_server.World.BioMechWorld
                 false,
                 async (s) =>
                 {
-                    s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
+                    /*s.Character.BroadcastToSoulsInRoom($"With a focused mind, {s.Character.Name} carefully examines the tube connected to their abdomen. " +
                     $"{s.Character.Name} notices the intricate mechanical elements, " +
                     "and with precise understanding, manages to disconnect it without causing harm. " +
-                    "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");
+                    "The tube detaches with a soft hiss, and they feel a slight release of pressure as it comes free.");*/
+                    s.Character.BroadcastToSoulsInRoom($"With a focused mind, you carefully examine the tube connected to your abdomen. " +
+                        $"You notice the intricate mechanical elements, " +
+                        "and with precise understanding, manage to disconnect it without causing harm. " +
+                        "The tube detaches with a soft hiss, and you feel a slight release of pressure as it comes free.");
                     incubatorRelease(s);
                     return "";
                 },
                 async (s) =>
                 {
-                    s.Character.BroadcastToSoulsInRoom(
+                    /*s.Character.BroadcastToSoulsInRoom(
                         $"The attempts of {s.Character.Name} to understand the connection between the tube and their body are in vain. " +
                         $"The mechanical elements are too complex to decipher, " +
-                        $"and {s.Character.Name} is unable to remove it.");
+                        $"and {s.Character.Name} is unable to remove it.");*/
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"Your attempts to understand the connection between the tube and your body are in vain. " +
+                        $"The mechanical elements are too complex to decipher, " +
+                        $"and you are unable to remove it.");
 
                     tubeMoveUsed++;
                     if (tubeMoveUsed == 1)
                         releaseSentry(s);
-                    else if ((tubeMoveUsed == 2))
+                    else if (tubeMoveUsed == 2)
                         s.Character.SetEnableCombatWith(ocularSentinel);
 
                     return "";
@@ -244,10 +263,15 @@ namespace fire_ash_server.World.BioMechWorld
                 false,
                 async (s) =>
                 {
-                    s.Character.BroadcastToSoulsInRoom(
+                    /*s.Character.BroadcastToSoulsInRoom(
                         $"{s.Character.Name} grips the tube firmly and yanks it away with a surge of brute strength. " +
                         "The connection resists at first, but sheer force overpowers it. " +
                         "The tube tears free with a violent jerk, and a brief sting of pain is felt before a rush of relief as it detaches. " +
+                        "Blood trickles from the wound left behind.");*/
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"You grip the tube firmly and yank it away with a surge of brute strength. " +
+                        "The connection resists at first, but sheer force overpowers it. " +
+                        "The tube tears free with a violent jerk, and a brief sting of pain shoots through you before a rush of relief as it detaches. " +
                         "Blood trickles from the wound left behind.");
                     s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
                     incubatorRelease(s);
@@ -255,17 +279,22 @@ namespace fire_ash_server.World.BioMechWorld
                 },
                 async (s) =>
                 {
-                    s.Character.BroadcastToSoulsInRoom(
+                    /*s.Character.BroadcastToSoulsInRoom(
                         $"{s.Character.Name} grasps the tube and pulls with all their might, but the connection holds firm. " +
                         "The blend of organic and mechanical elements proves too resilient, " +
                         $"and the effort leaves {s.Character.Name} exhausted with the tube still firmly attached. " +
-                        "Blood trickles from where the tube meets the skin.");
+                        "Blood trickles from where the tube meets the skin.");*/
+                    s.Character.BroadcastToSoulsInRoom(
+                        $"You grasp the tube and pull with all your might, but the connection holds firm. " +
+                        "The blend of organic and mechanical elements proves too resilient, " +
+                        "and the effort leaves you exhausted with the tube still firmly attached. " +
+                        "Blood trickles from where the tube meets your skin.");
                     s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name);
 
                     tubeMoveUsed++;
                     if (tubeMoveUsed == 1)
                         releaseSentry(s);
-                    else if ((tubeMoveUsed == 2))
+                    else if (tubeMoveUsed == 2)
                         s.Character.SetEnableCombatWith(ocularSentinel);
 
                     return "";

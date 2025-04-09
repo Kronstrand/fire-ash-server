@@ -11,7 +11,7 @@ using fire_ash_server.Props.Items.Weapons;
 using static fire_ash_server.Helpers;
 using static fire_ash_server.World.BioMechWorld.GlobalVariables;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class CaretakerRoom
     {
@@ -25,22 +25,25 @@ namespace fire_ash_server.World.BioMechWorld
                 "The room is eerily quiet, the stillness only occasionally disturbed by distant echoes of mechanical hums and faint dripping sounds. " +
                 "A desolate ambiance pervades the space, evoking a sense of abandonment and solitude."
             );
+            caretakerRoom.Light = Light.Bright;
 
             // Adding exit to the Enclosed Room
             Exit toCareTakersRoomFromNexusBridge = new Exit(
-                "In the middle of the bridge, branching eastward", 
+                "In the middle of the bridge, branching eastward",
                 "A staircase ascends, leading to a small, enclosed room.",
                 caretakerRoom);
             nexusBridge.AddExit(toCareTakersRoomFromNexusBridge);
 
-            toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul Soul, Prop p) =>
+            toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul) =>
             {
                 _ = Soul.SendAsync(
                     "A biomechanical rat scurries out from the enclosed room, " +
                     "its metallic spine glinting as it vanishes into the shadows."); // the caretakers rat
                 Soul.Character.CurrentRoom.BroadcastToSoulsInRoom("\"Aah Squee?! Where did you go now?\" " +
                     "a muffled, robotic-sounding voice emanates from the enclosed room.");
-            }, 
+
+                return Task.FromResult(true);
+            },
             true);
 
             Exit toNexusBridgeFromCaretakerRoom = new Exit(
@@ -66,6 +69,8 @@ namespace fire_ash_server.World.BioMechWorld
 
             // Adding exit to the Enclosed Room
             caretakerRoom.AddExit(exitToBackRoom);
+
+            ref Character vexisTheCaretaker = ref Program.GlobalVariables.vexisTheCaretaker;
 
             vexisTheCaretaker = new Character(
                 "Vexis",
@@ -198,7 +203,7 @@ namespace fire_ash_server.World.BioMechWorld
             // Evasiveness Node -> next
             vexisEvasivenessNode.AddChoice("Fine. Goodbye.", vexisGoodbyeNode);
             vexisEvasivenessNode.AddChoice("Tell me about Ezekiel.", vexisEzekielPuristsNode);
-            
+
 
             // Ezekiel & Purists Node -> exit or end
             vexisEzekielPuristsNode.AddChoice("I see. I'll find Ezekiel then.", vexisGoodbyeNode);
@@ -209,14 +214,16 @@ namespace fire_ash_server.World.BioMechWorld
             // Finally, assign this dialogue to Vexis
             vexisTheCaretaker.CreateDialogueManager(vexisIntroNode);
 
-            exitToBackRoom.OnBeforeExitEvent = async (Soul soul) =>
+            exitToBackRoom.OnBeforeExitEvent = async (soul) =>
             {
-                if (exitToBackRoom.IsInGroupWith(vexisTheCaretaker) != true)
+                if (exitToBackRoom.IsInGroupWith(Program.GlobalVariables.vexisTheCaretaker) != true)
                     return false;
 
                 _ = soul.SendAsync("Vexis is blocking the way...");
                 return true;
             };
+
+            ref DialogueNode vexisTemplePermissionNode = ref Program.GlobalVariables.vexisTemplePermissionNode;
 
             // player pass through
             vexisTemplePermissionNode = new DialogueNode(
@@ -250,10 +257,11 @@ namespace fire_ash_server.World.BioMechWorld
                 vexisTemplePermissionHumorous
             );
 
-            Action <DialogueManager> VexisGetOutOfTheWay = async (DialogueManager dm) => {
-                if (vexisTheCaretaker.IsInGroupWith(exitToBackRoom) == true)
+            Action<DialogueManager> VexisGetOutOfTheWay = async (dm) =>
+            {
+                if (Program.GlobalVariables.vexisTheCaretaker.IsInGroupWith(exitToBackRoom) == true)
                 {
-                    MoveTo move = new MoveTo(vexisTheCaretaker.Soul, toNexusBridgeFromCaretakerRoom);
+                    MoveTo move = new MoveTo(Program.GlobalVariables.vexisTheCaretaker.Soul, toNexusBridgeFromCaretakerRoom);
                     await move.Action();
                 }
             };

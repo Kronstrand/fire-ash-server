@@ -11,7 +11,7 @@ using fire_ash_server.Props.Items.Weapons;
 using System.Collections;
 using fire_ash_server.World.BioMechWorld.MainHall;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class Bazar
     {
@@ -27,6 +27,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "The air is thick with the scent of oil and metal, mingling with the hushed whispers of bartering Mecharions. " +
                 "Shadows dance across the walls as vendors showcase their wares, from weaponry and armor to mysterious artifacts and rare components."
             );
+            bazar.Light = Light.Bright;
 
             // Bazar -> Back Alley
             Exit exitFromBazarToBackAlley = new Exit(
@@ -76,19 +77,24 @@ namespace fire_ash_server.World.BioMechWorld
             weaponStallRoom.propsInImage.Add(weaponsTrader);
 
             weaponsTrader.AddOnAfterMoveToEvent(
-                (Soul soul, Prop movedToProp) =>
+                (soul) =>
                 {
-                    if (soul.Character.IsHidden()) return;
+                    if (soul.Character.IsHidden()) return Task.FromResult(false);
 
-                    Character movedToCharacter = (Character)movedToProp;
+                    Character movedToCharacter = weaponsTrader;
                     movedToCharacter.SetLookAt(soul.Character);
                     _ = soul.SendAsync($"{movedToCharacter.Name} gives you a measured look, a subtle nod suggesting you make a purchase or continue on your journey.");
+
+                    return Task.FromResult(true);
                 },
-                false);                 
+                false);
 
             weaponsTrader.AddToInventory(WeaponList.ColtARFifteen());
             weaponsTrader.AddToInventory(WeaponList.HolographicBlade());
             weaponsTrader.AddToInventory(WeaponList.LuminarBaton());
+            weaponsTrader.AddToInventory(WeaponList.Machete());
+            weaponsTrader.AddToInventory(ConsumableList.BookOfDualWield());
+            weaponsTrader.AddToInventory(new Coins(150, 25));
 
 
 
@@ -134,12 +140,16 @@ namespace fire_ash_server.World.BioMechWorld
             armorTrader.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
             armorTrader.GoToRoom(armorStallRoom);
 
-            armorTrader.AddOnAfterMoveToEvent(
-                (Soul soul, Prop movedToProp) =>
-                {
-                    if (soul.Character.IsHidden()) return;
+            armorTrader.AddToInventory(ArmorList.DriftersVest());
+            armorTrader.AddToInventory(ArmorList.MetalShield());
+            armorTrader.AddToInventory(new Coins(130, 30));
 
-                    Character movedToCharacter = (Character)movedToProp;
+            armorTrader.AddOnAfterMoveToEvent(
+                (soul) =>
+                {
+                    if (soul.Character.IsHidden()) return Task.FromResult(false);
+
+                    Character movedToCharacter = armorTrader;
                     string[] dialogues =
                     [
                         "Armor isn't just metal and plates; it's an art of the old world, refined with a touch of the future. What's your preference, antiquity or innovation?",
@@ -149,6 +159,8 @@ namespace fire_ash_server.World.BioMechWorld
                     Random random = new Random();
                     int index = random.Next(dialogues.Length);
                     movedToCharacter.Speak(dialogues[index]);
+
+                    return Task.FromResult(true);
                 },
                 false);
 
@@ -166,7 +178,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "In the other end",
                 "An anonomous door with a small sign reading 'Cogs & Curios'.",
                 artifactStallRoom);
-            entranceToartifactStallRoom.Hide(1);
+            entranceToartifactStallRoom.Hide(9);
 
             bazar.AddExit(entranceToartifactStallRoom);
 
@@ -198,6 +210,9 @@ namespace fire_ash_server.World.BioMechWorld
             artifactTrader.GoToRoom(artifactStallRoom);
 
             artifactTrader.AddToInventory(WeaponList.FlashLight());
+            artifactTrader.AddToInventory(ConsumableList.HealthPotion());
+            artifactTrader.AddToInventory(ConsumableList.ScrollOfEntanglement());
+            artifactTrader.AddToInventory(new Coins(90, 40));
 
             new MainHallRoom(bazar);
 

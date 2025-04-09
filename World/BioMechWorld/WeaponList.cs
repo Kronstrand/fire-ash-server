@@ -27,28 +27,42 @@ namespace fire_ash_server.World.BioMechWorld
 
         public static Weapon ColtARFifteen()
         {
-            Weapon coltRifle = new AssaultRifle(
-                "Colt AR-15",
+            Weapon blackBolt = new AssaultRifle(
+                "Blackbolt-15",
                 "A classic semi-automatic rifle, " +
                 "renowned for its reliability and precision, " +
                 "equipped with a robust barrel and a sleek, ergonomic design, " +
                 "exuding a sense of timeless power and modern efficiency.", 
-                40);
+                60);
 
-            return coltRifle;
+            return blackBolt;
         }
 
-        public static Weapon HolographicBlade()
+        public static Sword HolographicBlade()
         {
-            Weapon holographicBlade = new Dagger(
+            Sword holographicBlade = new Sword(
                 "Holographic Blade",
                 "A sleek, high-tech blade that shimmers with a holographic edge, designed for both precision and style. " +
                 "Its handle is wrapped in synthetic leather, providing a comfortable grip.");
-            holographicBlade.VendorValue = 250;
+            holographicBlade.VendorValue = 110;
             holographicBlade.Modifier = +1;
             holographicBlade.AddEquipEffect(EffectKey.DimLight);
 
             return holographicBlade;
+        }
+
+        public static Sword CeremonialBlade()
+        {
+            Sword ceremonialBlade = new Sword(
+                "Ceremonial Blade",
+                "A finely crafted sword used in sacred rituals and rites. Its blade is adorned with intricate engravings, " +
+                "and the hilt is wrapped in deep crimson cloth. Though primarily designed for ceremony, " +
+                "it remains a sharp and deadly weapon in the hands of a skilled wielder.");
+
+            ceremonialBlade.VendorValue = 250;
+            ceremonialBlade.Modifier = +2;
+
+            return ceremonialBlade;
         }
 
         public static Weapon LuminarBaton()
@@ -60,7 +74,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "polished metal and segments of translucent crystal. " +
                 "The core of the baton houses a sophisticated energy conduit that channels light through the crystalline segments, " +
                 "causing them to glow with a soft, pulsating light",
-                10);
+                25);
             luminarBaton.AddEquipEffect(EffectKey.BrightLight);
 
             return luminarBaton;
@@ -89,6 +103,19 @@ namespace fire_ash_server.World.BioMechWorld
             return stoneknife;
         }
 
+        public static Weapon WhiteCandle()
+        {
+            Club whiteCandle = new Club(
+                "White Candle",
+                "A simple white candle made of wax with a steady-burning wick. " +
+                "It is unremarkable in appearance but can be used as a makeshift weapon in desperate situations.",
+                0.5);
+            whiteCandle.DamageDie = new Die(1, 1);
+            whiteCandle.AddEquipEffect(EffectKey.DimLight);
+
+            return whiteCandle;
+        }
+
         public static ShortBow TribalShortBow()
         {
             ShortBow tribalShortBow = new ShortBow(
@@ -110,6 +137,18 @@ namespace fire_ash_server.World.BioMechWorld
                 "Despite its decay, the sword holds a lingering aura of past battles.");
 
             return rustedSword;
+        }
+
+
+        public static Sword Machete()
+        {
+            Sword machete = new Sword(
+                "Machete",
+                "A broad, single-edged blade with a brutal, unpretentious design. " +
+                "Its weight is perfectly measured for hacking through dense obstacles, " +
+                "while the slight curve ensures each strike bites deep.");
+
+            return machete;
         }
     }
 }

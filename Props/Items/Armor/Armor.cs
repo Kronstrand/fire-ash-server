@@ -7,6 +7,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items.Armor
 {
+    [Serializable]
     internal class Armor: Item
     {
         public int AC;

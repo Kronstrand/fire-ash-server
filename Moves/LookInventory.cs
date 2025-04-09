@@ -10,6 +10,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class LookInventory : Move
     {
         public LookInventory(Soul soul) : this(soul, soul.Character, "Iventory")
@@ -31,6 +32,8 @@ namespace fire_ash_server.Moves
 
                 Action = async () =>
             {
+                soul.Character.lookAtBeforeInventory = soul.Character.LookAt;
+
                 bool hasEquippedItem = (targetCharacter.EquippedItems.Count  > 0);
                 bool hasInventoryItem = (targetCharacter.Inventory.Items.Count > 0);
 

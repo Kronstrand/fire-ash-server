@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class StopBrowseGoods : Move
     {
         public StopBrowseGoods(Soul soul) : base(MoveKey.bg.ToString(), $"Stop Trading..")

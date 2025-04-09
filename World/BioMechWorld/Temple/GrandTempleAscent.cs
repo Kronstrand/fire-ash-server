@@ -41,15 +41,17 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             Room wellRoom =  WellRoom.Create(grandTempleAscent);
 
             Exit toMainTemple = new Exit(
-                "In the center of the camber",
-                "A grand staircase ascends toward towards the entrance to the main temple - a sanctum threashold, " +
+                "In the center of the chamber",
+                "A grand staircase ascends toward towards the entrance to the main temple - the sanctum threashold, " +
                 "its steps worn from centuries of passage.",
                 wellRoom);
             grandTempleAscent.AddExit(toMainTemple);
 
-            /*Character shadecreeper = MonsterCreator.Shadecreeper();
+            Character shadecreeper = MonsterCreator.Shadecreeper();
+            shadecreeper.AddToInventory(ConsumableList.HealthPotion());
+            shadecreeper.AddToInventory(ConsumableList.ScrollOfEntanglement());
             shadecreeper.GoToRoom(grandTempleAscent);
-            shadecreeper.MoveToGroup(toMainTemple);*/
+            shadecreeper.MoveToGroup(toMainTemple);
 
             return grandTempleAscent;
         }

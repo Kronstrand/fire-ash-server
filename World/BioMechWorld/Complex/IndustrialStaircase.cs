@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Props;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class IndustrialStaircase
     {

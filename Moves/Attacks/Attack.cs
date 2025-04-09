@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
+using fire_ash_server.Props.Items.Weapons;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves.Attacks
 {
+    [Serializable]
     internal class Attack : Move
     {
         public Attack(string key, string description, Character characterToAttack, RangeType rangeType) : base(key, description, characterToAttack)
@@ -21,7 +23,7 @@ namespace fire_ash_server.Moves.Attacks
 
         public override bool IsValid(Soul soul)
         {
-            if (soul.Character.LookAt == null)
+            /*if (soul.Character.LookAt == null)
                 return false;
 
             if (soul.Character.LookAt is Character)
@@ -37,10 +39,42 @@ namespace fire_ash_server.Moves.Attacks
                 if (!characterToAttack.Dead && !characterToAttack.IsHidden())
                     return true;            
             }
+            return false;*/
+            if (Range == RangeType.RangeSingleTarget)
+            {
+                return AttackIsValid(soul, Range, soul.Character.GetRangedWeapon(), soul.Character.LookAt);
+            }
+
+            return AttackIsValid(soul, Range, null, soul.Character.LookAt);
+        }
+
+        public static void InvalidAttack(Soul soul)
+        {
+            _ = soul.SendAsync("There is no valid target.");
+        }
+
+        public static bool AttackIsValid(Soul soul, RangeType range, Weapon? rangedWeapon, Prop? target)
+        {
+            if (target == null)
+                return false;
+
+            if (target is Character)
+            {
+                Character characterToAttack = (Character)target;
+                if (characterToAttack.GetLightState(soul.Character) == Light.Darkness)
+                    return false;
+                if (range == RangeType.CloseSingleTarget && soul.Character.IsInGroupWith(characterToAttack) != true)
+                    return false;
+                if (range == RangeType.RangeSingleTarget && rangedWeapon == null)
+                    return false;
+
+                if (!characterToAttack.Dead && !characterToAttack.IsHidden())
+                    return true;
+            }
             return false;
         }
 
-        public bool TryAttack(Character character, Character characterToAttack, Action<Character> attackAction)
+        public bool TryAttack(Character character, Character characterToAttack, Weapon? weapon, Action<Character, Weapon?> attackAction)
         {
             if (!character.AttackTargetIsWithinReach(characterToAttack, Range))
             {
@@ -59,7 +93,7 @@ namespace fire_ash_server.Moves.Attacks
                     return true;
                 }
             }
-            attackAction(characterToAttack);
+            attackAction(characterToAttack, weapon);
             return true;
         }
 

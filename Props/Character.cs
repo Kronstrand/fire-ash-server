@@ -12,14 +12,17 @@ using static fire_ash_server.Helpers;
 using fire_ash_server.World;
 using System.Linq;
 using System.Collections.Concurrent;
+using System.Xml.Linq;
 
 namespace fire_ash_server.Props
 {
+    [Serializable]
     internal class Character : Prop
     {
         public Room CurrentRoom;
         public Room? LastRoom;
         private Prop? lookAt;
+        public Prop? lookAtBeforeInventory;
         public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
         private List<CreatureType> types;
         public Kindred Kindred { get; set; }
@@ -38,7 +41,7 @@ namespace fire_ash_server.Props
         public bool UniqueName;
 
         public List<string> Feats = new List<string>();
-        public List<Action<Character>> Conditions = new List<Action<Character>>();
+        public ThreadSafeList<ActiveCondition> Conditions = new ThreadSafeList<ActiveCondition>(); 
         public Faction Faction;
         public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
 
@@ -57,7 +60,7 @@ namespace fire_ash_server.Props
         public ToxicRelationship? EnableCombatWith = null;
         public bool InCombat;
         public bool Dead;
-        public string DeathDescription;
+        public string deathDescription;
         public Soul Soul;
 
         public static Dictionary<string, List<Func<string, string, string>>> hitReactions = new Dictionary<string, List<Func<string, string, string>>>();
@@ -88,7 +91,8 @@ namespace fire_ash_server.Props
 
             Faction = NewPlayerFaction(Name);
 
-            DeathDescription = "todo"; //Todo
+            DeathDescription = "";
+
         }
         public Character(string name, string description, Kindred kindred, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
         {
@@ -119,6 +123,17 @@ namespace fire_ash_server.Props
             Inventory.HeldBy = this;
         }
 
+        public string DeathDescription
+        {
+            get 
+            {
+                if (deathDescription == "")
+                    return $"{Name} lies motionless, their frame slumped as if the weight of existence itself had finally become too much. No grand farewell, no final words, just the quiet departure of something that was here, and now is not..";
+                return deathDescription; 
+            } 
+            set { deathDescription = value; }
+        }
+
         public static Faction NewPlayerFaction(string name)
         {
             return Program.WorldSoul.GetFaction(FactionKey.Players);
@@ -144,18 +159,118 @@ namespace fire_ash_server.Props
 
         public int HP
         {
-            get
-            {
-                return hp;
-            }
+            get => hp;
             set
             {
-                if (CurrentHP == 0)
-                    CurrentHP = value;
-                else if (CurrentHP > 0)
-                    CurrentHP += value - hp;
-                hp = value;
+                if (value < 0)
+                    throw new ArgumentException("HP cannot be negative.");
+
+                int diff = value - hp; // Calculate the difference between the new HP and the current HP
+
+                if (diff > 0) // If HP is being increased
+                {
+                    CurrentHP = Math.Min(CurrentHP + diff, value); // Add the difference to CurrentHP, but not exceeding new HP
+                }
+                else if (diff < 0) // If HP is being decreased
+                {
+                    CurrentHP = Math.Max(0, CurrentHP + diff); // Subtract the difference from CurrentHP, but not below zero
+                }
+
+                hp = value; // Finally, set the new HP value
             }
+        }
+
+        public bool HasCondition(Condition condition)
+        {
+            foreach(ActiveCondition activeCondition in Conditions)
+            {
+                if (activeCondition.Condition == condition)
+                    return true;
+            }
+            return false;
+        }
+
+        public void TickConditionsDown(bool endOfCombat)
+        {
+            TickConditionsDown(endOfCombat, true);
+        }
+            public void TickConditionsDown(bool endOfCombat, bool broardcast)
+        {
+            List<Condition> removedConditions = new List<Condition>();
+            ThreadSafeList<ActiveCondition> ConditionsToBeRemoved = new ThreadSafeList<ActiveCondition>();
+            foreach (ActiveCondition activeCondition in Conditions)
+            {
+                if (endOfCombat)
+                    activeCondition.Turns = 0;
+                else
+                {
+                    if (activeCondition.CreatedThisTurn)
+                    {
+                        activeCondition.CreatedThisTurn = false;
+                        continue;
+                    }
+                    activeCondition.Turns--;
+                }
+
+                if (activeCondition.Turns == 0)
+                {
+                    if (!removedConditions.Contains(activeCondition.Condition))
+                        removedConditions.Add(activeCondition.Condition);
+                    ConditionsToBeRemoved.Add(activeCondition);
+                }
+            }
+            Conditions.RemoveAll(ConditionsToBeRemoved);
+
+            string endOfCombatOrTurn = "their turn";
+            if (endOfCombat)
+                endOfCombatOrTurn = "combat";
+
+            string conditions = "";
+            for (int i = 0; i < removedConditions.Count; i++)
+            {
+                if (i == 0)
+                    conditions += $"At end of {endOfCombatOrTurn}, {Name} is no longer " + Description(removedConditions[i]);
+                //not last item
+                else if (i + 1 != removedConditions.Count)
+                {
+                    conditions += $", {Description(removedConditions[i])}";
+                }
+                //last item and not first
+                else
+                {
+                    conditions += $", and {Description(removedConditions[i])}";
+                }
+
+                if (i + 1 == removedConditions.Count)
+                    conditions += ".";
+            }
+            if (conditions != "" && broardcast)
+                BroadcastToSoulsInRoom(conditions);
+        }
+
+        public void BroadcastActiveConditions()
+        {
+            string conditions = "";
+            for (int i = 0; i < Conditions.Count; i++)
+            {
+                if (i == 0)
+                    conditions += $"{Name} is " + Description(Conditions.GetAt(i).Condition);
+                //not last item
+                else if (i + 1 != Conditions.Count)
+                {
+                    conditions += $", {Description(Conditions.GetAt(i).Condition)}";
+                }
+                //last item and not first
+                else
+                {
+                    conditions += $", and {Description(Conditions.GetAt(i).Condition)}";
+                }
+
+                if (i + 1 == Conditions.Count)
+                    conditions += ".";
+            }
+            if (conditions != "")
+                BroadcastToSoulsInRoom(conditions);
         }
 
         public double GetTotalCoinValue()
@@ -165,39 +280,45 @@ namespace fire_ash_server.Props
                 return 0.0;
             return coins.Gold + (coins.Silver * 0.1);
         }
-        public void TransferCoinTo(Character toCharacter, int gp, int silver)
+        public Tuple<int, int> TransferCoinTo(Character toCharacter, int gp, int silver)
         {
             Coins? coins = GetCoins();
             if (coins == null)
                 coins = new Coins(0, 0);
 
             //antagelse: der er nok total
-            if (coins.Gold >= gp && coins.Silver >= silver)
+            if (coins.Gold >= gp && coins.Silver >= silver) //giver has enough gold and silver
             {
                 TransferExactCoinTo(toCharacter, gp, silver);
+                return Tuple.Create(gp, silver);
             }
-            else if(coins.Gold < gp)
+            else if(coins.Gold < gp) //giver has too little gold so gives the rest in silver
             {
                 int gpTransfered = coins.Gold;
                 int silverTransfered = silver + ((gp - gpTransfered) * 10);
 
                 TransferExactCoinTo(toCharacter, gpTransfered, silverTransfered);
+                return Tuple.Create(gpTransfered, silverTransfered);
             }
-            else if (coins.Silver < silver)
+            else if (coins.Silver < silver) //giver has too little silver so gives it in gold (round up)
             {
                 int silverTransfered = coins.Silver;
                 double result = gp + ((silver - silverTransfered) * 0.1);                
                 int gpTransfered = (int)Math.Ceiling(result);
-                int fractionalSilverPart = (int)((gpTransfered - result) * 10);
-                silverTransfered -= fractionalSilverPart;
 
                 TransferExactCoinTo(toCharacter, gpTransfered, silverTransfered);
+                return Tuple.Create(gpTransfered, silverTransfered);
             }
+
+            return Tuple.Create(0, 0);
 
         }
 
         private void TransferExactCoinTo(Character toCharacter, int gp, int silver)
         {
+            if (gp == 0 && silver == 0)
+                return;
+
             toCharacter.AddCoins(new Coins(gp, silver));
             RemoveCoins(new Coins(gp, silver));
         }
@@ -274,7 +395,7 @@ namespace fire_ash_server.Props
             Relationship rel = GetRelationShipTo(character);
             rel.Value += modifier;
 
-            string message = "";
+            /*string message = "";
 
             if (modifier > 0)
             {
@@ -308,7 +429,7 @@ namespace fire_ash_server.Props
             }
 
             if (message != "")
-                CurrentRoom.BroadcastToSoulsInRoom(message);
+                CurrentRoom.BroadcastToSoulsInRoom(message);*/
 
         }
 
@@ -399,7 +520,10 @@ namespace fire_ash_server.Props
 
         public void GainLife(int addHp)
         {
-            CurrentHP += addHp;
+            if (CurrentHP + addHp > HP)
+                CurrentHP = HP;
+            else
+                CurrentHP += addHp;
             SendCurrentHpSate();
         }
 
@@ -448,12 +572,8 @@ namespace fire_ash_server.Props
             return ac;
         }
 
-        public string? GetRangedAttackDescription(Prop prop)
+        public string? GetRangedAttackDescription(Weapon weapon, Prop prop)
         {
-            Weapon? weapon = GetRangedWeapon();
-            if (weapon == null)
-                return null;
-
             return weapon.GetAttackDescription(Name, prop);
         }
 
@@ -561,12 +681,14 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public void AttackWithRanged(Character characterToAttack)
+        public void AttackWithRangedWeapon(Character characterToAttack, Weapon? weapon)
         {
-            Weapon? weapon = GetRangedWeapon();
-            if (weapon == null) 
+            if (weapon == null)  
+                weapon = GetRangedWeapon();
+            if (weapon == null)
                 return;
-            string? attack = GetRangedAttackDescription(characterToAttack);
+
+            string? attack = GetRangedAttackDescription(weapon, characterToAttack);
             Roll roll = GetRangedAttackRoll(weapon);
             if (roll.GetSum() >= characterToAttack.GetAC())
             {
@@ -585,8 +707,9 @@ namespace fire_ash_server.Props
             }
         }
 
-        public void AttackWithMainHand(Character characterToAttack)
+        public void AttackWithMainHand(Character characterToAttack, Weapon? weaponOverride)
         {
+            //weapon override not implemented.
             string? attack = GetMainHandAttackDescription(characterToAttack);
             Weapon weapon = GetMainHand();
             Roll roll = GetMeleeAttackRoll(weapon);
@@ -615,8 +738,9 @@ namespace fire_ash_server.Props
             return 10 + GetModifer(ability);
         }
 
-        public void AttackWithOffhand(Character characterToAttack)
+        public void AttackWithOffhand(Character characterToAttack, Weapon? weaponOverride)
         {
+            //weapon override not implemented.
             string? attack = GetOffHandAttackDescription(characterToAttack);
             Weapon wapon = GetOffHand();
             Roll roll = GetMeleeAttackRoll(wapon);
@@ -636,8 +760,9 @@ namespace fire_ash_server.Props
             }
         }
 
-        public void AttackWithTeeth(Character characterToAttack)
+        public void AttackWithTeeth(Character characterToAttack, Weapon? weaponOverride)
         {
+            //weapon override not implemented.
             string? attack = GetTeethAttackDescription(characterToAttack);
             Weapon weapon = GetTeethWeapon();
             Roll roll = GetMeleeAttackRoll(weapon);
@@ -650,7 +775,10 @@ namespace fire_ash_server.Props
                     weapon.Name,
                     attack + SingleHitMessage(roll),
                     true);
-                    
+                
+                if (characterToAttack.Dead)
+                    return;
+
                 //poison damage    
                 Roll savingThrow = new Roll(characterToAttack.GetModifer(Ability.Constitution), RollType.SavingThrow, characterToAttack);
                 if (!savingThrow.BeatsDC(13))
@@ -755,7 +883,7 @@ namespace fire_ash_server.Props
         public void SetLookAt(Prop prop)
         {
             lookAt = prop;
-            if (LookedAt.Count == 0 || !ReferenceEquals(prop, LookedAt.GetAt(0)))
+            if (LookedAt.Count == 0 || LookedAt.GetAt(LookedAt.Count - 1) != prop)
                 LookedAt.Add(prop);
         }
         public Prop? LookAt
@@ -783,6 +911,7 @@ namespace fire_ash_server.Props
                 "Name: " + Name + "\n" +
                 "Kindred: " + Kindred + "\n" +
                 "Gender: " + Description(Gender) + "\n" +
+                "Health Points: " + HP + "\n" +
                 "Strength: " + Strength + "\n" +
                 "Dexterity: " + Dexterity + "\n" +
                 "Constitution: " + Constition + "\n" +
@@ -1035,5 +1164,6 @@ namespace fire_ash_server.Props
         {
             return Feats.Contains(Description(key));
         }
+
     }
 }

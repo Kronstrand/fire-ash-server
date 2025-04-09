@@ -27,6 +27,7 @@ namespace fire_ash_server.Enums
         UndergroundCavePath,
         SerpentsSpine,
         TempleCourtyard,
-        UndergroundStudy
+        UndergroundStudy,
+        AncientHallway
     }
 }

@@ -13,6 +13,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class Move
     {
         public string Key;
@@ -28,6 +29,7 @@ namespace fire_ash_server.Moves
         public MoveType Type = MoveType.Action;
         public bool EnablesCombat;
         public RangeType Range = RangeType.CloseSingleTarget;
+        public bool IsMovement = false;
 
         public Move(string key, string description, Func<Task> action)
         {
@@ -85,18 +87,32 @@ namespace fire_ash_server.Moves
 
             if (Type == MoveType.Action)
                 characters = Prop.GetCharactersLookingAt().Where(c => c != character && character.GetRelationshipStatus(c) != RelationshipStatus.good).ToList();
-                
             if (Prop is Character && ((Character)Prop != character) && ((Character)Prop).GetRelationshipStatus(character) != RelationshipStatus.good)
                 characters.Add((Character)Prop);
+            if (this is MoveTo)
+            {
+                Grouping? grouping = Prop.GetGrouping();
+                if (grouping != null)
+                    foreach (Character c in grouping.Props.OfType<Character>().Where(c => c != character).ToList())
+                        if (!characters.Contains(c))
+                            characters.Add(c);
+            }
 
             if (characters.Any())
             {
                 int targetDC = 0;
                 foreach (Character lookingChar in characters)
+                {
                     targetDC += lookingChar.GetModifer(Skill.Perception);
+                    if (lookingChar.IsInGroupWith(character) == true)
+                        targetDC += lookingChar.GetModifer(Skill.Perception) + 3;
+                }
+
                 targetDC = Math.Max(targetDC, 1);
 
                 Roll stealthRoll = new Roll(character.GetModifer(Skill.Stealth), RollType.SkillCheck, character);
+
+                Console.WriteLine($"{character.Name} has to beat DC {targetDC} to stay stealthed and rolled {stealthRoll}");
 
                 if (!stealthRoll.BeatsDC(targetDC))
                 {
@@ -111,7 +127,9 @@ namespace fire_ash_server.Moves
                     {
                         message = $"{character.Name} fails to stay hidden with a roll of {stealthRoll} and is aggressively engaged by {target.Name}.";
                         EnablesCombat = true;
+                        character.EnableCombatWith = new ToxicRelationship(target, false);
                         Type = MoveType.Action;
+                        
                     }
                     else //if is neutral
                     {
@@ -202,6 +220,39 @@ namespace fire_ash_server.Moves
                             activeCharacter.EnableCombatWith = new ToxicRelationship(soul.Character, true);
                 }
 
+            }
+        }
+
+        public void TriggerHostileCloseCombat(Soul soul, Prop targetProp)
+        {
+            Grouping? grouping = targetProp.GetGrouping();
+            if (grouping != null)
+            {
+                foreach (Prop prop in grouping.Props)
+                {
+                    if (!(prop is Character))
+                        continue;
+
+                    Character character = (Character)prop;
+                    if (character == soul.Character || !character.InitAttack)
+                        continue;
+
+                    if (character.GetRelationShipTo(soul.Character).IsHostile())
+                    {
+                        EnablesCombat = true;
+                        soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
+                        return;
+                    }
+                }
+            }
+            else if (targetProp is Character)
+            {
+                Character character = (Character)targetProp;
+                if (character.InitAttack && character.GetRelationShipTo(soul.Character).IsHostile())
+                {
+                    EnablesCombat = true;
+                    soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
+                }
             }
         }
     }

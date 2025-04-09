@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class BrowseGoods : Move
     {
         public BrowseGoods(Soul soul, Character targetCharacter) : base(MoveKey.bg.ToString(), $"Buy from {targetCharacter.Name}", targetCharacter)

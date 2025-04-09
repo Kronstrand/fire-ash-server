@@ -8,6 +8,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Moves.Attacks
 {
+    [Serializable]
     internal class DuelWieldAttack : Attack
     {
         public DuelWieldAttack(Soul soul, Character characterToAttack) : base(MoveKey.aa.ToString(), $"Attack {characterToAttack.Name}. (Dual Wield)", characterToAttack, RangeType.CloseSingleTarget)
@@ -19,12 +20,13 @@ namespace fire_ash_server.Moves.Attacks
 
             Character character = soul.Character;
 
-            Action = async () =>
+            Action = () =>
             {
-                if (!TryAttack(character, characterToAttack, character.AttackWithMainHand)) return;
+                if (!TryAttack(character, characterToAttack, null, character.AttackWithMainHand)) return Task.CompletedTask;
                 if (characterToAttack.Dead)
-                    return;
-                if (!TryAttack(character, characterToAttack, character.AttackWithOffhand)) return;
+                    return Task.CompletedTask;
+                TryAttack(character, characterToAttack, null, character.AttackWithOffhand);
+                return Task.CompletedTask;
             };
         }
 

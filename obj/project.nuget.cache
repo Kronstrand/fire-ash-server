@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "KCQRmgq65ik=",
+  "dgSpecHash": "zFZ798nq+yU=",
   "success": true,
   "projectFilePath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\jkkn\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

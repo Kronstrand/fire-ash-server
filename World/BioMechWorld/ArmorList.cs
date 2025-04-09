@@ -37,6 +37,31 @@ namespace fire_ash_server.World.BioMechWorld
             return wornWoodenShield;
         }
 
+        public static Shield MetalShield()
+        {
+            Shield metalShield = new Shield(
+                "Metal Shield",
+                "A solid, well-crafted shield forged from reinforced steel. " +
+                "Its smooth surface bears only the faintest hammer marks from its forging, " +
+                "and the edges are lined with rivets for added durability.",
+                16);
+
+            return metalShield;
+        }
+
+        public static Armor DriftersVest()
+        {
+            return new Armor(
+            "Drifter's Vest",
+            "A reinforced vest woven with interlocking metal fibers, offering protection without sacrificing mobility. " +
+            "The dark, matte plating is layered beneath a flexible, synthetic fabric, " +
+            "designed to absorb impact while allowing free movement. " +
+            "Sturdy yet unrestrictive, it’s favored by scouts and wanderers alike.",
+            ac: 13,
+            value: 30);
+        
+        }
+
         public static Armor WardensScales()
         {
             return new Armor(
@@ -45,8 +70,8 @@ namespace fire_ash_server.World.BioMechWorld
                 "gleaming metal plates, each shaped like the scales of a serpent. " +
                 "Brass accents form intricate snake motifs along the shoulders and chest, " +
                 "and the faint glint of ruby inlays gives it a watchful, protective aura. ",
-                ac: 15,
-                value: 120
+                ac: 14,
+                value: 110
             );
         }
 

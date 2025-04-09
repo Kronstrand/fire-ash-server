@@ -13,6 +13,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items
 {
+    [Serializable]
     internal class Item : Prop
     {
         public Prop? HeldBy;
@@ -21,6 +22,7 @@ namespace fire_ash_server.Props.Items
         public bool Sellable = true;
         public ThreadSafeList<InventorySlot> CarriableByInventorySlots = new ThreadSafeList<InventorySlot>();
         public List<Effect> EquipEffects = new List<Effect>();
+        public Character? SetBy;
 
         public Item(string name, string description, double value) : base(name, description)
         {
@@ -115,7 +117,7 @@ namespace fire_ash_server.Props.Items
 
         public double GetSellPriceFromVendor(Character buyFrom)
         {
-            return Math.Round(VendorValue * (1 - buyFrom.tradeModifier), 2);
+            return Math.Round(VendorValue * (1 - buyFrom.tradeModifier), 2); //maybe just 1, not 2
         }
 
     }

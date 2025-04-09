@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 
 namespace fire_ash_server.Props
 {
+    [Serializable]
     internal class Room : Prop
     {
         public string RoomKey;
@@ -39,8 +40,15 @@ namespace fire_ash_server.Props
         public Room(string roomKey,string name, string description) : base(name, description)
         {   
             RoomKey = roomKey;
-            Light = Light.Bright;
+            Light = Light.Dim;
             Program.WorldSoul.AddRoom(this);
+        }
+        public Room(string roomKey, string name, string description, bool skipAddToRoom) : base(name, description)
+        {
+            RoomKey = roomKey;
+            Light = Light.Dim;
+            if (!skipAddToRoom)
+                Program.WorldSoul.AddRoom(this);
         }
 
         public Room(RoomKey roomKey, string name, string description) : this(Description(roomKey), name, description)
@@ -65,6 +73,9 @@ namespace fire_ash_server.Props
         }
         public string GetAdditionalRoomDescription(Character lookingCharacter)
         {
+            if (GetLightState(lookingCharacter) == Light.Darkness)
+                return "";
+
             string description = "";
 
             List<Exit> exitList = Exits.Where(e => !e.IsHidden()).ToList();
@@ -293,8 +304,8 @@ namespace fire_ash_server.Props
                             output += " close at hand";
                         else if (groupedCountedProp.Prop != null)
                             output += " at the " + groupedCountedProp.Prop.Name;
-                        /*else if (groupedCountedProp.Prop == null)
-                            output += $" is also here";*/
+                        else if (groupedCountedProp.Prop == null)
+                            output += $" unaccompanied";
 
                         string itemsAsString = ListItemsAsString(lookingCharacter, groupedCountedProp.Prop);
                         if (itemsAsString != "")
@@ -410,24 +421,21 @@ namespace fire_ash_server.Props
         {
             InCombat = false;
 
+            if (broadcast)
+            {
+                BroadcastToSoulsInRoom($"Combat is resolved.");
+            }
             foreach (Character character in Characters.Where(c => c.InCombat))
             {
                 character.InCombat = false;
+                character.TickConditionsDown(true);
             }
-            if (broadcast)
-                BroadcastToSoulsInRoom($"Combat is resolved.");
+            
             Console.WriteLine("Combat has ended.");
+
+
             
             RunOnAfterCombatEvents();
-        }
-
-        public void TestCombatIsResolved()
-        {
-            if (!InCombat)
-                return;
-
-            if (CombatIsResolved())
-                DisableCombat(true);
         }
 
         private bool CombatIsResolved()
@@ -539,9 +547,9 @@ namespace fire_ash_server.Props
                     Console.WriteLine(character.Name + " is in combat.");
                 }
 
-                //activeOrderedCombatCharsInRound = orderedCombatChars.Where(c => c.InCombat).ToList();
                 foreach (Character character in orderedCombatChars)
                 {
+                    bool skipLoop = false;
                     bool playerTurnBroadcasted = false;
                     
                     bool ActionUsed = false;
@@ -549,41 +557,52 @@ namespace fire_ash_server.Props
                     {
                         character.Soul.ClearMoves();
                         character.Soul.GeneratePossibleMoves();
-                        if (character.Soul.ShownPossibleMoves.Count == 0)
-                            throw new Exception("We need moves...");
-                        if (!character.Soul.IsDaemon)
+
+                        character.BroadcastActiveConditions();
+                        if (character.HasCondition(Condition.Stunned) || character.Soul.ShownPossibleMoves.Count == 0)
                         {
-                            try
-                            {                          
-                                await character.Soul.SendPossibleMovesAsync();
-                                if (!playerTurnBroadcasted)
+                            ActionUsed = true;
+                            skipLoop = true;
+                        }
+
+                        Console.WriteLine($"{character.Name} has {character.Soul.ShownPossibleMoves.Count} moves");
+                        if (!skipLoop)
+                        {                          
+                            if (!character.Soul.IsDaemon)
+                            {
+                                try
                                 {
-                                    BroadcastToSoulsInRoom($"{character.Name} has the initiative...");
-                                    playerTurnBroadcasted = true;
+                                    await character.Soul.SendPossibleMovesAsync();
+                                    if (!playerTurnBroadcasted)
+                                    {
+                                        BroadcastToSoulsInRoom($"{character.Name} has the initiative...");
+                                        playerTurnBroadcasted = true;
+                                    }
+                                    Move? nextMove = await character.Soul.ReceiveAndHandleMoveAsync(false);
+                                    ActionUsed = await ExecuteCombatAction(character, nextMove);
+                                    character.TryEnableCombat();
                                 }
-                                Move? nextMove = await character.Soul.ReceiveAndHandleMoveAsync(false);
+                                catch (OperationCanceledException)
+                                {
+                                    Console.WriteLine($"{character.Name} combat loop was interrupted by player loop.");
+                                    //do nothing, this should rarely happen. (if ever)
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.ToString());
+                                    character.Soul.Banish();
+                                }
+                            }
+                            else
+                            {
+                                Move? nextMove = character.Soul.DaemonChoosesNextMove();
+                                if (nextMove != null && nextMove.Type != MoveType.MinorAction)
+                                    await Task.Delay(1500);
                                 ActionUsed = await ExecuteCombatAction(character, nextMove);
                                 character.TryEnableCombat();
                             }
-                            catch (OperationCanceledException)
-                            {
-                                Console.WriteLine($"{character.Name} combat loop was interrupted by player loop.");
-                                //do nothing, this should rarely happen. (if ever)
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-                                character.Soul.Banish();  
-                            }
                         }
-                        else
-                        {
-                            Move? nextMove = character.Soul.DaemonChoosesNextMove();
-                            if (nextMove != null && nextMove.Type != MoveType.MinorAction)
-                                await Task.Delay(1500);
-                            ActionUsed = await ExecuteCombatAction(character, nextMove);
-                            character.TryEnableCombat();
-                        }                       
+                        character.TickConditionsDown(false);
                     }
                     if (TestCombatReslovedIsFlagged())
                         if (CombatIsResolved())

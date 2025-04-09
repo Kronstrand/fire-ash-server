@@ -9,6 +9,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
+    [Serializable]
     internal class Fist : Weapon
     {
         public Fist() : base("Fist", "Fist", new Die(1, 1), DamageType.Bludgeoning, 0)

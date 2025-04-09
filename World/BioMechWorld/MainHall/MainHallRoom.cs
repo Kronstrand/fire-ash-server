@@ -9,6 +9,7 @@ using fire_ash_server.Enums;
 using fire_ash_server.Moves;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
+using fire_ash_server.World.BioMechWorld.Complex;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World.BioMechWorld.MainHall
@@ -65,6 +66,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 "At the far end of the hall, a raised stage stands ready for speakers to address the assembly or for occasional performances to entertain the Mecharions. " +
                 "The atmosphere is heavy with an undercurrent of ancient wisdom, a place where the past and future converge in an unsettling, yet fascinating blend."
             );
+            mainHall.Light = Light.Bright;
 
             mainHall.OnEnterEvent = (soul) =>
             {
@@ -130,6 +132,12 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
                 "A massive, reinforced steel door stands, secured with an intricate system of hydraulic braces and clamps.",
                 corridor2A);
             mainHall.AddExit(reinforcedSteelDoor);
+
+            reinforcedSteelDoor.OnBeforeExitEvent = (soul) =>
+            {
+                _ = soul.SendAsync("The steel door is sealed shut.");
+                return Task.FromResult(true);
+            };
 
             // Define the stage item
             Item stage = new Item(

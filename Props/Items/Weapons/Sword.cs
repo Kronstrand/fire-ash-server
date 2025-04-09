@@ -8,9 +8,10 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
+    [Serializable]
     internal class Sword : Weapon
     {
-        public Sword(string name, string description) : base(name, description, new Die(1, 6), DamageType.Slashing, 4)
+        public Sword(string name, string description) : base(name, description, new Die(1, 6), DamageType.Slashing, 5)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                 InventorySlot.MainHand,

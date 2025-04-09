@@ -8,6 +8,7 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Armor;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
 {
@@ -26,6 +27,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "The air is damp, thick with the scent of mildew and forgotten knowledge. " +
                 "A wooden desk sits against the south-facing wall."
             );
+            undergroundStudy.Light = Light.Bright;
 
             Exit toUndergroundStudy = new Exit(
                 "After a set of southward stairs",
@@ -79,6 +81,28 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             eriska.AddToInventory(ConsumableList.HealthPotion());
             eriska.AddToInventory(ConsumableList.HealthPotion());
             eriska.AddToInventory(ConsumableList.HealthPotion());
+            eriska.AddToInventory(ConsumableList.BookOfHealth());
+            eriska.AddToInventory(new Coins(200, 32));
+
+
+            eriska.AddOnAfterMoveToEvent((Soul soul) =>
+            {
+                if (eriska.Dead)
+                    return Task.FromResult(false);
+                if (soul.Character.IsHidden())
+                    return Task.FromResult(false);
+                if (soul.Character.HP == soul.Character.CurrentHP)
+                    return Task.FromResult(false);
+
+                soul.Character.CurrentRoom.BroadcastToSoulsInRoom(
+                    $"With a slow gesture, Eriska traces a pattern in the air, and faint ribbons of light drift toward {soul.Character.Name}. " +
+                    $"The energy settles over {FormatPossessive(soul.Character.Name)} wounds, " +
+                    $"stitching them closed with a soft, fleeting warmth before fading into nothing.");
+                soul.Character.GainLife(soul.Character.HP - soul.Character.CurrentHP);
+
+                return Task.FromResult(true);
+            },
+            false);
 
             DialogueNode eriskaIntroNode = new DialogueNode(
                 "I see you have met Lily... Such a fragile thing, isn't she? A pity, truly, what has become of her. But pity does little to mend what is broken."
@@ -266,8 +290,8 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             "Those who fail its test are said to be lost in time, their fate forever sealed within the coils of the Serpent's domain.";
 
             Item book = new Item("An Account of the Nine Serpents", bookDescription, 13);
-
             desk.AddItem(book);
+            desk.AddItem(WeaponList.WhiteCandle());
 
             bool SerpentsTearHandedOverToEriska = false;
 
@@ -326,11 +350,12 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 if (SerpentsTearHandedOverToEriska)
                 {
                     _ = soul.SendAsync(GetEndText());
+                    soul.CompletedGame = true;
                 }
             };
 
-            Item st = new Item("Serpent's Tear", "lol", 0);
-            undergroundStudy.AddItem(st);
+            /*Item st = new Item("Serpent's Tear", "lol", 0);
+            undergroundStudy.AddItem(st);*/
 
             return undergroundStudy;
         }

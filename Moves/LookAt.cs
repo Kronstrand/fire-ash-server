@@ -14,6 +14,7 @@ using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class LookAt : Move
     {
         public LookAt(Soul soul, Prop prop) : base(MoveKey.l.ToString(), CreateDescription(soul.Character, prop), prop)

@@ -35,6 +35,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "A small set of stairs ascends through an arched opening in the wall to a chamber above.",
                 wellRoom
             );
+            serpentSanctum.AddExit(serpentSanctumToWellRoom);
 
             Item serpentineAltar = new Item(
                 "Serpent Altar",
@@ -43,6 +44,8 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "The altar is adorned with intricate engravings and ritualistic objects, its purpose lost to history but still emanating an aura of significance. " +
                 "The texture of the stone is aged and rough, darkened by time and the reverence of those who once stood here."
             );
+            serpentineAltar.AddItem(WeaponList.CeremonialBlade());
+            serpentineAltar.AddItem(new Coins(44, 0));
             serpentSanctum.AddItem(serpentineAltar);
 
             Item ritualBowls = new Item(
@@ -52,6 +55,11 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "They appear empty now, but traces of a dark residue cling to their surfaces, hinting at past ceremonial uses."
             );
             serpentSanctum.AddItem(ritualBowls);
+
+            Consumable healthPotion = ConsumableList.HealthPotion();
+            healthPotion.Hide(9);
+            ritualBowls.AddItem(healthPotion);
+            
 
             Item carvedWallReliefs = new Item(
                 "Carved Wall Reliefs",

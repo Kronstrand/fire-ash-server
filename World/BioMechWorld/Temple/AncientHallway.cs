@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
+using fire_ash_server.Enums;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
 {
@@ -13,6 +14,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
         public static Room Create(Room wellRoom)
         {
             Room ancientHall = new Room(
+                RoomKey.AncientHallway,
                 "Ancient Hallway",
                 "Massive stone columns rise from the ground and stand like ancient sentinels, dividing the hall. " +
                 "The cave walls, visible between the columns, are rugged and uneven, adding to the sense of untamed depth in this underground space. " +
@@ -41,9 +43,24 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             );
             ancientHall.AddExit(ancientHallToWellRoom);
 
-            ZigzaggingStairway.Create(ancientHall);
+            Room zigzaggingStairway = ZigzaggingStairway.Create(ancientHall);
             SmallRitualChamber.Create(ancientHall);
 
+            Exit ancientHallToZigzaggingStairway = new Exit(
+                "To the northeast",
+                "A gently ascending staircase bordered by arching stone pillars, " +
+                "continuing upward into a cavernous tunnel.",
+                zigzaggingStairway
+            );
+            ancientHall.AddExit(ancientHallToZigzaggingStairway);
+
+            Character skel1 = MonsterCreator.Skeleton();
+            skel1.GoToRoom(ancientHall);
+            skel1.MoveToGroup(ancientHallToZigzaggingStairway);
+
+            Character skel2 = MonsterCreator.Skeleton();
+            skel2.GoToRoom(ancientHall);
+            
             return ancientHall;
         }
     }

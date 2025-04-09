@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
@@ -36,7 +37,7 @@ namespace fire_ash_server.World
             shadecreeper.AddEquippedItem(InventorySlot.Ranged, WeaponList.TribalShortBow());
 
             // Set the creature's health
-            shadecreeper.HP = 6;
+            shadecreeper.HP = 7;
 
             // Add special feats or abilities
             shadecreeper.AddFeat(FeatKey.Stealth); // Allows them to move undetected
@@ -44,7 +45,7 @@ namespace fire_ash_server.World
             shadecreeper.AddFeat(FeatKey.MeleeAttack);
             shadecreeper.AddFeat(FeatKey.RangedAttack);
             shadecreeper.AddToInventory(TempleTrinketList.GetRandom());
-            shadecreeper.AddToInventory(Coins.GenerateCoins(1));
+            shadecreeper.AddToInventory(Coins.GenerateCoins(40));
 
             if (!Character.hitReactions.ContainsKey(shadecreeper.Name))
             {
@@ -111,7 +112,7 @@ namespace fire_ash_server.World
             //skeleton.AddFeat(FeatKey.DarkVision); // Enables it to see in the dark, typical for undead creatures
 
             // Optional: Add some simple loot or effects
-            skeleton.AddToInventory(Coins.GenerateCoins(3));
+            skeleton.AddToInventory(Coins.GenerateCoins(5));
 
             // Skeleton hit reactions
             if (!Character.hitReactions.ContainsKey(skeleton.Name))
@@ -160,7 +161,7 @@ namespace fire_ash_server.World
             );
             
             // Set the creature's health
-            giantSnake.HP = 22;
+            giantSnake.HP = 12;
 
             // Add special feats or abilities
             //giantSnake.AddFeat(FeatKey.Constriction); // Can immobilize its prey with a powerful squeeze
@@ -216,7 +217,7 @@ namespace fire_ash_server.World
             );
 
             // Set the creature's health
-            serpentDevil.HP = 28;
+            serpentDevil.HP = 17;
             serpentDevil.DefaultHand = new BeastClaw();
             serpentDevil.AddFeat(FeatKey.DarkVision); // Can see clearly in low-light conditions
             serpentDevil.AddFeat(FeatKey.DualWield);
@@ -264,11 +265,12 @@ namespace fire_ash_server.World
                 6,   // intelligence - driven by primal and programmed instincts
                 9,  // wisdom - sharp survival instincts
                 7,   // charisma - induces fear rather than charm
-                "The Ratrocity collapses into a heap of fur and scrap, its mechanical components sparking weakly."
+                "A Ratrocity collapsed into a heap of fur and scrap, its mechanical components sparking weakly."
             );
 
             BeastClaw beastClaw = new BeastClaw();
             beastClaw.DamageDie = new Die(1, 2);
+            beastClaw.VendorValue = 0.6;
 
             ratrocity.AddEquippedItem(InventorySlot.MainHand, beastClaw);
             ratrocity.HP = 2;

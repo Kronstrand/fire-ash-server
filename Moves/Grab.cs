@@ -10,7 +10,7 @@ using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.Moves
 {
-
+    [Serializable]
     internal class Grab : Move
     {
         public Grab(Soul soul, Item prop) : base(MoveKey.g.ToString(), CreateDescription(prop), prop, async () => { })
@@ -58,6 +58,8 @@ namespace fire_ash_server.Moves
                         soul.Character.BroadcastToSoulsInRoom(grabDescriptions);
                     EnablesCombat = false;
                 }
+                
+                TriggerHostileCloseCombat(soul, item);
 
                 await Task.CompletedTask;
             };

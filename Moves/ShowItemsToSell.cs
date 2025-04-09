@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class ShowItemsToSell : Move
     {
         public ShowItemsToSell(Soul soul, Character targetCharacter) : base(MoveKey.st.ToString(), $"Sell to {targetCharacter.Name}", targetCharacter)

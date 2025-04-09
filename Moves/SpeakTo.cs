@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class SpeakTo : Move
     {
         public SpeakTo(Soul soul, Character targetCharacter) : base(MoveKey.sp.ToString(), $"Speak to {targetCharacter.Name}", targetCharacter)

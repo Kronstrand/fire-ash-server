@@ -8,6 +8,7 @@ using fire_ash_server.Moves;
 
 namespace fire_ash_server
 {
+    [Serializable]
     public class ThreadSafeList<T> : IEnumerable<T>, IEnumerable, IDisposable
     {
         private readonly List<T> _list = new List<T>();

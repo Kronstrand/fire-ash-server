@@ -7,6 +7,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items.Armor
 {
+    [Serializable]
     internal class Head : Item
     {
         public Head(string name, string description, double value) : base(name, description, value)

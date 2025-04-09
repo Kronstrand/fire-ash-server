@@ -9,6 +9,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class SkillCheck : Move
     {
         public SkillNumber SkillNumber { get; set; }

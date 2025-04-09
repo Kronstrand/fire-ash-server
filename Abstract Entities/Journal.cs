@@ -9,6 +9,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Abstract_Entities
 {
+    [Serializable]
     internal class Journal
     {
         Character Character;
@@ -30,6 +31,7 @@ namespace fire_ash_server.Abstract_Entities
         }
     }
 
+    [Serializable]
     internal class JournalEntry
     {
         public string Text;

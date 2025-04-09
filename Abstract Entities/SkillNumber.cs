@@ -8,6 +8,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server
 {
+    [Serializable]
     internal class SkillNumber
     {
         public Skill Skill { get; set; }

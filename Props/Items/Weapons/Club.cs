@@ -8,6 +8,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
+    [Serializable]
     internal class Club : Weapon
     {
         public Club(string name, string description, double value) : base(name, description, new Die(1, 4), DamageType.Bludgeoning, value)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace fire_ash_server.Enums
 {
+    [Serializable]
     internal class Effect
     {
         public string Name;

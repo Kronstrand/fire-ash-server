@@ -8,11 +8,12 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items
 {
+    [Serializable]
     internal class Coins : Item
     {
         public int Gold {  get; private set ; }
         public int Silver {  get; private set; }
-        public Coins(int gold, int silver) : base(CreateName(gold, silver), CreateName(gold, silver) + ", so shiny.", gold + SilverToGold(silver))
+        public Coins(int gold, int silver) : base(CreateName(gold, silver), CreateDescription(gold, silver), gold + SilverToGold(silver))
         {
             Gold = gold;
             Silver = silver;
@@ -24,6 +25,7 @@ namespace fire_ash_server.Props.Items
             Gold = gold;
             Silver = silver;                                                            
             Name = CreateName(gold, silver);
+            Description = CreateDescription(gold, silver);
         }
 
         private static string CreateName(int gold, int silver)
@@ -47,6 +49,11 @@ namespace fire_ash_server.Props.Items
             else if (silverText != "")
                 return silverText ;
             return "An empty space, where coins should have been."; //should not happen
+        }
+
+        private static string CreateDescription(int gold, int silver)
+        {
+            return CreateName(gold, silver) + ", so shiny.";
         }
         public static Coins GenerateCoins(int maxGold)
         {

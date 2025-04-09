@@ -9,13 +9,14 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server
 {
+    [Serializable]
     internal class Roll
     {
         public int[] DieRolls;
         public int Modifier;
-        public Character RollingCharacter;
+        public Character? RollingCharacter;
         public RollType Type;
-        public Roll(int modifier, RollType type, Character rollingCharacter)
+        public Roll(int modifier, RollType type, Character? rollingCharacter)
         {
             RollingCharacter = rollingCharacter;
             DieRolls = Roll(1, 20);
@@ -23,7 +24,7 @@ namespace fire_ash_server
             Type = type;
         }
 
-        public Roll(Die die, int modifier, RollType type, Character rollingCharacter)
+        public Roll(Die die, int modifier, RollType type, Character? rollingCharacter)
         {
             RollingCharacter = rollingCharacter;
             DieRolls = Roll(die.NumberOfDies, die.Sides);
@@ -65,16 +66,17 @@ namespace fire_ash_server
         public int GetCharacterEffectsModifier() 
         {
             int modifer = 0;
-            foreach(Effect effect in RollingCharacter.GetAllEffectsIncludingFeats()) 
-            {
-                foreach(RollModifier rollModifier in effect.rollModifiers)
+            if (RollingCharacter != null)
+                foreach(Effect effect in RollingCharacter.GetAllEffectsIncludingFeats()) 
                 {
-                    if (Type == rollModifier.Type)
+                    foreach(RollModifier rollModifier in effect.rollModifiers)
                     {
-                        modifer += rollModifier.Modifer;
+                        if (Type == rollModifier.Type)
+                        {
+                            modifer += rollModifier.Modifer;
+                        }
                     }
                 }
-            }
             return modifer;
         }
     }

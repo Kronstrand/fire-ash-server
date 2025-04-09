@@ -9,6 +9,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World
 {
+    [Serializable]
     internal static class Effects
     {
         public static Effect Get(EffectKey key)

@@ -9,11 +9,13 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class Stealth : Move
     {
         public Stealth(Soul soul) : base (MoveKey.s.ToString(), SkillCheck.CreateDescription("Hide.", Skill.Stealth))
         {
             Range = RangeType.None;
+            IsMovement = true;
             Character character = soul.Character;
             Action = async () =>
             {

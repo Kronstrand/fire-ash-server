@@ -8,10 +8,12 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class RoomChange : Move
     {
         public RoomChange(Soul soul, Exit exit) : base(MoveKey.r.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
         {
+            IsMovement = true;
         }
 
         private static string CreateDescription(Room room)

@@ -10,11 +10,13 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class MoveTo : Move
     {
         public MoveTo(Soul soul, Prop targetProp) : base(MoveKey.m.ToString(), CreateMoveName(soul.Character, targetProp), targetProp)
         {
             Range = RangeType.RangeSingleTarget;
+            IsMovement = true;
 
             Action = async () =>
             {
@@ -38,45 +40,15 @@ namespace fire_ash_server.Moves
                     await LookAt.LookAtAction(soul, targetProp);
                 }
 
-                TriggerHostileCombat(soul, targetProp);
+                if (!soul.Character.IsHidden())
+                    TriggerHostileCloseCombat(soul, targetProp);
 
-                targetProp.RunOnAfterMoveToEvents(soul);
+                grouping = soul.Character.GetGrouping();
+                if (grouping != null)
+                    foreach(Prop prop in grouping.Props)
+                        await prop.RunOnAfterMoveToEvents(soul);
             };
         }
-
-        private void TriggerHostileCombat(Soul soul, Prop targetProp)
-        {
-            Grouping? grouping = targetProp.GetGrouping();
-            if (grouping != null)
-            {
-                foreach (Prop prop in grouping.Props)
-                {
-                    if (!(prop is Character))
-                        continue;
-
-                    Character character = (Character)prop;
-                    if (character == soul.Character || !character.InitAttack)
-                        continue;
-
-                    if (character.GetRelationShipTo(soul.Character).IsHostile())
-                    {
-                        EnablesCombat = true;
-                        soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
-                        return;
-                    }
-                }
-            }
-            else if (targetProp is Character)
-            {
-                Character character = (Character)targetProp;
-                if (character.InitAttack && character.GetRelationShipTo(soul.Character).IsHostile())
-                {
-                    EnablesCombat = true;
-                    soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
-                }
-            }
-        }
-
         public static string CreateMoveName(Character character, Prop prop)
         {
             if (prop.DynamicDescription && prop.GetLightState(character) == Light.Darkness)

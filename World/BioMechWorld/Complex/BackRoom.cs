@@ -8,7 +8,7 @@ using fire_ash_server.Props.Items;
 using fire_ash_server.Props;
 using fire_ash_server.World.BioMechWorld.Temple;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class BackRoom
     {
@@ -36,7 +36,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Each shelf seems to defy gravity, the precariously balanced items threatening to topple with the slightest disturbance."
             );
             clutteredShelf.MakeUnpickupable()
-        ;   backRoom.AddItem(clutteredShelf);
+        ; backRoom.AddItem(clutteredShelf);
 
             Item perpetualWireUntangler = new Item(
                 "Perpetual Wire Untangler",
@@ -45,6 +45,7 @@ namespace fire_ash_server.World.BioMechWorld
                 3
             );
             clutteredShelf.AddItem(perpetualWireUntangler);
+            clutteredShelf.AddItem(ConsumableList.ARC2000());
 
             Room serpentsSpine = SerpentsSpine.Create(backRoom);
 

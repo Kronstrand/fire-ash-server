@@ -7,6 +7,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items
 {
+    [Serializable]
     internal class Inventory : Item
     {
         public Inventory() : base("Inventory", "Inventory", 0)

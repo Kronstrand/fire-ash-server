@@ -10,12 +10,12 @@ using fire_ash_server.Props;
 using fire_ash_server.World.BioMechWorld.MainHall;
 using static fire_ash_server.Helpers;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class NexusBridge
     {
-       public NexusBridge(Room creationChamber)
-       {
+        public NexusBridge(Room creationChamber)
+        {
             Room nexusBridge = new Room(
                 Description(RoomKey.NexusBridge),
                 "Industrial Expanse",
@@ -30,9 +30,11 @@ namespace fire_ash_server.World.BioMechWorld
                 "An imposing steel doorframe marks the exit, its rigid structure contrasting with the room's lifeblood. Beyond, a central metal bridge extends into the hazy distance.",
                 nexusBridge);
             toBridgeFromCreationChamber.AddOnAfterMoveToEvent(
-                (Soul soul, Prop exit) => {
+                (soul) =>
+                {
                     _ = soul.SendAsync("A cold breeze wafts in from beyond the door, carrying a hint of metallic chill.");
-                }, 
+                    return Task.FromResult(true);
+                },
                 false);
             creationChamber.AddExit(toBridgeFromCreationChamber);
 
@@ -40,7 +42,7 @@ namespace fire_ash_server.World.BioMechWorld
 
             // Adding exit to the Creation Chamber
             nexusBridge.AddExit(new Exit(
-                "To the south", 
+                "To the south",
                 "A doorway leads to the Creation Chamber.",
                 creationChamber));
 

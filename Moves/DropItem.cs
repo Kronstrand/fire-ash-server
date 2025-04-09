@@ -10,6 +10,7 @@ using fire_ash_server.Abstract_Entities;
 
 namespace fire_ash_server.Moves
 {
+    [Serializable]
     internal class DropItem : Move
     {
         public DropItem(Soul soul, Item prop) : base(MoveKey.d.ToString(), CreateDescription(prop), prop, async () => { })
@@ -39,7 +40,7 @@ namespace fire_ash_server.Moves
             };
         }
 
-        private void RemoveItemFromCharacter(Character character, Item item)
+        public static void RemoveItemFromCharacter(Character character, Item item)
         {
             if (character.Inventory.Items.Remove(item))
                 return;

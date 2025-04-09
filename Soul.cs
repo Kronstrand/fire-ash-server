@@ -16,13 +16,17 @@ using fire_ash_server.Moves.Attacks;
 using fire_ash_server.Dialogue;
 using fire_ash_server.World;
 using fire_ash_server.Abstract_Entities;
+using System.Diagnostics;
+using fire_ash_server.World.BioMechWorld;
+using Newtonsoft.Json;
 
 namespace fire_ash_server
 {
+    [Serializable]
     internal class Soul
     {
         private Character? character;
-        public Socket? Socket;
+        public Guid Id;
         public bool IsDaemon;
         public ConcurrentDictionary<string, Move> AllPossibleMoves = new ConcurrentDictionary<string, Move>();
         public ConcurrentDictionary<string, Move> ShownPossibleMoves = new ConcurrentDictionary<string, Move>();
@@ -30,18 +34,38 @@ namespace fire_ash_server
         public string BufferText = "";
         public bool AddToBufferText = false;
         public int InventoryToolTip = 0;
+        public bool CompletedGame = false;
 
         public Soul(Socket soulSocket)
         {
+            
+            Id = Guid.NewGuid();
             Socket = soulSocket;
             AddToWorldSoul();
         }
 
         public Soul(Character character)
         {
+            Id = Guid.NewGuid();
             Character = character;
             IsDaemon = true;
             AddToWorldSoul();
+        }
+
+        public Socket? Socket
+        {
+            get 
+            {
+                Program.Sockets.TryGetValue(Id, out Socket? socket);
+                return socket;
+            }
+            set
+            {
+                if (value == null)
+                    Program.Sockets.Remove(Id, out Socket? socket);
+                else 
+                    Program.Sockets[Id] = value;
+            }
         }
 
         public Character Character
@@ -102,6 +126,11 @@ namespace fire_ash_server
         public async Task SendPossibleMovesAsync()
         {
             string possibleMoves = GetPossibleMovesAsString();
+            await SendPossibleMovesAsync(possibleMoves);
+        }
+
+        public async Task SendPossibleMovesAsync(string possibleMoves)
+        {
             if (possibleMoves == "")
                 return;
             await SendAsync("$[pm]" + possibleMoves + "$[pmend]", SendOption.None);
@@ -150,8 +179,26 @@ namespace fire_ash_server
             return (input == "y" || input == "yes");
         }
 
+        public async Task<string> AwaitInput(bool SetChoiceFlag)
+        {
+            if (SetChoiceFlag)
+                await SendChoiceFlagAsync();
+            string input = await ReceiveAsync();
+            await SendAsync(InputOk());
+            return input;
+        }
+
         public async void GeneratePossibleMoves()
         {
+            if (CompletedGame)
+            {
+                AddExitGameMove(false);
+                return;
+            }
+
+            if (Character.Dead)
+                return;
+
             if (Character.SpeakingTo != null && Character.SpeakingTo.DialogueManager != null && Character.SpeakingTo.DialogueManager.Initiater == Character)
             {
                 DialogueManager dialogueManager = Character.SpeakingTo.DialogueManager;
@@ -236,9 +283,11 @@ namespace fire_ash_server
                             AddPossibleMove(new Grab(this, (Item)Character.LookAt)); //But you can pickup Props??
                         else
                         {
-                            if (!Character.EquippedItems.Values.Contains(item))
-                                foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
+                            foreach (InventorySlot inventorySlot in item.CarriableByInventorySlots)
+                            {
+                                if (!(Character.EquippedItems.TryGetValue(inventorySlot, out var equippedItem) && equippedItem == item))
                                     AddPossibleMove(new Equip(this, item, inventorySlot));
+                            }
 
                             if (item is Consumable)
                                 AddPossibleMove(new Consume(this, (Consumable)item));
@@ -335,6 +384,13 @@ namespace fire_ash_server
                 }
             }
 
+            foreach(Consumable consumable in Character.Inventory.Items.Where(i => i is Consumable))
+            {
+                Consume consume = new Consume(this, consumable);
+                consume.Hidden = true;
+                AddPossibleMove(consume);
+            }
+
             //Exits in current room
             foreach (Exit exit in Character.CurrentRoom.Exits.Where(exit => !exit.IsHidden()))
             {                           
@@ -373,8 +429,9 @@ namespace fire_ash_server
                     }
                 }
                 else if (ReferenceEquals(Character.LookAt, Character.CurrentRoom))
-                {                       
-                    AddPossibleMove(new MoveTo(this, exit));
+                {
+                    if (exit.GetLightState(Character) != Light.Darkness)
+                        AddPossibleMove(new MoveTo(this, exit));
                 }
             }
 
@@ -390,6 +447,24 @@ namespace fire_ash_server
             //journal
             //AddPossibleMove(new CheckJournal(this));
 
+            AddExitGameMove(true);
+
+            //AddPossibleMove(new SaveGameState(this));
+            //AddPossibleMove(new LoadGameState(this));
+        }
+
+        private void AddExitGameMove(bool hidden)
+        {
+            Move exitGameMove = new Move("x", "Exit Game", async () =>
+            {
+                await SendAsync("Do you really want to quit? (y/n)");
+                if (await AwaitYesNo())
+                    await SendAsync("$[quit]");
+                else
+                    await SendAsync("You decide to press on.");
+            });
+            exitGameMove.Hidden = hidden;
+            AddPossibleMove(exitGameMove);
         }
 
         public void AddPossibleHiddenLookAtMove(Character character)
@@ -499,6 +574,7 @@ namespace fire_ash_server
             while (true)
             {
                 string input = await ReceiveAsync();
+                input = input.ToLower();
 
                 Move? moveToExecute = GetMoveFromInput(input);
                 if (moveToExecute != null)
@@ -531,73 +607,6 @@ namespace fire_ash_server
             }
             return null;
         }
-
-        /*public void Execute(ref Move move)
-        {
-            Execute(ref move, Character);
-        }
-        public void Execute(ref Move move, Character activeCharacter)
-        {
-            if (!Character.PropTargetIsValid(move))
-                return;
-            
-            Character.RegisterUsedMoveOnProp(move);
-
-
-            if (move is Attack)
-                if (Character.GetLightState(null) == Light.Darkness)
-                {
-                    if (move.Prop != null)
-                        SetThreadBasedBufferText($"From the darkness, ");
-                    else
-                        SetThreadBasedBufferText($"Within the darkness, ");
-                    Console.WriteLine("Buffer is set at " + DateTime.Now);
-                }
-            
-
-            if (move.EnablesCombat)
-            {
-                if (Character.IsHidden())
-                    Character.CurrentRoom.BroadcastToSoulsInRoom($"{Character.Name} reveals themselves from the shadows...");
-
-                move.Action();
-                RemoveBufferTextForThread();
-
-                if (Character.IsHidden())
-                    Character.Unhide();
-            }
-            else
-                move.Action();
-
-            move.ExecutePostAction(Character);
-         
-            if (move.EnablesCombat)
-            {
-                if (activeCharacter.EnableCombatWith == null)
-                {
-                    Character? targetCharacer = null;
-                    if (move.Prop is Item)
-                    {
-                        Item item = (Item)move.Prop;
-                        Character? heldByCharacter = item.HeldByCharacter();
-                        if (heldByCharacter != null || heldByCharacter != Character)
-                        {
-                            targetCharacer = heldByCharacter;
-                        }
-                    }
-                    else if (move.Prop is Character)
-                        targetCharacer = (Character)move.Prop;
-
-                    if (targetCharacer != null && move.EnablesCombat)
-                        if (targetCharacer != activeCharacter)
-                            activeCharacter.EnableCombatWith = new ToxicRelationship(targetCharacer, false);
-                        else
-                            activeCharacter.EnableCombatWith = new ToxicRelationship(Character, true);
-                }
-
-            }
-        }
-        */
 
         public void ClearMoves()
         {
@@ -642,6 +651,7 @@ namespace fire_ash_server
 
         public void AddPossibleMove(Move move, bool forceHide)
         {
+            if (move.IsMovement && Character.HasCondition(Condition.Rooted)) return;
             if (!move.AllowedInCombat && Character.CurrentRoom.InCombat) return;
             if (Character.TradingWith != null)
             {
@@ -729,7 +739,8 @@ namespace fire_ash_server
 
             Dictionary<string, Move> relevantAttackMoves = AllPossibleMoves.Where(x => 
                                                                 x.Value is Attack || 
-                                                                (x.Value is MoveTo && x.Value.Prop is Character && Character.IsInHostileCombatWith((Character)x.Value.Prop))).ToDictionary();
+                                                                (x.Value is MoveTo && x.Value.Prop is Character && Character.IsInHostileCombatWith((Character)x.Value.Prop) ||
+                                                                x.Value is Consume)).ToDictionary();
 
             //add all feat moves from character
             foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
@@ -743,7 +754,44 @@ namespace fire_ash_server
 
 
             if (relevantAttackMoves.Count > 0)
-                return relevantAttackMoves.ElementAt(rnd.Next(relevantAttackMoves.Count)).Value;
+            {
+                while (true)
+                {
+                    Move chosenMove = relevantAttackMoves.ElementAt(rnd.Next(relevantAttackMoves.Count)).Value;
+                    if (chosenMove is Consume)
+                    {
+                        Random rand = new Random();
+                        double roll = rand.NextDouble(); // Generates a random number between 0.0 and 1.0
+
+                        if (roll <= 0.75) // 75% chance to skip consumable move
+                            continue;
+
+                        if (chosenMove.Prop != null)
+                        {
+                            if (chosenMove.Prop.Name == ConsumableList.BearTrapName)
+                            {
+                                continue;
+                            }
+                            else if (chosenMove.Prop.Name == ConsumableList.HealingPotionName)
+                            {
+                                if (Character.CurrentHP >= (Character.HP - Character.CurrentHP)) //only choose move if HP is below %50
+                                    continue;
+                            }
+                            else if (chosenMove.Prop.Name == ConsumableList.ScrollofEntanglementName)
+                            {
+                                if (Character.lookAtBeforeInventory is Character)
+                                {
+                                    bool? isCloseTo = Character.IsInGroupWith(Character.lookAtBeforeInventory);
+                                    if (isCloseTo == true || isCloseTo == null)
+                                        continue;
+                                }
+                            }
+                        }
+                    }
+
+                    return chosenMove;
+                }
+            }
             return null;
         }
 

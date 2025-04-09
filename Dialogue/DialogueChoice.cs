@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace fire_ash_server.Dialogue
 {
+    [Serializable]
     internal class DialogueChoice
     {
         public string Text { get; set; }

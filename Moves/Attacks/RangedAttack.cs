@@ -10,15 +10,19 @@ using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves.Attacks
 {
+    [Serializable]
     internal class RangedAttack : Attack
     {
+        public Weapon? weapon = null;
         public RangedAttack(Soul soul, Character characterToAttack) : base(MoveKey.ra.ToString(), GetName(soul.Character, characterToAttack), characterToAttack, RangeType.RangeSingleTarget)
         {
             Character character = soul.Character;
 
-            Action = async () =>
+            Action = () =>
             {
-                if (!TryAttack(character, characterToAttack, character.AttackWithRanged)) return;
+                TryAttack(character, characterToAttack, weapon, character.AttackWithRangedWeapon);
+
+                return Task.CompletedTask;
             };
         }
 
@@ -26,8 +30,12 @@ namespace fire_ash_server.Moves.Attacks
         {
             Weapon? weapon = character.GetRangedWeapon();
 
-            if (weapon != null)
-                return $"Attack {characterToAttack.Name} with {weapon.Name}.";
+            string penelty = "";
+            if (character.IsInGroupWith(characterToAttack) == true)
+                penelty = " (-5 to hit)";
+
+                if (weapon != null)
+                return $"Attack {characterToAttack.Name} with {weapon.Name}.{penelty}";
 
             return $"Attack {characterToAttack.Name} with ranged weapon."; //should not happen
         }

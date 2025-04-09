@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Props;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World.BioMechWorld.Complex
 {
     internal class BackAlley
     {
@@ -49,10 +49,10 @@ namespace fire_ash_server.World.BioMechWorld
             );
             backAlley.AddExit(entranceToBazarFromBackAlley);
 
-            Character rat1 = MonsterCreator.Ratrocity();
-            Character rat2 = MonsterCreator.Ratrocity();
+            Character rat1 = MonsterCreator.Ratrocity();        
             rat1.GoToRoom(backAlley);
             rat1.MoveToGroup(entranceToBazarFromBackAlley);
+            Character rat2 = MonsterCreator.Ratrocity();
             rat2.GoToRoom(backAlley);
             rat2.MoveToGroup(rat1);
 

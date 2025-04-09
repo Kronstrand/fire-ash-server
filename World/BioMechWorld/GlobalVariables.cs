@@ -9,9 +9,16 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.World.BioMechWorld
 {
-    static class GlobalVariables
+    [Serializable]
+    //Should be handled as singleton
+    internal class GlobalVariables
     {
-        static public Character vexisTheCaretaker = new Character(
+        public GlobalVariables()
+        {
+         
+        }
+
+        public Character vexisTheCaretaker = new Character(
                 "Vexis",
                 "Vexis, a friendly yet eccentric figure. " +
                 "Standing at five feet, his body is a fusion of rusted metal, gears, and organic tissue. " +
@@ -33,7 +40,7 @@ namespace fire_ash_server.World.BioMechWorld
                 "Even in death, there's a lingering warmth to his form, a testament to his friendly nature."
             );
 
-        static public DialogueNode vexisTemplePermissionNode = new DialogueNode(
+        public DialogueNode vexisTemplePermissionNode = new DialogueNode(
                 "Those eyes of yours have a purpose now, eh? " +
                 "I'm guessing Ezekiel or Elara finally sent you my way. " +
                 "I'll admit, I'm not keen on letting folks wander past this door, " +

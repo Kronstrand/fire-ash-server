@@ -20,14 +20,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 "The pillars rise like sentinels, their towering forms giving the passage an imposing feel. " +
                 "The walls close in around the staircase, glowing mineral veins casting faint reflections on the worn steps. "
             );
-
-            Exit ancientHallToZigzaggingStairway = new Exit(
-                "To the northeast",
-                "A gently ascending staircase bordered by arching stone pillars, " +
-                "continuing upward into a cavernous tunnel.",
-                zigzaggingStairway
-            );
-            ancientHall.AddExit(ancientHallToZigzaggingStairway);
+            zigzaggingStairway.Light = Light.Darkness;
 
             Exit zigzaggingStairwayToAncientHall = new Exit(
                 "At the base of the jagged staircase", 
@@ -49,11 +42,14 @@ namespace fire_ash_server.World.BioMechWorld.Temple
 
             ironGate.OnBeforeExitEvent = async (Soul soul) =>
             {
-                _ = soul.SendAsync("This passage leads to the part of the complex controlled by the Purists. Entering alone would be certain suicide. " + "\n" +
-                    "Would you like to return to Ezekiel with the news that you found the way through the temple?" + "\n" + 
-                    "y/n?");
+                await soul.SendAsync("This passage leads to the part of the complex controlled by the Purists. Entering alone would be certain suicide. " + "\n" +
+                    "Would you like to return to Ezekiel with the news that you found the way through the temple?" + "\n" +
+                    "(y/n)");
                 if (await soul.AwaitYesNo())
-                    _ = soul.SendAsync(GetBattleSceneEnding());
+                {
+                    await soul.SendAsync(GetBattleSceneEnding());
+                    soul.CompletedGame = true;
+                }
                 
                 return true;
             };

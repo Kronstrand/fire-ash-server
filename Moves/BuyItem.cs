@@ -12,7 +12,7 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-
+    [Serializable]
     internal class BuyItem : Move
     {
         public BuyItem(Soul soul, Item prop, Character buyFrom) : base(MoveKey.bi.ToString(), CreateDescription(prop, buyFrom), prop, async () => { })
@@ -38,9 +38,9 @@ namespace fire_ash_server.Moves
 
                 if (soul.Character.GetTotalCoinValue() >= vendorValue)
                 {
-                    soul.Character.TransferCoinTo(buyFrom, price.Item1, price.Item2);
+                    Tuple<int, int> boughtPrice = soul.Character.TransferCoinTo(buyFrom, price.Item1, price.Item2);
                     soul.Character.AddToInventory(item);
-                    _ = soul.SendAsync($"You buy {item.Name} from {buyFrom.Name} for {price.Item1} gold and {price.Item2} silver.");
+                    _ = soul.SendAsync($"You buy {item.Name} from {buyFrom.Name} for {boughtPrice.Item1} gold and {boughtPrice.Item2} silver.");
                 }
                 else
                 {

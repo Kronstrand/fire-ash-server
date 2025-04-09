@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
+using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.World.BioMechWorld.MainHall
 {
@@ -39,6 +40,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             elaraTheDefender.AddFeat(FeatKey.MeleeAttack);
             elaraTheDefender.AddFeat(FeatKey.RangedAttack);
             elaraTheDefender.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
+            elaraTheDefender.AddToInventory(new Coins(500, 10));
 
             // Create dialogue nodes for Elara the Defender
             elaraStartNode = new DialogueNode("I am Elara, the Defender of this enclave. Time is against us, and I have no one else to spare. I need your help.");
@@ -51,7 +53,7 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
             );
 
             DialogueNode elaraSeekVexisNode = new DialogueNode("To find these tunnels, you must seek out Vexis, the caretaker. Vexis knows the way into these ancient passages. Find him in the Caretaker's Chamber, close to the Creation Chamber. When you locate the tunnels, you'll need to find your way through and clear them for safe passage.");
-            DialogueNode elaraEndNode = new DialogueNode("");
+            DialogueNode elaraEndNode = new DialogueNode("");       
 
             elaraStartNode.AddChoice("How so?", elaraTunnelMission);
 
@@ -62,9 +64,24 @@ namespace fire_ash_server.World.BioMechWorld.MainHall
 
             elaraSeekVexisNode.AddChoice("I see.", elaraEndNode);
 
+            bool gaveGold = false;
             elaraEndNode.OnAfterEvent = (DialogueManager dm) =>
             {
-                GlobalVariables.vexisTheCaretaker.CreateDialogueManager(GlobalVariables.vexisTemplePermissionNode);
+                if (!gaveGold)
+                {
+                    if (elaraTheDefender.SpeakingTo != null)
+                    {
+                        int goldAmount = 150;
+                        elaraTheDefender.BroadcastToSoulsInRoom(
+                            $"{elaraTheDefender.Name} hands {goldAmount} gold coins to {elaraTheDefender.SpeakingTo.Name}. " +
+                            "With a knowing smile, she says, \"Spend this wisely. The bazar has more than just gear.\"");
+                        elaraTheDefender.TransferCoinTo(elaraTheDefender.SpeakingTo, goldAmount, 0);
+                        
+                        gaveGold = true;
+                    }
+                }
+
+                Program.GlobalVariables.vexisTheCaretaker.CreateDialogueManager(Program.GlobalVariables.vexisTemplePermissionNode);
             };
 
             // Assign dialogue to Elara is done by Ezekiel

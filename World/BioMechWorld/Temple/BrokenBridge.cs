@@ -35,7 +35,21 @@ namespace fire_ash_server.World.BioMechWorld.Temple
                 serpentsSpine);
             brokenBridge.AddExit(toSerpentsSpine);
 
-            UndergroundCavePath.Create(brokenBridge);
+            Room undergroundCavePath = UndergroundCavePath.Create(brokenBridge);
+
+            Exit exitToUndergroundCavePath = new Exit(
+                "Along the jagged stone walls, the last intact stretch of another bridge clings desperately, its stone slabs worn and cracked yet still forming a narrow passage.This precarious path leads to",
+                 "A set of stairs that descend deeper into the cavern's depths.",
+                 undergroundCavePath);
+            brokenBridge.AddExit(exitToUndergroundCavePath);
+
+            Character shadeCreeper = MonsterCreator.Shadecreeper();
+            shadeCreeper.AddToInventory(ConsumableList.BearTrap());
+            shadeCreeper.GoToRoom(brokenBridge);
+
+            Events.AddCharacterMoveToAndIsrangedAttacked(shadeCreeper, exitToUndergroundCavePath);
+
+
 
             return brokenBridge;
         }

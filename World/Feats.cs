@@ -11,6 +11,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.World
 {
+    [Serializable]
     internal static class Feats
     {
         public static Feat? GetWithoutMoves(string key, Soul soul) //soul is not needed

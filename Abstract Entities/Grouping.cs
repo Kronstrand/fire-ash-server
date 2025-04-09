@@ -8,6 +8,7 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Abstract_Entities
 {
+    [Serializable]
     internal class Grouping
     {
         public  ThreadSafeList<Prop> Props = new ThreadSafeList<Prop>();

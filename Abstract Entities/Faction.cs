@@ -7,6 +7,7 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server
 {
+    [Serializable]
     internal class Faction
     {
         public string Name;
