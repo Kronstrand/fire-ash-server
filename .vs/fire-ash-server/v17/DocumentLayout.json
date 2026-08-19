@@ -3,6 +3,22 @@
   "WorkspaceRootPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server-websocket\\gameloop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:gameloop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server-websocket\\props\\items\\itempopulation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\items\\itempopulation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server-websocket\\moves\\savegamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\savegamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server-websocket\\props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:props\\character.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|c:\\users\\jkkn\\documents\\c#\\fire-ash-server-websocket\\moves\\move.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9C4A2678-62D5-4438-889C-66B532EC7368}|fire-ash-server.csproj|solutionrelative:moves\\move.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -53,7 +69,59 @@
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SaveGameState.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Moves\\SaveGameState.cs",
+              "RelativeDocumentMoniker": "Moves\\SaveGameState.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Moves\\SaveGameState.cs",
+              "RelativeToolTip": "Moves\\SaveGameState.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAgwF4AAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-18T08:38:34.164Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ItemPopulation.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Items\\ItemPopulation.cs",
+              "RelativeDocumentMoniker": "Props\\Items\\ItemPopulation.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Items\\ItemPopulation.cs",
+              "RelativeToolTip": "Props\\Items\\ItemPopulation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-18T08:37:24.448Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "Character.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Character.cs",
+              "RelativeDocumentMoniker": "Props\\Character.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Character.cs",
+              "RelativeToolTip": "Props\\Character.cs",
+              "ViewState": "AgIAAKoAAAAAAAAAAAAjwLYAAABdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-18T08:22:00.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GameLoop.cs",
+              "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\GameLoop.cs",
+              "RelativeDocumentMoniker": "GameLoop.cs",
+              "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\GameLoop.cs",
+              "RelativeToolTip": "GameLoop.cs",
+              "ViewState": "AgIAAHQAAAAAAAAAAAAIwFIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-18T07:55:38.535Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Microsoft.Common.CurrentVersion.targets",
               "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
@@ -61,12 +129,11 @@
               "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
               "ViewState": "AgIAAP8UAAAAAAAAAAAuwBEVAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
-              "WhenOpened": "2026-08-14T12:11:23.919Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T12:11:23.919Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "ConsumableList.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\World\\ConsumableList.cs",
               "RelativeDocumentMoniker": "World\\ConsumableList.cs",
@@ -74,12 +141,11 @@
               "RelativeToolTip": "World\\ConsumableList.cs",
               "ViewState": "AgIAAKEBAAAAAAAAAAAiwLEBAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T12:03:09.361Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T12:03:09.361Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "Consumable.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Items\\Consumable.cs",
               "RelativeDocumentMoniker": "Props\\Items\\Consumable.cs",
@@ -87,25 +153,24 @@
               "RelativeToolTip": "Props\\Items\\Consumable.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T12:02:21.114Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T12:02:21.114Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "Move.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Moves\\Move.cs",
               "RelativeDocumentMoniker": "Moves\\Move.cs",
               "ToolTip": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Moves\\Move.cs",
               "RelativeToolTip": "Moves\\Move.cs",
-              "ViewState": "AgIAAFoAAAAAAAAAAAAmwGsAAABFAAAAAAAAAA==",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAcwFoAAACVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-14T12:01:38.157Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 10,
               "Title": "Soul.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Soul.cs",
               "RelativeDocumentMoniker": "Soul.cs",
@@ -113,12 +178,11 @@
               "RelativeToolTip": "Soul.cs",
               "ViewState": "AgIAAHABAAAAAAAAAADgv4QBAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:44:50.937Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:44:50.937Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 13,
               "Title": "WorldTick.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\WorldTick.cs",
               "RelativeDocumentMoniker": "WorldTick.cs",
@@ -126,12 +190,11 @@
               "RelativeToolTip": "WorldTick.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAADgvy0AAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:45:18.598Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:45:18.598Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 11,
               "Title": "Room.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Room.cs",
               "RelativeDocumentMoniker": "Props\\Room.cs",
@@ -139,12 +202,11 @@
               "RelativeToolTip": "Props\\Room.cs",
               "ViewState": "AgIAAIcCAAAAAAAAAAAvwJ0CAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:44:50.978Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:44:50.978Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 9,
               "Title": "Consume.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Moves\\Consume.cs",
               "RelativeDocumentMoniker": "Moves\\Consume.cs",
@@ -152,12 +214,11 @@
               "RelativeToolTip": "Moves\\Consume.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAjwBMAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:44:50.993Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:44:50.993Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 12,
               "Title": "Coins.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\Props\\Items\\Coins.cs",
               "RelativeDocumentMoniker": "Props\\Items\\Coins.cs",
@@ -165,12 +226,11 @@
               "RelativeToolTip": "Props\\Items\\Coins.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAArwCMAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:44:51.019Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:44:51.019Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 6,
               "Title": "GoldfieldMausoleum.cs",
               "DocumentMoniker": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\World\\Goldfield\\GoldfieldMausoleum.cs",
               "RelativeDocumentMoniker": "World\\Goldfield\\GoldfieldMausoleum.cs",
@@ -178,8 +238,7 @@
               "RelativeToolTip": "World\\Goldfield\\GoldfieldMausoleum.cs",
               "ViewState": "AgIAABkAAAAAAAAAAAAgwC0AAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T11:44:04.206Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T11:44:04.206Z"
             }
           ]
         }
