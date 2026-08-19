@@ -1,83 +1,104 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text.Json.Serialization;
+using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
 using fire_ash_server.Moves.Attacks;
 using fire_ash_server.Props.Items;
+using fire_ash_server.Props.Items.Armoring;
 using fire_ash_server.Props.Items.Weapons;
-using fire_ash_server.Props.Items.Armor;
-using fire_ash_server.Abstract_Entities;
-using static fire_ash_server.Helpers;
 using fire_ash_server.World;
-using System.Linq;
-using System.Collections.Concurrent;
-using System.Xml.Linq;
+using fire_ash_server.World.AI;
+using Newtonsoft.Json.Linq;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props
 {
-    [Serializable]
     internal class Character : Prop
-    {
-        public Room CurrentRoom;
-        public Room? LastRoom;
-        private Prop? lookAt;
-        public Prop? lookAtBeforeInventory;
-        public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
-        private List<CreatureType> types;
-        public Kindred Kindred { get; set; }
-        public Gender Gender { get; set; }
-        public int Strength { get; set; }
-        public int Dexterity { get; set; }
-        public int Constition { get; set; }
-        public int Wisdom { get; set; }
-        public int Intelligence { get; set; }
-        public int Charisma { get; set; }
-        private int hp { get; set; }
-        public int CurrentHP { get; set; }
+    {       
+        [JsonInclude]   public string Title = "";
+        [JsonInclude]   public bool NPC = true;
+        [JsonIgnore]    public Room CurrentRoom;
+        [JsonPropertyName("CurrentRoom")]
+        [JsonInclude]   public string CurrentRoomSerialization
+                        { 
+                            get => Program.WorldSoul.GetRoomKey(CurrentRoom);
+                            set => CurrentRoom = Program.WorldSoul.GetRoom(value);     
+                        }      
 
-        public Weapon DefaultHand = new Fist();
+        [JsonIgnore]    public Room? LastRoom;
+        [JsonIgnore]    private Prop? lookAt;
+        [JsonIgnore]    public Prop? lookAtBeforeInventory;
+        [JsonIgnore]    public ThreadSafeList<Prop> LookedAt = new ThreadSafeList<Prop>();
+        [JsonInclude]   private List<CreatureType> Types;
+        [JsonInclude]   public Kindred Kindred { get; set; }
+        [JsonInclude]   public Gender Gender { get; set; }
+        [JsonInclude]   public int Strength { get; set; }
+        [JsonInclude]   public int Dexterity { get; set; }
+        [JsonInclude]   public int Constition { get; set; }
+        [JsonInclude]   public int Wisdom { get; set; }
+        [JsonInclude]   public int Intelligence { get; set; }
+        [JsonInclude]   public int Charisma { get; set; }
+        [JsonInclude]   private int hp { get; set; }
+        [JsonInclude]   public int CurrentHP { get; set; }
+        [JsonInclude]   public Weapon DefaultHand = new Fist();
 
-        public bool UniqueName;
+        [JsonInclude]   public bool UniqueName;
 
-        public List<string> Feats = new List<string>();
-        public ThreadSafeList<ActiveCondition> Conditions = new ThreadSafeList<ActiveCondition>(); 
-        public Faction Faction;
-        public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
+        [JsonInclude]   public List<string> Feats = new List<string>();
 
-        public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
-        public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
-        public Inventory Inventory = new Inventory();
-        public Journal Journal;
-        public DialogueManager? DialogueManager;
-        public Character? TradingWith;
-        public bool IsTrader = false;
-        public double tradeModifier = 0.0;
-        public Character? SpeakingTo;
-        private Dictionary<Prop, ThreadSafeList<string>> UsedMovesOnProp = new Dictionary<Prop, ThreadSafeList<string>>();
-        public bool InitAttack = true;
+        [JsonIgnore]    public ThreadSafeList<BuffDebuff> BuffDebuffs = new ThreadSafeList<BuffDebuff>();
+        [JsonPropertyName("BuffDebuffs")]
+        [JsonInclude]   public List<BuffDebuff> ConditionsSerializable
+                        {
+                            get => BuffDebuffs.ToList();
+                            set => BuffDebuffs = new ThreadSafeList<BuffDebuff>(value);
+                        }
+        [JsonInclude]   public Faction Faction;
+        [JsonInclude]   public bool IsInfluencer = true; //consider change to enum: 1) None (can't infuence), 2) Normal, 3) High (2x)
+        [JsonInclude]   public Dictionary<Skill, int> Skills = new Dictionary<Skill, int>();
+        [JsonInclude]   public ConcurrentDictionary<InventorySlot, Item> EquippedItems = new ConcurrentDictionary<InventorySlot, Item>();
+        [JsonInclude]   public Inventory Inventory = new Inventory();
+        [JsonInclude]   public Journal Journal;
+        [JsonIgnore]    public DialogueManager? DialogueManager;
+        [JsonInclude]   private DialogueKey? dialogueKey;
+        [JsonIgnore]    public Character? TradingWith;
+        [JsonInclude]   public bool IsTrader = false;
+        [JsonInclude]   public double TradeModifier = 0.0;
+        [JsonIgnore]    public Character? SpeakingTo;
+        [JsonIgnore]    private Dictionary<Prop, ThreadSafeList<string>> UsedMovesOnProp = new Dictionary<Prop, ThreadSafeList<string>>();
+        [JsonIgnore]    public bool InitAttack = true;
+        [JsonIgnore]    public ToxicRelationship? EnableCombatWith = null;
+        [JsonInclude]   public bool InCombat;
+        [JsonInclude]   public bool Dead;
+        [JsonInclude]   private string deathDescription;
+        [JsonInclude]   public DateTime TimeOfDeath;
+        [JsonIgnore]    public Soul Soul;
+        [JsonInclude]   public static Dictionary<string, List<Func<string, string, string>>> hitReactions = new Dictionary<string, List<Func<string, string, string>>>();
+        [JsonIgnore]    public Action<Soul, Character>? OnBeforeSpeakTo;
+        [JsonIgnore]    public Action<Soul, Character>? OnAfterSpeakTo;
 
-        public ToxicRelationship? EnableCombatWith = null;
-        public bool InCombat;
-        public bool Dead;
-        public string deathDescription;
-        public Soul Soul;
+        [JsonInclude]   public BehaviorKey BehaviorKey = BehaviorKey.None;
+        [JsonInclude]   public Stack<Goal> Goals = new Stack<Goal>();
+        [JsonInclude]   public DateTime LastAte { get; set; } = DateTime.UtcNow;
 
-        public static Dictionary<string, List<Func<string, string, string>>> hitReactions = new Dictionary<string, List<Func<string, string, string>>>();
+        public Character() { }
 
-        public Action<Soul, Character>? OnBeforeSpeakTo;
-        public Action<Soul, Character>? OnAfterSpeakTo;
-
-        public Character(Soul soul, string name) : base(name, "")
+        public Character(Soul soul, string name) : base(name, "", name + "-" + Guid.NewGuid().ToString())
         {
             CurrentRoom = Program.WorldSoul.GetRoom(RoomKey.Void);
             Soul = soul;
+            NPC = false;
 
             init();
             Journal = new Journal(this);
 
-            types = new List<CreatureType> { CreatureType.Humanoid };
-            Kindred = Kindred.Mecharion;
+            Types = new List<CreatureType> { CreatureType.Humanoid };
+            Kindred = Kindred.Human;
             Gender = RollGender();
             Strength = Roll(3, 6).Sum();
             Dexterity = Roll(3, 6).Sum();
@@ -94,14 +115,14 @@ namespace fire_ash_server.Props
             DeathDescription = "";
 
         }
-        public Character(string name, string description, Kindred kindred, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description)
+        public Character(string name, string description, Kindred kindred, CreatureType creatureType, int strength, int dexterity, int constition, int intelligence, int wisdom, int charisma, string deathDescription) : base(name, description, Guid.NewGuid().ToString())
         {
 
             CurrentRoom = Program.WorldSoul.Rooms[Description(RoomKey.Void)];
             init();
             Journal = new Journal(this);
 
-            types = new List<CreatureType> {creatureType};
+            Types = new List<CreatureType> {creatureType};
             Kindred = kindred;
             Gender = RollGender();
             Strength = strength;
@@ -123,6 +144,20 @@ namespace fire_ash_server.Props
             Inventory.HeldBy = this;
         }
 
+        public static Character? GetCharacterFromId(string id)
+        {
+            //not including solestoned characters
+            foreach(Room room in Program.WorldSoul.Rooms.Values)
+            {
+                Character? character = room.Characters.Where(c => c.Id == id).FirstOrDefault();
+                if (character != null) 
+                    return character;
+            }
+            
+            return null;
+        }
+
+        [JsonInclude]
         public string DeathDescription
         {
             get 
@@ -134,11 +169,16 @@ namespace fire_ash_server.Props
             set { deathDescription = value; }
         }
 
+        public string NameWithTitle()
+        {
+            if (Title == "")
+                return Name;
+
+            return $"{Name} the {Title}";
+        }
+
         public static Faction NewPlayerFaction(string name)
         {
-            return Program.WorldSoul.GetFaction(FactionKey.Players);
-
-            //individual factions for players?
             Faction newPlayerFaction = new Faction(name);
             Faction playerFactionTemplate = Program.WorldSoul.GetFaction(FactionKey.Players);
 
@@ -157,6 +197,27 @@ namespace fire_ash_server.Props
             return newPlayerFaction;
         }
 
+        public void ChangeConstitutionAndUpdateHp(int addCon)
+        {
+            int oldModifier = GetModifer(Ability.Constitution);
+
+            Constition += addCon;
+
+            int newModifier = GetModifer(Ability.Constitution);
+
+            int modifierDifference = newModifier - oldModifier;
+
+            SetMaxHpOnly(hp + modifierDifference);
+        }
+
+        public void SetMaxHpOnly(int newMaxHp)
+        {
+            hp = newMaxHp;
+            if (CurrentHP > hp)
+                CurrentHP = hp;
+        }
+
+        [JsonIgnore]
         public int HP
         {
             get => hp;
@@ -180,9 +241,57 @@ namespace fire_ash_server.Props
             }
         }
 
+        public bool HasItem(string itemName)
+        {
+            return GetItem(itemName) != null;
+        }
+
+        public Item? GetItem(string itemName)
+        {
+            //should this exlude bodyparts?
+            Item? item = Inventory.Items.FirstOrDefault(i => i.Name == itemName);
+            if (item != null)
+                return item;
+
+            return EquippedItems.Values.FirstOrDefault(i => i.Name == itemName);
+        }
+
+        public void SetDialogue(DialogueKey dialogueKey)
+        {
+            this.dialogueKey = dialogueKey;
+            SetDialogueManager();
+        }
+        public DialogueKey? GetDialogueKey()
+        {
+            return dialogueKey;
+        }
+
+        public void SetDialogueManager()
+        {
+            if (dialogueKey == null)
+                return;
+            
+            Dialogues.Registry.TryGetValue((DialogueKey)dialogueKey, out Func<DialogueNode>? getDialogeuNode);
+            if (getDialogeuNode != null)
+                CreateDialogueManager(getDialogeuNode());      
+        }
+
+        public Item? GetLookingAtUnpickupable()
+        {
+            return LookedAt.LastOrDefault(p => p.GetType() == typeof(Item) && !p.IsPickupable()) as Item;
+        }
+
+        public void AddBuffDebuff(BuffDebuff buffDebuff)
+        {
+            if (buffDebuff.Unique)
+                BuffDebuffs.RemoveAll(b => b.Name == buffDebuff.Name);
+
+            BuffDebuffs.Add(buffDebuff);
+        }
+
         public bool HasCondition(Condition condition)
         {
-            foreach(ActiveCondition activeCondition in Conditions)
+            foreach(BuffDebuff activeCondition in BuffDebuffs)
             {
                 if (activeCondition.Condition == condition)
                     return true;
@@ -192,81 +301,95 @@ namespace fire_ash_server.Props
 
         public void TickConditionsDown(bool endOfCombat)
         {
-            TickConditionsDown(endOfCombat, true);
+            TickBuffsDown(endOfCombat, true);
         }
-            public void TickConditionsDown(bool endOfCombat, bool broardcast)
+        public void TickBuffsDown(bool endOfCombat, bool broardcast)
         {
-            List<Condition> removedConditions = new List<Condition>();
-            ThreadSafeList<ActiveCondition> ConditionsToBeRemoved = new ThreadSafeList<ActiveCondition>();
-            foreach (ActiveCondition activeCondition in Conditions)
+            if (!InCombat && !Program.NewGlobalTurn)
+                return;
+            
+            List<string> removedConditionsAndBuffs = new List<string>();
+            ThreadSafeList<BuffDebuff> buffsDebuffsToBeRemoved = new ThreadSafeList<BuffDebuff>();
+            foreach (BuffDebuff buffDebuff in BuffDebuffs)
             {
-                if (endOfCombat)
-                    activeCondition.Turns = 0;
-                else
-                {
-                    if (activeCondition.CreatedThisTurn)
-                    {
-                        activeCondition.CreatedThisTurn = false;
-                        continue;
-                    }
-                    activeCondition.Turns--;
-                }
 
-                if (activeCondition.Turns == 0)
+                if (buffDebuff.CreatedThisTurn)
                 {
-                    if (!removedConditions.Contains(activeCondition.Condition))
-                        removedConditions.Add(activeCondition.Condition);
-                    ConditionsToBeRemoved.Add(activeCondition);
+                    buffDebuff.CreatedThisTurn = false;
+                    if (InCombat)
+                        continue;
+                }
+                buffDebuff.Turns--;
+                
+
+                if (buffDebuff.Turns == 0)
+                {
+                    if (!removedConditionsAndBuffs.Contains(buffDebuff.Name))
+                        removedConditionsAndBuffs.Add(buffDebuff.Name);
+
+                    buffsDebuffsToBeRemoved.Add(buffDebuff);
                 }
             }
-            Conditions.RemoveAll(ConditionsToBeRemoved);
+            BuffDebuffs.RemoveAll(buffsDebuffsToBeRemoved);
 
             string endOfCombatOrTurn = "their turn";
             if (endOfCombat)
                 endOfCombatOrTurn = "combat";
 
             string conditions = "";
-            for (int i = 0; i < removedConditions.Count; i++)
+            for (int i = 0; i < removedConditionsAndBuffs.Count; i++)
             {
                 if (i == 0)
-                    conditions += $"At end of {endOfCombatOrTurn}, {Name} is no longer " + Description(removedConditions[i]);
-                //not last item
-                else if (i + 1 != removedConditions.Count)
                 {
-                    conditions += $", {Description(removedConditions[i])}";
+                    if (InCombat)
+                    {
+                        conditions = $"At end of {endOfCombatOrTurn}, {Name} is no longer " + removedConditionsAndBuffs[i];
+                    }
+                    else
+                    {
+                        conditions = $"{Name} is no longer " + removedConditionsAndBuffs[i];
+                    }
+                }
+                //not last item
+                else if (i + 1 != removedConditionsAndBuffs.Count)
+                {
+                    conditions += $", {removedConditionsAndBuffs[i]}";
                 }
                 //last item and not first
                 else
                 {
-                    conditions += $", and {Description(removedConditions[i])}";
+                    conditions += $", and {removedConditionsAndBuffs[i]}";
                 }
 
-                if (i + 1 == removedConditions.Count)
+                if (i + 1 == removedConditionsAndBuffs.Count)
                     conditions += ".";
             }
             if (conditions != "" && broardcast)
+            {
                 BroadcastToSoulsInRoom(conditions);
+            }
         }
 
         public void BroadcastActiveConditions()
         {
             string conditions = "";
-            for (int i = 0; i < Conditions.Count; i++)
+            List<BuffDebuff> buffDebuffs = BuffDebuffs.Where(b => b.Condition != null).ToList();
+            for (int i = 0; i < buffDebuffs.Count; i++)
             {
                 if (i == 0)
-                    conditions += $"{Name} is " + Description(Conditions.GetAt(i).Condition);
+                    conditions += $"{Name} is " + Description(buffDebuffs[i].Condition);
                 //not last item
-                else if (i + 1 != Conditions.Count)
+                else if (i + 1 != buffDebuffs.Count)
                 {
-                    conditions += $", {Description(Conditions.GetAt(i).Condition)}";
+                    conditions += $", {Description(buffDebuffs[i].Condition)}";
                 }
                 //last item and not first
                 else
                 {
-                    conditions += $", and {Description(Conditions.GetAt(i).Condition)}";
+                    conditions += $", and {Description(buffDebuffs[i].Condition)}";
                 }
 
-                if (i + 1 == Conditions.Count)
+                if (i + 1 == buffDebuffs.Count)
                     conditions += ".";
             }
             if (conditions != "")
@@ -284,7 +407,7 @@ namespace fire_ash_server.Props
         {
             Coins? coins = GetCoins();
             if (coins == null)
-                coins = new Coins(0, 0);
+                return Tuple.Create(0, 0);
 
             //antagelse: der er nok total
             if (coins.Gold >= gp && coins.Silver >= silver) //giver has enough gold and silver
@@ -358,7 +481,9 @@ namespace fire_ash_server.Props
                     charCoins.Gold - coins.Gold,
                     charCoins.Silver - coins.Silver);
                 if (charCoins.Gold == 0 && charCoins.Silver == 0)
-                    Items.Remove(charCoins);
+                {
+                    Inventory.Items.Remove(charCoins);
+                }
 
 
             }
@@ -376,12 +501,12 @@ namespace fire_ash_server.Props
 
         public void AddCreatureType(CreatureType creatureType)
         {
-            types.Add(creatureType);
+            Types.Add(creatureType);
         }
 
         public bool IsOfCreatureType(CreatureType creatureType)
         {
-            return types.Contains(creatureType);
+            return Types.Contains(creatureType);
         }
 
         public void ModifyRelationshipTo(Character? character, int modifier)
@@ -433,9 +558,20 @@ namespace fire_ash_server.Props
 
         }
 
-        public void Speak(string messaage)
+        public void Speak(string message)
         {
-            CurrentRoom.BroadcastToSoulsInRoom($"{Name} says:\"{messaage}\"");
+            CurrentRoom.BroadcastToSoulsInRoom($"{Name} says:\"{message}\"");
+        }
+
+        public void Yell(string message)
+        {
+            var rooms = CurrentRoom.Exits.Select(e => e.GoToRoom).Distinct();
+
+            foreach (Room room in rooms)
+            {
+                room.BroadcastToSoulsInRoom($"From {CurrentRoom.Name}, someone yells: \"{message}\"");
+            }
+            CurrentRoom.BroadcastToSoulsInRoom($"{Name} yells: \"{message}\"");
         }
 
         public void CreateDialogueManager(DialogueNode startingNode)
@@ -527,33 +663,63 @@ namespace fire_ash_server.Props
             SendCurrentHpSate();
         }
 
+        public void SetHealth(int hp)
+        {
+            if (hp > HP)
+                CurrentHP = HP;
+            else
+                CurrentHP = hp;
+
+            SendCurrentHpSate();
+            TestDeath();
+        }
+
         public void TestDeath()
         {
             if (CurrentHP > 0)
                 return;
 
+            Dies($"{Name} falls to the ground - dead.\n\n" + DeathDescription);
+        }
+
+        public void Dies(string deathMessage)
+        {
             if (!Dead)
             {
+                if (CurrentHP > 0)
+                    CurrentHP = 0;
+
                 Dead = true;
-                BroadcastToSoulsInRoom($"{Name} falls to the ground - dead.\n\n" + DeathDescription);
-            }           
+                TimeOfDeath = DateTime.UtcNow;
+                BuffDebuffs.Clear();
+                if (deathMessage != "")
+                    BroadcastToSoulsInRoom(deathMessage);           
+            }
 
             CurrentRoom.FlagCombatMightBeResolved();
+        }
+
+        public void LivesAgain()
+        {
+            Dead = false;
+            int tenPercent = (int)Math.Ceiling(HP * 0.10);
+            CurrentHP = Math.Max(tenPercent, CurrentHP);
         }
 
         public async Task Interrupt()
         {
             if (Soul.Socket == null)
                 return;
-            
+
             await Soul.SendAsync("$[cancel]");
             if (TradingWith != null)
             {
                 SetLookAt(TradingWith);
                 TradingWith = null;
             }
-            
-            Soul.CancelAndResetTokenSource();          
+
+            //Soul.CancelAndResetTokenSource();
+            Soul.StopReceiveFromLoop();
         }
 
         public int GetAC()
@@ -579,9 +745,9 @@ namespace fire_ash_server.Props
 
         public string? GetMainHandAttackDescription(Prop prop)
         {
-            return GetMainHand().GetAttackDescription(
-                Name,
-                prop);
+            Weapon weapon = GetMainHand();
+            string? s = weapon.GetType().FullName;
+            return weapon.GetAttackDescription(Name, prop);
         }
 
         public string? GetOffHandAttackDescription(Prop prop)
@@ -598,7 +764,7 @@ namespace fire_ash_server.Props
 
         public Roll GetMeleeAttackRoll(Weapon meleeWeapon)
         {
-           return new Roll(GetModifer(Skill.CloseCombat) + meleeWeapon.Modifier, RollType.AttackRoll, this);
+           return new Roll(GetModifer(Skill.CloseCombat) + meleeWeapon.Modifier, RollType.Attack, this);
         }
 
         public Roll GetRangedAttackRoll(Weapon rangedWeapon)
@@ -606,27 +772,27 @@ namespace fire_ash_server.Props
             int modifier = GetModifer(Skill.RangedCombat) + rangedWeapon.Modifier;
             if (lookAt is Character && IsInGroupWith((Character)lookAt) == true)
                 modifier -= 5;
-            return new Roll(modifier, RollType.AttackRoll, this);
+            return new Roll(modifier, RollType.Attack, this);
         }
 
         public Damage GetRangedDamageRoll(Weapon rangedWeapon)
         {
             return new Damage(
-                new Roll(rangedWeapon.DamageDie, GetModifer(Ability.Dexterity) + rangedWeapon.Modifier, RollType.DamageRoll, this),
+                new Roll(rangedWeapon.DamageDie, GetModifer(Ability.Dexterity) + rangedWeapon.Modifier, RollType.Damage, this),
                 rangedWeapon.DamageType);
         }
 
         public Damage GetMainMeleeDamageRoll(Weapon mainHandWeapon)
         {
             return new Damage(
-                new Roll(mainHandWeapon.DamageDie, GetModifer(Ability.Strength) + mainHandWeapon.Modifier, RollType.DamageRoll, this),
+                new Roll(mainHandWeapon.DamageDie, GetModifer(Ability.Strength) + mainHandWeapon.Modifier, RollType.Damage, this),
                 mainHandWeapon.DamageType);
         }
 
         public Damage GetOffHandDamageRoll(Weapon offHandWeapon)
         {
             return new Damage(
-                new Roll(offHandWeapon.DamageDie, offHandWeapon.Modifier, RollType.DamageRoll, this),
+                new Roll(offHandWeapon.DamageDie, offHandWeapon.Modifier, RollType.Damage, this),
                 offHandWeapon.DamageType);
         }
 
@@ -783,7 +949,7 @@ namespace fire_ash_server.Props
                 Roll savingThrow = new Roll(characterToAttack.GetModifer(Ability.Constitution), RollType.SavingThrow, characterToAttack);
                 if (!savingThrow.BeatsDC(13))
                 {
-                    Roll dmgRoll = new Roll(new Die(1,4), 0, RollType.DamageRoll, this);
+                    Roll dmgRoll = new Roll(new Die(1,4), 0, RollType.Damage, this);
                     Damage poisonDmg = new Damage(dmgRoll, DamageType.Poison);
                     string preDmgMessage = $"{characterToAttack.Name} fails constitution saving throw against {FormatPossessive(this.Name)} poisonous bite with a roll of {savingThrow}.";
                     characterToAttack.TakeDamage(poisonDmg, this, "venom", preDmgMessage, true);
@@ -826,9 +992,10 @@ namespace fire_ash_server.Props
 
         public void AddEquippedItem(InventorySlot inventorySlot, Item item)
         {
+            item.LastHeldBy = item.HeldBy;
             item.ClearHeldBy();
             if (!EquippedItems.TryAdd(inventorySlot, item))
-                throw new Exception($"{Description(inventorySlot)} has already an eqipped item.");
+                throw new Exception($"{Description(inventorySlot)} has already an equipped item.");
             item.HeldBy = this;
 
             foreach(Effect effect in item.EquipEffects)
@@ -842,8 +1009,24 @@ namespace fire_ash_server.Props
             LookBackFromItem(item);
         }
 
-        public void GoToRoom(Room room)
+        public void DestroyHeldItem(Item item)
         {
+            if (item.HeldBy is Inventory)
+                Inventory.Items.Remove(item);
+            else
+                foreach (KeyValuePair<InventorySlot, Item> kvp in EquippedItems)
+                {
+                    if (kvp.Value.Name == item.Name)
+                        EquippedItems.Remove(kvp.Key, out Item? removedItem);
+                }
+            ItemPopulation.Destroy(item);
+        }
+
+        public void GoToRoom(Room room, bool broadcast)
+        {
+            Console.WriteLine($"{Name} changes room: {CurrentRoom.Name} -> {room.Name}");
+            InCombat = room.InCombat;
+
             LastRoom = CurrentRoom;
             RemoveFromCurrentRoom();
             CurrentRoom = room;
@@ -854,12 +1037,38 @@ namespace fire_ash_server.Props
                 MoveToGroup(exitInNewRoom);
 
             ResetLookAt();
-            LastRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
-            if (LastRoom.RoomKey == Description(RoomKey.Void))
-                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name}.", this);
-            else
-                room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {LastRoom.Name}.", this);
+
+            if (broadcast)
+            {
+                LastRoom.BroadcastToSoulsInRoom($"{Name} left, heading in the direction of {room.Name}.", this);
+                if (LastRoom.RoomKey == Description(RoomKey.Void))
+                    room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name}.", this);
+                else
+                    room.BroadcastToSoulsInRoom($"{Name} enters The {room.Name} from The {LastRoom.Name}.", this);
+            }
+
+            if (LastRoom != null && LastRoom.InCombat)
+                LastRoom.FlagCombatMightBeResolved();
+
+            if (broadcast)
+                _ = Soul.SendAsync(room.GetDescription(this, true));
+
+            if (room.OnEnterEvent != null)
+                room.OnEnterEvent(Soul);
+
+            if (broadcast)
+                _ = Soul.SendAsync(room.GetAdditionalRoomDescription(this));
+
+            if (room.InCombat)
+                room.EnableOrUpdateCombat(this, null);
         }
+
+        public void GoToRoom(Room room)
+        {
+            GoToRoom(room, true);
+        }
+
+
 
         public void BroadcastToSoulsInRoom(string message)
         {
@@ -886,6 +1095,8 @@ namespace fire_ash_server.Props
             if (LookedAt.Count == 0 || LookedAt.GetAt(LookedAt.Count - 1) != prop)
                 LookedAt.Add(prop);
         }
+
+        [JsonIgnore]
         public Prop? LookAt
         {
             get { return lookAt; }
@@ -894,6 +1105,33 @@ namespace fire_ash_server.Props
         {
             LookedAt = new ThreadSafeList<Prop>();
             SetLookAt(CurrentRoom);         
+        }
+
+        public void ConsumeCorpse()
+        {
+            EmptyInventoryOnGround();
+            
+            if (UniqueName)
+            {
+                if (NPC || Soul.Socket != null)
+                {
+                    Item soulstone = ConsumableList.Soulstone(this);
+                    CurrentRoom.AddItem(soulstone);
+                    soulstone.MoveToGroup(this);
+                }
+            }
+
+            RemoveFromCurrentRoom();
+        }
+
+        public void EmptyInventoryOnGround()
+        {
+            foreach(Item item in Inventory.Items)
+            {
+                DropItem.RemoveItemFromCharacter(this, item);
+                CurrentRoom.AddItem(item);
+                item.MoveToGroup(this);
+            }
         }
 
         public void RemoveFromCurrentRoom()
@@ -908,16 +1146,19 @@ namespace fire_ash_server.Props
         public string StatsToString()
         {
             return
-                "Name: " + Name + "\n" +
+                "Name: " + Name + "\n\n" +
+
                 "Kindred: " + Kindred + "\n" +
-                "Gender: " + Description(Gender) + "\n" +
-                "Health Points: " + HP + "\n" +
-                "Strength: " + Strength + "\n" +
-                "Dexterity: " + Dexterity + "\n" +
-                "Constitution: " + Constition + "\n" +
-                "Intelligence: " + Intelligence + "\n" +
-                "Wisdom: " + Wisdom + "\n" +
-                "Charisma: " + Charisma;
+                "Gender: " + Description(Gender) + "\n\n" +
+
+                "Health Points: " + HP + "\n\n" +
+
+                $"Strength: {Strength} ({GetModifer(Ability.Strength).ToString("+0;-#;+0")})" + "\n" +
+                $"Dexterity: {Dexterity} ({GetModifer(Ability.Dexterity).ToString("+0;-#;+0")})" + "\n" +
+                $"Constitution: {Constition} ({GetModifer(Ability.Constitution).ToString("+0;-#;+0")})" + "\n" +
+                $"Intelligence: {Intelligence} ({GetModifer(Ability.Intelligence).ToString("+0;-#;+0")})" + "\n" +
+                $"Wisdom: {Wisdom} ({GetModifer(Ability.Wisdom).ToString("+0;-#;+0")})" + "\n" +
+                $"Charisma: {Charisma} ({GetModifer(Ability.Charisma).ToString("+0;-#;+0")})";
         }
 
         public int GetModifer(Ability ability)
@@ -1004,6 +1245,13 @@ namespace fire_ash_server.Props
                 aggressor.ModifyRelationshipTo(victim, -5);
 
             CurrentRoom.EnableOrUpdateCombat(this, toxicRel.ToxicCharacter);
+        }
+
+        public bool IsHostileTowards(Character character)
+        {
+            Relationship relationship = GetRelationShipTo(character);
+
+            return relationship.IsHostile() || character.Flags.Any(f => f.Type == FlagKey.Stole && Faction.KeyIs(f.FactionKey));
         }
 
         public Relationship GetRelationShipTo(Character character)
@@ -1133,7 +1381,7 @@ namespace fire_ash_server.Props
 
         public bool HasPointLight()
         {
-            foreach(Effect effect in GetAllEffectsIncludingFeats())
+            foreach(Effect effect in GetAllEffectsIncludingFeatsAndBuffs())
             {
                 if (effect.LightPointerModifer >= Light.Dim)
                     return true;
@@ -1141,7 +1389,7 @@ namespace fire_ash_server.Props
             return false;
         }
 
-        public List<Effect> GetAllEffectsIncludingFeats()
+        public List<Effect> GetAllEffectsIncludingFeatsAndBuffs()
         {
             List<Effect> allEffects = Effects.ToList();
             foreach(string featName in Feats)
@@ -1151,6 +1399,11 @@ namespace fire_ash_server.Props
                 {
                     allEffects.AddRange(feat.Effects);
                 }
+            }
+            foreach(BuffDebuff buffDebuff in BuffDebuffs)
+            {
+                if (buffDebuff.Effect != null)
+                allEffects.Add(buffDebuff.Effect);
             }
             return allEffects;
         }
@@ -1164,6 +1417,167 @@ namespace fire_ash_server.Props
         {
             return Feats.Contains(Description(key));
         }
+
+        public void RespawnItems()
+        {
+            if (ItemRespawns == null)
+                return;
+
+            foreach (ItemRespawn itemSpawn in ItemRespawns)
+            {
+                if (DateTime.UtcNow < itemSpawn.NextRespawn)
+                    continue;
+
+                if (Inventory.Items.Count(i => i.Name.Contains(Description(itemSpawn.ItemFactoryKey))) >= itemSpawn.MaxItems)
+                {
+                    itemSpawn.SetNextRespawnTime();
+                    continue;
+                }
+
+                Item item = ItemFactory.Registry[itemSpawn.ItemFactoryKey]();
+
+                AddToInventory(item);
+
+                itemSpawn.SetNextRespawnTime();
+            }
+        }
+
+        #region AI
+
+        public void ExecuteAIGoalAndTryEnambleCombat()
+        {
+            ExecuteAiGoal();
+            TryEnableCombat();
+        }
+
+        public void ExecuteAiGoal()
+        {
+            if (Dead)
+                return;
+
+            if (!Goals.Any()) 
+                return;
+
+            Goal currentGoal = Goals.Peek();
+            
+            Dictionary<Goal, GoalAction>? goalActions;
+            Behavior.goalActionsByBehaviorKey.TryGetValue(BehaviorKey, out goalActions);
+            if (goalActions == null)
+                return;
+
+            GoalAction? goalAction;
+            goalActions.TryGetValue(currentGoal, out goalAction);
+            if (goalAction == null)
+                return;
+
+            BehaviorResult result = goalAction.Action(this);
+            if (result == BehaviorResult.Completed)
+            {
+                Goals.Pop();
+                if (goalAction.OnCompleted.HasValue)
+                {
+                    Goals.Push(goalAction.OnCompleted.Value);
+                }
+            }
+            else if (result == BehaviorResult.CantComplete)
+            {
+                if (goalAction.PopOnCantComplete)
+                    Goals.Pop();
+                if (goalAction.OnCantComplete.HasValue)
+                {
+                    Goals.Push(goalAction.OnCantComplete.Value);
+                }
+            }
+        }
+
+        public BehaviorResult AI_MoveToDarkSpot()
+        {
+            if (GetLightState(null) == Light.Darkness)
+                return BehaviorResult.Completed;
+
+            List<Item> darkSpots = CurrentRoom.Items.Where(i => i.GetLightState(null) == Light.Darkness && i.DynamicDescription).ToList();
+            if (darkSpots.Any())
+            {
+                _ = new MoveTo(Soul, darkSpots[GetRandomInt(darkSpots.Count)]).Execute(Soul);
+                return BehaviorResult.Completed;
+            }
+
+            return BehaviorResult.CantComplete;
+        }
+
+        public BehaviorResult AI_ExitRoom()
+        {
+            List<Exit> relevantExits = CurrentRoom.Exits.Where(e => e.State.IsOpen).ToList();
+
+            if (!relevantExits.Any())
+                return BehaviorResult.CantComplete;
+
+            // Prefer open exits that don't lead back to LastRoom
+            List<Exit> forwardExits = relevantExits.Where(e => e.GoToRoom != LastRoom).ToList();
+
+            // If there are forward exits, pick one; otherwise, fall back to any open exit
+            List<Exit> candidateExits = forwardExits.Any() ? forwardExits : relevantExits;
+
+            Exit ChosenExit = candidateExits[GetRandomInt(candidateExits.Count)];
+
+            if (IsInGroupWith(ChosenExit) == false)
+            {
+                _ = new MoveTo(Soul, ChosenExit).Execute(Soul);
+                return BehaviorResult.Inprogress;
+            }
+
+            _ = new RoomChange(Soul, ChosenExit).Execute(Soul);
+            return BehaviorResult.Completed;
+        }
+        public BehaviorResult AI_Prey()
+        {
+            //add food
+
+
+            List<Character> deadBodies = CurrentRoom.Characters.Where(c => c.Dead && !c.IsHidden()).ToList();
+            if (deadBodies.Any())
+            {
+                List<Character> closeDeadBodies = deadBodies.Where(c => c.IsInGroupWith(this) == true).ToList();
+                if (closeDeadBodies.Any())
+                {
+                    int randomIndex = new Random().Next(closeDeadBodies.Count);
+                    Character closeDeadBody = closeDeadBodies[randomIndex];
+
+                    _ = new EatCorpse(Soul, closeDeadBody).Execute(Soul);
+                    return BehaviorResult.Completed;
+                }
+                else
+                {
+                    int randomIndex = new Random().Next(deadBodies.Count);
+                    Character deadBody = deadBodies[randomIndex];
+
+                    _ = new MoveTo(Soul, deadBody).Execute(Soul);
+                    return BehaviorResult.Inprogress;
+                }
+            }
+
+            List<Character> charactersThatDoNotShareType = CurrentRoom.Characters
+                .Where(c => c != this && !c.Dead && !c.IsHidden() && !c.Types.Any(t => this.Types.Contains(t)))
+                .ToList();
+
+
+
+            if (!charactersThatDoNotShareType.Any())
+                return BehaviorResult.CantComplete;
+
+            Character? preyCloseBy = charactersThatDoNotShareType.Where(c => c.IsInGroupWith(this) == true).FirstOrDefault();
+            if (preyCloseBy == null)
+            {
+                preyCloseBy = charactersThatDoNotShareType[GetRandomInt(charactersThatDoNotShareType.Count)];
+                _ = new MoveTo(Soul, preyCloseBy).Execute(Soul);
+                return BehaviorResult.Inprogress;
+            }
+            _ = new MeleeAttack(Soul, preyCloseBy).Execute(Soul);
+            return BehaviorResult.Inprogress;
+
+        }
+
+        #endregion
 
     }
 }

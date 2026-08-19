@@ -12,7 +12,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves.Attacks
 {
-    [Serializable]
     internal class Attack : Move
     {
         public Attack(string key, string description, Character characterToAttack, RangeType rangeType) : base(key, description, characterToAttack)
@@ -83,7 +82,7 @@ namespace fire_ash_server.Moves.Attacks
             }
             if (characterToAttack.GetLightState(character) == Light.Dim)
             {
-                Roll roll = new Roll(new Die(1, 100), 0, RollType.DimLightAttackRoll, character);
+                Roll roll = new Roll(new Die(1, 100), 0, RollType.DimLightAttack, character);
                 if (roll.GetSum() <= 15)
                 {
                     character.CurrentRoom.BroadcastToSoulsInRoom(

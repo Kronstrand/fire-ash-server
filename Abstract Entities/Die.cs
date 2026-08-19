@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace fire_ash_server
 {
-    [Serializable]
     internal class Die
     {
         public int NumberOfDies { get; set; }
         public int Sides { get; set; }
+
+        public Die() { }
         public Die(int numberOfDies, int numberOfSides)
         {
             NumberOfDies = numberOfDies;

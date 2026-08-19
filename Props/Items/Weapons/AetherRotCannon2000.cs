@@ -7,7 +7,6 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class AetherRotCannon2000 : Weapon
     {
         public AetherRotCannon2000() : base("Aether Rot Cannon 2000", "Developed for a war that never happened. Or maybe it did, and the ARC-2000 just erased all evidence.", new Die(1, 6), DamageType.Necrotic, 70)
@@ -15,7 +14,11 @@ namespace fire_ash_server.Props.Items.Weapons
             
             TwoHander = true;
             Modifier = 10;
-            CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{InventorySlot.Ranged};
+            CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{InventorySlot.Ranged};      
+        }
+
+        public override void InitAttackDescriptions()
+        {
             SetGeneralAttackDescriptionsForType();
             SetHumanoidAttackDescriptionsForType();
         }

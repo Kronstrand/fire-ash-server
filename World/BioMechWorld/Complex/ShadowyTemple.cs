@@ -114,7 +114,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
             auroraTheShadowmancer.GoToRoom(templeOfShadowsAndTechnology);
             auroraTheShadowmancer.MoveToGroup(altar);
 
-            auroraTheShadowmancer.AddOnAfterMoveToEvent((soul) =>
+            /*auroraTheShadowmancer.AddOnAfterMoveToEvent((soul) =>
             {
                 if (auroraTheShadowmancer.Dead)
                     return Task.FromResult(false);
@@ -131,12 +131,12 @@ namespace fire_ash_server.World.BioMechWorld.Complex
 
                 return Task.FromResult(true);
             },
-            false);
+            false);*/
 
             Character nyx = new Character(
                 "Nyx, the Temple Cat",
                 "A sleek, dark-furred cat with eyes like liquid silver. Nyx moves with ethereal grace, often blending into the shadows of the temple. Her presence is both comforting and enigmatic, adding a subtle touch of mystique wherever she goes.",
-                Kindred.Feline,
+                Kindred.None,
                 CreatureType.Beast,
                 4, // strength
                 16, // dexterity

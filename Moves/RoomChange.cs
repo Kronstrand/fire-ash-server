@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
@@ -8,12 +9,12 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class RoomChange : Move
     {
-        public RoomChange(Soul soul, Exit exit) : base(MoveKey.r.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom, CreateAction(soul, exit))
+        public RoomChange(Soul soul, Exit exit) : base(MoveKey.r.ToString(), CreateDescription(exit.GoToRoom), exit.GoToRoom)
         {
             IsMovement = true;
+            Action = CreateAction(soul, exit);
         }
 
         private static string CreateDescription(Room room)
@@ -21,7 +22,7 @@ namespace fire_ash_server.Moves
             return $"Enter {room.Name}.";
         }
 
-        private static Func<Task> CreateAction(Soul soul, Exit exit)
+        private Func<Task> CreateAction(Soul soul, Exit exit)
         {
             return async () =>
             {                
@@ -33,6 +34,9 @@ namespace fire_ash_server.Moves
                 }
 
                 await soul.MoveCharToRoomAndSendDescriptionAsync(exit.GoToRoom);
+
+                if (!soul.Character.IsHidden())
+                    TriggerHostileCloseCombat(soul, null);
             };
         }
     }

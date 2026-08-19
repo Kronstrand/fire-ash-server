@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
-using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Armoring;
 using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
@@ -44,10 +44,10 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             brokenBridge.AddExit(exitToUndergroundCavePath);
 
             Character shadeCreeper = MonsterCreator.Shadecreeper();
-            shadeCreeper.AddToInventory(ConsumableList.BearTrap());
+            //shadeCreeper.AddToInventory(ConsumableList.BearTrap());
             shadeCreeper.GoToRoom(brokenBridge);
 
-            Events.AddCharacterMoveToAndIsrangedAttacked(shadeCreeper, exitToUndergroundCavePath);
+            //Events.AddCharacterMoveToAndIsrangedAttacked(shadeCreeper, exitToUndergroundCavePath);
 
 
 

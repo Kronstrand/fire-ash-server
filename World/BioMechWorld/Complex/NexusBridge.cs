@@ -29,13 +29,13 @@ namespace fire_ash_server.World.BioMechWorld.Complex
             Exit toBridgeFromCreationChamber = new Exit(
                 "An imposing steel doorframe marks the exit, its rigid structure contrasting with the room's lifeblood. Beyond, a central metal bridge extends into the hazy distance.",
                 nexusBridge);
-            toBridgeFromCreationChamber.AddOnAfterMoveToEvent(
+            /*toBridgeFromCreationChamber.AddOnAfterMoveToEvent(
                 (soul) =>
                 {
                     _ = soul.SendAsync("A cold breeze wafts in from beyond the door, carrying a hint of metallic chill.");
                     return Task.FromResult(true);
                 },
-                false);
+                false);*/
             creationChamber.AddExit(toBridgeFromCreationChamber);
 
 

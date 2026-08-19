@@ -7,7 +7,7 @@ using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
-using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Armoring;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
@@ -73,7 +73,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
 
             eriska.UniqueName = true;
             eriska.IsTrader = true;
-            eriska.tradeModifier = 0.2;
+            eriska.TradeModifier = 0.2;
             eriska.HP = 24;
             eriska.Faction = Program.WorldSoul.GetFaction(FactionKey.Technomancers);
 
@@ -81,11 +81,11 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             eriska.AddToInventory(ConsumableList.HealthPotion());
             eriska.AddToInventory(ConsumableList.HealthPotion());
             eriska.AddToInventory(ConsumableList.HealthPotion());
-            eriska.AddToInventory(ConsumableList.BookOfHealth());
+            //eriska.AddToInventory(ConsumableList.BookOfHealth());
             eriska.AddToInventory(new Coins(200, 32));
 
 
-            eriska.AddOnAfterMoveToEvent((Soul soul) =>
+            /*eriska.AddOnAfterMoveToEvent((Soul soul) =>
             {
                 if (eriska.Dead)
                     return Task.FromResult(false);
@@ -102,7 +102,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
 
                 return Task.FromResult(true);
             },
-            false);
+            false);*/
 
             DialogueNode eriskaIntroNode = new DialogueNode(
                 "I see you have met Lily... Such a fragile thing, isn't she? A pity, truly, what has become of her. But pity does little to mend what is broken."

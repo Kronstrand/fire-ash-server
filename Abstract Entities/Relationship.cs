@@ -9,12 +9,13 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server
 {
-    [Serializable]
     internal class Relationship
     {
         public Faction Faction1;
         public Faction Faction2;
         public int Value;
+
+        public Relationship() { }
 
         public Relationship(Faction faction1, Faction faction2, int value) 
         {   

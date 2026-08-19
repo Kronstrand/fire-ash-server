@@ -9,7 +9,6 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server
 {
-    [Serializable]
     internal class Roll
     {
         public int[] DieRolls;
@@ -67,7 +66,7 @@ namespace fire_ash_server
         {
             int modifer = 0;
             if (RollingCharacter != null)
-                foreach(Effect effect in RollingCharacter.GetAllEffectsIncludingFeats()) 
+                foreach(Effect effect in RollingCharacter.GetAllEffectsIncludingFeatsAndBuffs()) 
                 {
                     foreach(RollModifier rollModifier in effect.rollModifiers)
                     {

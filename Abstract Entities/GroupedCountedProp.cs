@@ -7,7 +7,6 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.Abstract_Entities
 {
-    [Serializable]
     internal class GroupedCountedProp
     {
         public Prop? Prop { get; set; } //unpickupable item or exit
@@ -22,7 +21,7 @@ namespace fire_ash_server.Abstract_Entities
 
         public void AddToCountedCharacters(Character character)
         {
-            string characterName = character.Name;
+            string characterName = character.NameWithTitle();
             if (CountedCharacters.ContainsKey(characterName))
                 CountedCharacters[characterName] = new CountedCharacter(
                     CountedCharacters[characterName].Count + 1,
@@ -36,7 +35,6 @@ namespace fire_ash_server.Abstract_Entities
         }
     }
 
-    [Serializable]
     internal class CountedCharacter
     {
         public int Count { get; set; }

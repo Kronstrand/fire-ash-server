@@ -6,45 +6,99 @@ using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using fire_ash_server.Enums;
-using fire_ash_server.World;
-using fire_ash_server.Moves;
-using fire_ash_server.Abstract_Entities;
-using static fire_ash_server.Helpers;
-using fire_ash_server.Props.Items;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.Serialization;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using fire_ash_server.Abstract_Entities;
+using fire_ash_server.Enums;
+using fire_ash_server.Moves;
+using fire_ash_server.Props.Items;
+using fire_ash_server.World;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props
 {
-    [Serializable]
     internal class Room : Prop
     {
-        public string RoomKey;
-        public ThreadSafeList<Character> Characters = new ThreadSafeList<Character>();
-        public ThreadSafeList<Grouping> Groupings = new ThreadSafeList<Grouping>();
-        public ThreadSafeList<Relationship> RelationshipsInHostileCombat = new ThreadSafeList<Relationship>();
-        public ThreadSafeList<Exit> Exits = new ThreadSafeList<Exit>();
-        public Action<Soul>? OnEnterEvent;
-        private List<Action> onCombatEndEvents = new List<Action>();
-        private List<Action> onCombatEndEventsToBeRemoved = new List<Action>();
-        public bool InCombat;
-        private bool testCombatResolved;
-        public bool AddCombatantsInCombatLoop;
+        [JsonIgnore]    private string roomKey;
 
-        public Room(string roomKey,string name, string description) : base(name, description)
-        {   
+        [JsonInclude]   public string RoomKey 
+                        {
+                            get => roomKey;
+                            set
+                            {
+                                roomKey = value;
+                                Program.WorldSoul.AddRoom(this); //adding in deserialization
+                            }
+                        }
+        [JsonIgnore]    public ThreadSafeList<Character> Characters = new ThreadSafeList<Character>();
+        [JsonPropertyName("Characters")]
+        [JsonInclude]   public List<Character> CharactersSerializable
+                        {
+                            get => Characters.Where(c => c.Soul.IsDaemon == true).ToList(); //exclude players
+                            set => Characters = new ThreadSafeList<Character>(value);
+                        }
+
+
+
+        //[JsonIgnore] public ThreadSafeList<Item> ItemsInRoom = new ThreadSafeList<Item>();
+
+
+
+
+        [JsonIgnore]    public ThreadSafeList<Grouping> Groupings = new ThreadSafeList<Grouping>(); 
+        [JsonPropertyName("Groupings")]
+        [JsonIgnore]   public List<Grouping> GroupingsSerializable //To Do
+        {
+                            get => Groupings.ToList();
+                            set => Groupings = new ThreadSafeList<Grouping>(value);
+                        }
+
+        [JsonIgnore]    public ThreadSafeList<Relationship> RelationshipsInHostileCombat = new ThreadSafeList<Relationship>();
+        
+        [JsonPropertyName("RelationshipsInHostileCombat")]
+        [JsonInclude]   public List<Relationship> RelationshipsInHostileCombatSerializable
+                        {
+                            get => RelationshipsInHostileCombat.ToList();
+                            set => RelationshipsInHostileCombat = new ThreadSafeList<Relationship>(value);
+                        }
+
+        [JsonIgnore]    public ThreadSafeList<Exit> Exits = new ThreadSafeList<Exit>();
+        
+        [JsonPropertyName("Exits")]
+        [JsonInclude]   public List<Exit> ExitsSerializable
+                        {
+                            get => Exits.ToList();
+                            set => Exits = new ThreadSafeList<Exit>(value);
+                        }
+
+        [JsonIgnore]    public Action<Soul>? OnEnterEvent;
+        [JsonIgnore]    private List<Action> onCombatEndEvents = new List<Action>();
+        [JsonIgnore]    private List<Action> onCombatEndEventsToBeRemoved = new List<Action>();
+        [JsonIgnore]    public bool InCombat;
+        [JsonIgnore]    private bool TestCombatResolved;
+        [JsonIgnore]    public bool AddCombatantsInCombatLoop;
+
+        public Room() 
+        {
+        }
+
+        public Room(string roomKey,string name, string description) : base(name, description, roomKey)
+        {
+            WorldProp = true;
             RoomKey = roomKey;
             Light = Light.Dim;
             Program.WorldSoul.AddRoom(this);
         }
-        public Room(string roomKey, string name, string description, bool skipAddToRoom) : base(name, description)
+        public Room(string roomKey, string name, string description, bool skipAddToRoom) : base(name, description, roomKey)
         {
+            WorldProp = true;
             RoomKey = roomKey;
             Light = Light.Dim;
             if (!skipAddToRoom)
@@ -82,7 +136,7 @@ namespace fire_ash_server.Props
             for (int i = 0; i < exitList.Count; i++)
             {
                 if (i != 0)
-                    description += "; ";
+                    description += ".\n\n";//"; ";
 
                 string exitDescription = exitList[i].GetDescription(lookingCharacter, false);
 
@@ -94,11 +148,19 @@ namespace fire_ash_server.Props
             
             string charactersAsString = ListPropsAsString(lookingCharacter);
             if (charactersAsString != "")
-                description += "\n\n" + charactersAsString;
-
+            {
+                if (description != "")
+                    description += "\n\n";
+                description += charactersAsString;
+            }
+                
             string restOfItemsAsString = ListRestOfItemsAsString(lookingCharacter);
             if (restOfItemsAsString != "")
-                description += "\n\n" + restOfItemsAsString;
+            {
+                if (description != "")
+                    description += "\n\n";
+                description += restOfItemsAsString;
+            }
 
             return description;
         }
@@ -174,13 +236,15 @@ namespace fire_ash_server.Props
         }
         
 
-            private string ListItemsAsString(Character lookingCharacter, Prop? groupProp)
+            private string ListItemsAsString(Character lookingCharacter, Prop? groupProp, out bool IsSingular)
         {
             Grouping? grouping = null;
             if (groupProp != null)
                 grouping = groupProp.GetGrouping(lookingCharacter.CurrentRoom);
 
             List<Item> items = lookingCharacter.CurrentRoom.Items.Where(e => !e.IsHidden() && e.IsPickupable() && e.GetGrouping(lookingCharacter.CurrentRoom) == grouping).ToList();
+
+            IsSingular = (items.Count == 1 && !items[0].IsPlural) ? true : false;
 
             return ListToString(items);
         }
@@ -264,7 +328,7 @@ namespace fire_ash_server.Props
             int numberOfItems = 0;
             int outerLoopCounter = 0;
 
-            string output = "As you look around you also see";     
+            string output = "As you look around you see";     
             foreach (GroupedCountedProp groupedCountedProp in groupedCountedProps)
             {
                 outerLoopCounter++;
@@ -307,9 +371,13 @@ namespace fire_ash_server.Props
                         else if (groupedCountedProp.Prop == null)
                             output += $" unaccompanied";
 
-                        string itemsAsString = ListItemsAsString(lookingCharacter, groupedCountedProp.Prop);
+                        bool isSingular;
+                        string itemsAsString = ListItemsAsString(lookingCharacter, groupedCountedProp.Prop, out isSingular);
                         if (itemsAsString != "")
-                            output += " where on the ground lies " + itemsAsString;
+                        {
+                            string lies = isSingular ? "lies" : "lie";
+                            output += $" where on the ground {lies} " + itemsAsString;
+                        }
 
                         if (outerLoopCounter != groupedCountedProps.Count())
                             output += ';';
@@ -334,11 +402,11 @@ namespace fire_ash_server.Props
         public void FlagCombatMightBeResolved()
         {
             if (InCombat)
-                testCombatResolved = true;
+                TestCombatResolved = true;
         }
         public bool TestCombatReslovedIsFlagged()
         {
-            return testCombatResolved;
+            return TestCombatResolved;
         }
 
         public void EnableOrUpdateCombat(Character enabledBy, Character? enemy)
@@ -468,7 +536,7 @@ namespace fire_ash_server.Props
 
         private List<Character> GetOrderedCombatants(Dictionary<Character, int> initiativeRolls)
         {
-            List<Character> combatCharacters = Characters.Where(c => c.InCombat).ToList();
+            List<Character> combatCharacters = Characters.Where(c => c.InCombat && !c.Dead).ToList();
             if (combatCharacters.Count == 0)
                 return new List<Character>();
 
@@ -494,7 +562,7 @@ namespace fire_ash_server.Props
                     initiative += $" {roll}  {combatChar.Name}";
                 else 
                     initiative += $"{roll} {combatChar.Name}";
-                if (!firstRound && !xOrderedCombatChars.Contains(combatChar)) //dosnt work, since char is never removed from list...
+                if (!firstRound && !xOrderedCombatChars.Contains(combatChar))
                     initiative += " (Joined combat)";
             }
             BroadcastToSoulsInRoom(initiative);
@@ -525,11 +593,12 @@ namespace fire_ash_server.Props
 
                     AddCombatantsInCombatLoop = false;
 
-                    foreach(Character combatCaracter in orderedCombatChars)
-                    {
-                        if (combatCaracter != initiater)                        
-                            await combatCaracter.Interrupt();
-                    }
+                    if(round == 1)
+                        foreach(Character combatCaracter in orderedCombatChars)
+                        {
+                            if (combatCaracter != initiater)                        
+                                await combatCaracter.Interrupt();
+                        }
                     
                     foreach (Character tradingCharacterNotInCombat in Characters.Where(c => c.TradingWith != null && !c.InCombat))
                     {
@@ -539,6 +608,8 @@ namespace fire_ash_server.Props
                     initiater = null;
 
                     BroadcastInitiative(orderedCombatChars, activeOrderedCombatCharsInRound, initiativeRolls, (round == 1));
+                    activeOrderedCombatCharsInRound = orderedCombatChars;
+
                 }
 
                 Console.WriteLine($"Combat round {round} in room {Name}.");
@@ -567,7 +638,8 @@ namespace fire_ash_server.Props
 
                         Console.WriteLine($"{character.Name} has {character.Soul.ShownPossibleMoves.Count} moves");
                         if (!skipLoop)
-                        {                          
+                        {
+                            Move? nextMove = null;
                             if (!character.Soul.IsDaemon)
                             {
                                 try
@@ -578,7 +650,7 @@ namespace fire_ash_server.Props
                                         BroadcastToSoulsInRoom($"{character.Name} has the initiative...");
                                         playerTurnBroadcasted = true;
                                     }
-                                    Move? nextMove = await character.Soul.ReceiveAndHandleMoveAsync(false);
+                                    nextMove = await character.Soul.ReceiveAndHandleMoveAsync(false, 18);
                                     ActionUsed = await ExecuteCombatAction(character, nextMove);
                                     character.TryEnableCombat();
                                 }
@@ -590,28 +662,47 @@ namespace fire_ash_server.Props
                                 catch (Exception ex)
                                 {
                                     Console.WriteLine(ex.ToString());
-                                    character.Soul.Banish();
+                                    await character.Soul.BanishAsync();
                                 }
                             }
                             else
                             {
-                                Move? nextMove = character.Soul.DaemonChoosesNextMove();
+                                nextMove = character.Soul.DaemonChoosesNextMove();
                                 if (nextMove != null && nextMove.Type != MoveType.MinorAction)
-                                    await Task.Delay(1500);
+                                    await Task.Delay(1000);
                                 ActionUsed = await ExecuteCombatAction(character, nextMove);
                                 character.TryEnableCombat();
+                            }
+
+                            if (nextMove != null)
+                            {
+                                if (nextMove.MoveDuration != null)
+                                    await Task.Delay((int)nextMove.MoveDuration);
+                                else if (nextMove.Type == MoveType.Action)
+                                    await Task.Delay(6000);
+                                //else
+                                    //await Task.Delay(1000);
                             }
                         }
                         character.TickConditionsDown(false);
                     }
                     if (TestCombatReslovedIsFlagged())
+                    {
                         if (CombatIsResolved())
                         {
                             DisableCombat(true);
                             return;
                         }
+                        else
+                        {
+                            TestCombatResolved = false;
+                        }
+                    }
+                    
                 }
+                Console.WriteLine($"Combat round {round} Finished.");
                 round++;
+                Thread.Sleep(10);
             }
         }
 
@@ -662,10 +753,10 @@ namespace fire_ash_server.Props
                 {
                     message = buffer + message;
                     RemoveBufferTextForThread();
-                    Console.WriteLine("Buffer used and cleared at " + DateTime.Now);
+                    Console.WriteLine("Buffer used and cleared at " + DateTime.UtcNow);
                 }
                 else
-                    Console.WriteLine("send without buffer at " + DateTime.Now);
+                    Console.WriteLine("send without buffer at " + DateTime.UtcNow);
 
                 if (character.IsHidden())
                 {
@@ -684,6 +775,57 @@ namespace fire_ash_server.Props
                     _ = characterInRoom.Soul.SendAsync(message);
                 }
             }
+        }
+
+        public Prop? GetBaseLevelPropById(string id)
+        {
+            foreach(Character character in Characters)
+                if(character.Id == id) return character;
+            foreach(Exit exit in Exits)
+                if(exit.Id == id) return exit;
+            foreach(Item item in Items)
+                if(item.Id == id) return item;
+            
+            return null;
+        }
+
+        public int GetCharacterCount(string name)
+        {
+            return Characters.Count(c => c.Name == name);
+        }
+
+        public void CreateRespawningMonster(Func<Character> monsterFactory, int minMinutes, int maxMinutes, int maxSpawns, Prop? moveToProp)
+        {
+            DateTime nextSpawn = DateTime.UtcNow;
+            string rootName = monsterFactory.Method.Name;
+
+            Update = () =>
+            {
+                void ScheduleNextSpawn()
+                {
+                    nextSpawn = DateTime.UtcNow.AddMinutes(
+                        GetRandomInt(maxMinutes - minMinutes + 1) + minMinutes
+                    );
+                }
+
+                if (DateTime.UtcNow < nextSpawn)
+                    return;
+
+                int count = Characters.Count(c => c.Name.Contains(rootName) && !c.Dead && c.Soul.IsDaemon);
+                if (count >= maxSpawns)
+                {
+                    ScheduleNextSpawn();
+                    return;
+                }
+
+                Character monster = monsterFactory();
+
+                monster.GoToRoom(this);
+                if (moveToProp != null)
+                    monster.MoveToGroup(moveToProp);
+
+                ScheduleNextSpawn();
+            };
         }
     }
 }

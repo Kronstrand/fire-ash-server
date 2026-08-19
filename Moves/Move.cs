@@ -13,7 +13,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Move
     {
         public string Key;
@@ -30,6 +29,8 @@ namespace fire_ash_server.Moves
         public bool EnablesCombat;
         public RangeType Range = RangeType.CloseSingleTarget;
         public bool IsMovement = false;
+        public string Payload = "";
+        public int? MoveDuration = null;
 
         public Move(string key, string description, Func<Task> action)
         {
@@ -119,11 +120,12 @@ namespace fire_ash_server.Moves
                     Character target = characters[new Random().Next(characters.Count)];
 
                     character.Unhide();
-                    Relationship rel = character.GetRelationShipTo(target);
+                    //Relationship rel = character.GetRelationShipTo(target);
                     string message = "";
 
-                    RelationshipStatus relStatus = rel.GetStatus();
-                    if (relStatus == RelationshipStatus.bad)
+                    //RelationshipStatus relStatus = rel.GetStatus();
+                    if (target.IsHostileTowards(character))
+                    //if (relStatus == RelationshipStatus.bad)
                     {
                         message = $"{character.Name} fails to stay hidden with a roll of {stealthRoll} and is aggressively engaged by {target.Name}.";
                         EnablesCombat = true;
@@ -161,13 +163,12 @@ namespace fire_ash_server.Moves
         {
             await Execute(soul, soul.Character);
         }
-        public async Task Execute(/*ref Move move,*/Soul soul, Character activeCharacter)
+        public async Task Execute(Soul soul, Character activeCharacter)
         {
             if (!soul.Character.PropTargetIsValid(this))
                 return;
 
             soul.Character.RegisterUsedMoveOnProp(this);
-
 
             if (this is Attack)
                 if (soul.Character.GetLightState(null) == Light.Darkness)
@@ -176,7 +177,7 @@ namespace fire_ash_server.Moves
                         SetThreadBasedBufferText($"From the darkness, ");
                     else
                         SetThreadBasedBufferText($"Within the darkness, ");
-                    Console.WriteLine("Buffer is set at " + DateTime.Now);
+                    Console.WriteLine("Buffer is set at " + DateTime.UtcNow);
                 }
 
 
@@ -223,9 +224,9 @@ namespace fire_ash_server.Moves
             }
         }
 
-        public void TriggerHostileCloseCombat(Soul soul, Prop targetProp)
+        public void TriggerHostileCloseCombat(Soul soul, Prop? targetProp)
         {
-            Grouping? grouping = targetProp.GetGrouping();
+            Grouping? grouping = soul.Character.GetGrouping();
             if (grouping != null)
             {
                 foreach (Prop prop in grouping.Props)
@@ -236,8 +237,7 @@ namespace fire_ash_server.Moves
                     Character character = (Character)prop;
                     if (character == soul.Character || !character.InitAttack)
                         continue;
-
-                    if (character.GetRelationShipTo(soul.Character).IsHostile())
+                    if (character.IsHostileTowards(soul.Character))
                     {
                         EnablesCombat = true;
                         soul.Character.EnableCombatWith = new ToxicRelationship(character, false);
@@ -248,7 +248,7 @@ namespace fire_ash_server.Moves
             else if (targetProp is Character)
             {
                 Character character = (Character)targetProp;
-                if (character.InitAttack && character.GetRelationShipTo(soul.Character).IsHostile())
+                if (character.InitAttack && character.IsHostileTowards(soul.Character))
                 {
                     EnablesCombat = true;
                     soul.Character.EnableCombatWith = new ToxicRelationship(character, false);

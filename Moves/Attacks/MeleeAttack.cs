@@ -9,7 +9,6 @@ using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves.Attacks
 {
-    [Serializable]
     internal class MeleeAttack : Attack
     {
         Weapon? weapoon = null;
@@ -20,7 +19,7 @@ namespace fire_ash_server.Moves.Attacks
 
             Action = () =>
             {
-                Console.WriteLine("BufferText from Action is _" + character.Soul.BufferText + "_ at " + DateTime.Now);
+                Console.WriteLine("BufferText from Action is _" + character.Soul.BufferText + "_ at " + DateTime.UtcNow);
                 TryAttack(character, characterToAttack, weapoon, character.AttackWithMainHand);
                 return Task.CompletedTask;
                 

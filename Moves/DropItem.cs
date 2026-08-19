@@ -10,7 +10,6 @@ using fire_ash_server.Abstract_Entities;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class DropItem : Move
     {
         public DropItem(Soul soul, Item prop) : base(MoveKey.d.ToString(), CreateDescription(prop), prop, async () => { })
@@ -29,10 +28,19 @@ namespace fire_ash_server.Moves
             return async () =>
             {
                 RemoveItemFromCharacter(soul.Character, item);
-                soul.Character.CurrentRoom.AddItem(item);
-                item.MoveToGroup(soul.Character);
 
-                soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} dropped {item.Name}.");
+                Item? lookingAtProp = soul.Character.GetLookingAtUnpickupable();
+                if (lookingAtProp == null)
+                {
+                    soul.Character.CurrentRoom.AddItem(item);
+                    item.MoveToGroup(soul.Character);
+                    soul.Character.BroadcastToSoulsInRoom($"{soul.Character.Name} places {item.Name} on the ground.");
+                }
+                else
+                {
+                    lookingAtProp.AddItem(item);
+                    soul.Character.BroadcastToSoulsInRoom($"{soul.Character.Name} places {item.Name} so that it is {lookingAtProp.HoldsDescription} {lookingAtProp.Name}"); 
+                }
 
                 soul.Character.LookBackFromItem(item);
 

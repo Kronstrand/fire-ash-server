@@ -7,10 +7,11 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World
 {
     internal static class WeaponList
     {
+
         public static Weapon FlashLight()
         {
             Club flashLite = new Club(
@@ -65,6 +66,7 @@ namespace fire_ash_server.World.BioMechWorld
             return ceremonialBlade;
         }
 
+
         public static Weapon LuminarBaton()
         {
             Club luminarBaton = new Club(
@@ -80,12 +82,24 @@ namespace fire_ash_server.World.BioMechWorld
             return luminarBaton;
         }
 
+        public static Weapon Torch()
+        {
+            Club torch = new Club(
+                Names.Torch,
+                "A short, stout wooden torch, bound with iron bands to keep the flaring end secure. " +
+                "The wood is blackened in places from past use, and the tip is wrapped with oily rags that flare when lit, casting a flickering glow.",
+                1);
+            torch.AddEquipEffect(EffectKey.BrightLight);
+
+            return torch;
+        }
+
         public static Weapon YShapedSlingShot()
         {
             Sling yShapedSlingShot = new Sling(
                 "Y-Shaped Slingshot",
-                "A simple, Y-shaped slingshot made from a sturdy piece of scrap metal or wood. The handle is wrapped in leather strips for a comfortable grip, " +
-                "and the elastic band is made from durable rubber. It can launch small stones or metal fragments with surprising force."
+                "A simple, Y-shaped slingshot made from a sturdy piece of wood. The handle is wrapped in leather strips for a comfortable grip, " +
+                "It can launch small stones or metal fragments with surprising force."
             );
             yShapedSlingShot.DamageDie = new Die(1, 4);
             return yShapedSlingShot;
@@ -133,7 +147,7 @@ namespace fire_ash_server.World.BioMechWorld
             Sword rustedSword = new Sword(
                 "Rusted Sword",
                 "A corroded blade, dulled and pitted with rust. " +
-                "The hilt’s leather is worn and brittle, hinting at better days. " +
+                "The hilt's leather is worn and brittle, hinting at better days. " +
                 "Despite its decay, the sword holds a lingering aura of past battles.");
 
             return rustedSword;

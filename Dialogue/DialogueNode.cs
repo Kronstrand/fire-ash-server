@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace fire_ash_server.Dialogue
 {
-    [Serializable]
     internal class DialogueNode
     {
         private Func<DialogueManager, string> Text { get; set; }
         public bool Dialogue = true;
+        public bool Say = true;
         public  Action<DialogueManager>? OnAfterEvent { private get; set; }
+        public  Action<DialogueManager>? OnBeforeEvent { private get; set; }
         public List<DialogueChoice> Choices { get; set; } = new List<DialogueChoice>();
 
         public DialogueNode(string text)
@@ -23,6 +24,7 @@ namespace fire_ash_server.Dialogue
         public DialogueNode(Func<DialogueManager, string> text)
         {
             Text = text;
+            Say = false;
         }
 
         public void AddChoice(DialogueChoice choice)
@@ -42,7 +44,7 @@ namespace fire_ash_server.Dialogue
 
         public void AddChoice(string choiceText, DialogueNode nextNode)
         {
-            AddChoice(choiceText, nextNode, false);
+            AddChoice(choiceText, nextNode, true);
         }
         public void AddChoice(string choiceText, DialogueNode nextNode, bool asLastChoice)
         {
@@ -75,6 +77,11 @@ namespace fire_ash_server.Dialogue
         { 
             if (OnAfterEvent != null)
                 OnAfterEvent.Invoke(dialogueManager);
+        }
+        public void RunOnBeforeEvent(DialogueManager dialogueManager)
+        {
+            if (OnBeforeEvent != null)
+                OnBeforeEvent.Invoke(dialogueManager);
         }
     }
 }

@@ -9,10 +9,9 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Stealth : Move
     {
-        public Stealth(Soul soul) : base (MoveKey.s.ToString(), SkillCheck.CreateDescription("Hide.", Skill.Stealth))
+        public Stealth(Soul soul) : base (MoveKey.h.ToString(), SkillCheck.CreateDescription("Hide.", Skill.Stealth))
         {
             Range = RangeType.None;
             IsMovement = true;
@@ -56,7 +55,7 @@ namespace fire_ash_server.Moves
             character.Hide(10 + character.GetModifer(Skill.Stealth));
 
             Effect effect = new Effect(Description(EffectKey.Stealth));
-            effect.rollModifiers.Add(new RollModifier(RollType.AttackRoll, 1));
+            effect.rollModifiers.Add(new RollModifier(RollType.Attack, 1));
             character.Effects.Add(effect);
         }
 

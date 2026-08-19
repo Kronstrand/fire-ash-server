@@ -12,7 +12,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class BuyItem : Move
     {
         public BuyItem(Soul soul, Item prop, Character buyFrom) : base(MoveKey.bi.ToString(), CreateDescription(prop, buyFrom), prop, async () => { })

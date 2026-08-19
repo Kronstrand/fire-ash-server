@@ -7,16 +7,17 @@ using fire_ash_server.Enums;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
 using fire_ash_server.Props.Items.Weapons;
+using fire_ash_server.World;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Consume : Move
     {
-        public Consume(Soul soul, Consumable consumable) : base(MoveKey.c.ToString(), CreateName(soul, consumable), async () => { })
+        public Consume(Soul soul, Consumable consumable) : base(MoveKey.cs.ToString(), CreateName(soul, consumable), async () => { })
         {
             Prop = consumable;
             Action = CreateAction(soul, consumable);
+            AllowedInCombat = consumable.UsableInCombat;
         }
             
 
@@ -34,16 +35,22 @@ namespace fire_ash_server.Moves
         private Func<Task> CreateAction(Soul soul, Consumable consumable)
         {
             return async () => {
-                if (consumable.Requirement == null || consumable.Requirement(soul, consumable.Range, consumable.Weapon, soul.Character.lookAtBeforeInventory))
+
+                ConsumableList.ConsumableEffects.TryGetValue(consumable.ConsumeKey, out Func<Soul, Item, Task>? effect);
+
+                if (effect != null)
+                    await effect(soul, consumable);
+                else
+                    await soul.SendAsync($"{consumable.Name} doesn't do anything and is discarded."); //should not happen
+
+                if (consumable.WasNotConsumed)
                 {
-                    await consumable.Consume(soul);
+                    consumable.WasNotConsumed = false;
+                }
+                else
+                {
                     soul.Character.LookBackFromItem(consumable);
                     soul.Character.Inventory.Items.Remove(consumable);
-                }
-                else if (consumable.NotAvailable != null)
-                {
-                    consumable.NotAvailable(soul);
-                    Type = MoveType.MinorAction;
                 }
             };
         }

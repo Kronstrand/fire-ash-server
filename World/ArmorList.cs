@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
-using fire_ash_server.Props.Items.Armor;
-using fire_ash_server.World.BioMechWorld;
+using fire_ash_server.Props.Items.Armoring;
 
-namespace fire_ash_server.World.BioMechWorld
+namespace fire_ash_server.World
 {
     internal static class ArmorList
     {
@@ -37,16 +36,15 @@ namespace fire_ash_server.World.BioMechWorld
             return wornWoodenShield;
         }
 
-        public static Shield MetalShield()
+        public static Shield SteelShield()
         {
-            Shield metalShield = new Shield(
-                "Metal Shield",
-                "A solid, well-crafted shield forged from reinforced steel. " +
-                "Its smooth surface bears only the faintest hammer marks from its forging, " +
-                "and the edges are lined with rivets for added durability.",
+            Shield steelShield = new Shield(
+                "Steel Shield",
+                "A sturdy steel shield, its surface dulled and scarred, the metal bearing old hammer marks and signs of repair. " +
+                "Rivets line the rim, some mismatched, holding the piece together through years of hard use.",
                 16);
 
-            return metalShield;
+            return steelShield;
         }
 
         public static Armor DriftersVest()
@@ -60,6 +58,25 @@ namespace fire_ash_server.World.BioMechWorld
             ac: 13,
             value: 30);
         
+        }
+
+        public static Armor GuardHauberk()
+        {
+            return new Armor(
+                "Guard's Hauberk",
+                "A mail hauberk of interlinked rings, worn thin and patched in places. " +
+                "The metal is dulled and darkened, yet still holds firm, offering protection without hindering movement.",
+                ac: 14,
+                value: 30);
+        }
+
+        public static Armor GuardLeather()
+        {
+            return new Armor(
+                "Guard's Studded Leather",
+                "A worn leather jerkin reinforced with metal studs. The leather is cracked and darkened, patched in places, yet still sturdy enough to protect the wearer.",
+                ac: 13,
+                value: 25);
         }
 
         public static Armor WardensScales()

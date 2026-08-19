@@ -9,10 +9,14 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class Fist : Weapon
     {
         public Fist() : base("Fist", "Fist", new Die(1, 1), DamageType.Bludgeoning, 0)
+        {
+            
+        }
+
+        public override void InitAttackDescriptions() 
         {
             CreateGeneralAttackDescriptions();
             CreateGeneralOffHandAttackDescriptions();
@@ -32,7 +36,7 @@ namespace fire_ash_server.Props.Items.Weapons
                 descriptions.Add((a, r, w) => $"{a} channels momentum into a crushing blow to {r}");
                 descriptions.Add((a, r, w) => $"{a} delivers a sharp jab towards {r}");
                 descriptions.Add((a, r, w) => $"{a} rears back and launches a swift uppercut at {r}");
-                descriptions.Add((a, r, w) => $"{a} throws a strong straight punch at {r}");
+                descriptions.Add((a, r, w) => $"{a} throws a straight punch at {r}");
                 descriptions.Add((a, r, w) => $"{a} releases a forceful hook towards {r}");
                 descriptions.Add((a, r, w) => $"{a} adjusts their footing and delivers a rapid punch at {r}");
                 descriptions.Add((a, r, w) => $"{a} launches a brutal cross towards {r}");

@@ -8,16 +8,19 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class Dagger : Weapon
     {
+        public Dagger() { }
+
         public Dagger(string name, string description) : base(name, description, new Die(1, 4), DamageType.Piercing, 2)
         {
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                 InventorySlot.MainHand,
                 InventorySlot.OffHand
             };
-
+        }
+        public override void InitAttackDescriptions()
+        {
             SetGeneralAttackDescriptionsForType();
             SetGeneralOffHandAttackDescriptionsForType();
             SetHumanoidAttackDescriptionsForType();

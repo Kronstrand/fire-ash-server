@@ -49,7 +49,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
 
             Character shadecreeper = MonsterCreator.Shadecreeper();
             shadecreeper.AddToInventory(ConsumableList.HealthPotion());
-            shadecreeper.AddToInventory(ConsumableList.ScrollOfEntanglement());
+            //shadecreeper.AddToInventory(ConsumableList.ScrollOfEntanglement());
             shadecreeper.GoToRoom(grandTempleAscent);
             shadecreeper.MoveToGroup(toMainTemple);
 

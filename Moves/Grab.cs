@@ -10,7 +10,6 @@ using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Grab : Move
     {
         public Grab(Soul soul, Item prop) : base(MoveKey.g.ToString(), CreateDescription(prop), prop, async () => { })
@@ -44,6 +43,8 @@ namespace fire_ash_server.Moves
                     {
                         soul.Character.AddToInventory(item);
                         soul.Character.CurrentRoom.BroadcastToSoulsInRoom($"{soul.Character.Name} tries to forcefully take {item.Name} from {heldByCharacter.Name}, and succeeds with a roll of {strRoll}.");
+                        
+                        await item.RunOnAfterPickUpEvents(soul);
                     }
                     else
                     {
@@ -56,7 +57,10 @@ namespace fire_ash_server.Moves
 
                     if (grabDescriptions != "")
                         soul.Character.BroadcastToSoulsInRoom(grabDescriptions);
+                    
                     EnablesCombat = false;
+
+                    await item.RunOnAfterPickUpEvents(soul);
                 }
                 
                 TriggerHostileCloseCombat(soul, item);

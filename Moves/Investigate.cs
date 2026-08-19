@@ -11,7 +11,6 @@ using fire_ash_server.Props.Items;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Investigate : Move
     {
         public Investigate(Soul soul, Prop prop) : base(MoveKey.i.ToString(), CreateDescription(prop), prop)

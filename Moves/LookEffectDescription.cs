@@ -10,7 +10,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class LookEffectDescription : Move
     {
         public LookEffectDescription(Soul soul, string effectName) : base(MoveKey.le.ToString(), $"Check {effectName}.")

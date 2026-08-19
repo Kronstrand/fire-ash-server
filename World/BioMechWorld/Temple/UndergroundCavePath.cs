@@ -11,7 +11,7 @@ using fire_ash_server.Props.Items.Weapons;
 using System.Diagnostics.Metrics;
 using System.Threading.Channels;
 using fire_ash_server.World.BioMechWorld.Temple;
-using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Armoring;
 
 namespace fire_ash_server.World.BioMechWorld
 {
@@ -84,7 +84,7 @@ namespace fire_ash_server.World.BioMechWorld
             rustBeetle.GoToRoom(undergroundCavePath);
             rustBeetle.MoveToGroup(abandonedGuardPost);
             rustBeetle.InitAttack = false;
-            Events.AddCharacterMoveFromCharacterAndIsAttacked(rustBeetle);
+            //Events.AddCharacterMoveFromCharacterAndIsAttacked(rustBeetle);
 
             TempleCourtyard.Create(undergroundCavePath);
 

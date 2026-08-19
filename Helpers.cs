@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
 using fire_ash_server.World;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace fire_ash_server
 {
@@ -148,25 +150,36 @@ namespace fire_ash_server
 
         public static string ListToString<T>(List<T> list) where T : Prop
         {
-            string output = "";
-            int lengthOfList = list.Count;
-            for (int i = 0; i < lengthOfList; i++)
+
+            string KvpToString(KeyValuePair<string, int> kvp)
             {
-                //first item
-                if (string.IsNullOrEmpty(output)) 
-                {
-                    output = list[i].Name;
-                }
-                //not last item
-                else if (i + 1 != lengthOfList) 
-                {
-                    output += $", {list[i].Name}";
-                }
-                //last item
+                if (kvp.Value == 1)
+                    return kvp.Key;
                 else
+                    return $"{NumberToWord(kvp.Value)} {GetPluralizedName(kvp.Key)}";
+            }
+
+            string output = "";
+
+            Dictionary<string, int> counts = list
+                .GroupBy(x => x.Name)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            int lengthOfList = counts.Count;
+            for (int i = 0; i < counts.Count; i++)
+            {
+                KeyValuePair<string, int> kvp = counts.ElementAt(i);
+
+                if (string.IsNullOrEmpty(output))
                 {
-                    output += $", and {list[i].Name}";
+                    //do nothing
                 }
+                else if (i + 1 != lengthOfList)
+                    output += ", ";
+                else
+                    output += $", and ";
+                    
+                output += KvpToString(kvp);
             }
             return output;
         }
@@ -290,6 +303,26 @@ namespace fire_ash_server
                 priceString = $"{price.Item1} gp, {price.Item2} sp";
             
             return priceString;
+        }
+
+        public static int GetRandomInt(int value)
+        {
+            Random random = new Random();
+            return random.Next(value);
+        }
+
+        public static string FormatTimeLeft(int totalSeconds)
+        {
+            TimeSpan t = TimeSpan.FromSeconds(totalSeconds);
+
+            var parts = new List<string>();
+
+            if (t.Days > 0) parts.Add($"{t.Days}d");
+            if (t.Hours > 0) parts.Add($"{t.Hours}h");
+            if (t.Minutes > 0) parts.Add($"{t.Minutes}m");
+            if (t.Seconds > 0 || parts.Count == 0) parts.Add($"{t.Seconds}s");
+
+            return string.Join(" ", parts);
         }
     }
 }

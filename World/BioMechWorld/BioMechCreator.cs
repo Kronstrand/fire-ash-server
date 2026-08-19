@@ -22,7 +22,7 @@ namespace fire_ash_server.World.BioMechWorld
             startingRoom = new CreationChamber();
         }
 
-        public static void SetFactions()
+        public void SetFactions()
         {
             Relationship.Set(FactionKey.Players, FactionKey.Technomancers, 13);
             Relationship.Set(FactionKey.Technomancers, FactionKey.TechnomancersDefenceSystem, 18);

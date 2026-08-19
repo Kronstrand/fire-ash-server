@@ -8,10 +8,12 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class TailSnakeBite : Weapon
     {
         public TailSnakeBite() : base("Tail Snake Bite", "Tail Snake Bite", new Die(1, 6), DamageType.Piercing, 1.2)
+        {
+        }
+        public override void InitAttackDescriptions()
         {
             SetGeneralAttackDescriptionsForType();
             SetHumanoidAttackDescriptions();

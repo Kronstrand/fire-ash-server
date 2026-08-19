@@ -9,7 +9,6 @@ using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves.Attacks
 {
-    [Serializable]
     internal class BiteAttack : Attack
     {
         Weapon? weapon = null;

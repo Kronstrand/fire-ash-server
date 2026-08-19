@@ -3,22 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items
 {
-    [Serializable]
     internal class Coins : Item
     {
-        public int Gold {  get; private set ; }
-        public int Silver {  get; private set; }
+        [JsonInclude] public int Gold {  get; private set ; }
+        [JsonInclude] public int Silver {  get; private set; }
+
+        public Coins() { }
         public Coins(int gold, int silver) : base(CreateName(gold, silver), CreateDescription(gold, silver), gold + SilverToGold(silver))
         {
             Gold = gold;
             Silver = silver;
             Sellable = false;
+            IsPlural = GetIsPlural();
         }
+
+        private bool GetIsPlural()
+        {
+            int totalCoins = Gold + Silver;
+            return totalCoins > 1;
+        }
+
 
         public void SetValues(int gold, int silver)
         {
@@ -26,6 +36,7 @@ namespace fire_ash_server.Props.Items
             Silver = silver;                                                            
             Name = CreateName(gold, silver);
             Description = CreateDescription(gold, silver);
+            IsPlural = GetIsPlural();
         }
 
         private static string CreateName(int gold, int silver)

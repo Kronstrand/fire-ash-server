@@ -19,5 +19,8 @@ namespace fire_ash_server.Enums
         [Description("Technomancer Defence System")]
         TechnomancersDefenceSystem,
         Zathar,
+        Goldfield,
+        [Description("Kettle Keepers")]
+        KettleKeepers
     }
 }

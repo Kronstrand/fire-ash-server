@@ -45,7 +45,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                 3
             );
             clutteredShelf.AddItem(perpetualWireUntangler);
-            clutteredShelf.AddItem(ConsumableList.ARC2000());
+            //clutteredShelf.AddItem(ConsumableList.ARC2000());
 
             Room serpentsSpine = SerpentsSpine.Create(backRoom);
 

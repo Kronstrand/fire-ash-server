@@ -8,12 +8,22 @@ using fire_ash_server.Moves;
 
 namespace fire_ash_server
 {
-    [Serializable]
     public class ThreadSafeList<T> : IEnumerable<T>, IEnumerable, IDisposable
     {
         private readonly List<T> _list = new List<T>();
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private bool _disposed = false;
+
+        public ThreadSafeList() { }
+
+        // Add this constructor
+        public ThreadSafeList(IEnumerable<T> items)
+        {
+            if (items != null)
+            {
+                _list.AddRange(items);
+            }
+        }
 
         public void Add(T item)
         {
@@ -95,6 +105,23 @@ namespace fire_ash_server
                 for (int i = _list.Count - 1; i >= 0; i--)
                 {
                     if (ToBeRemovedList.Contains(_list[i]))
+                        _list.RemoveAt(i);
+                }
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+
+        public void RemoveAll(Func<T, bool> predicate)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                for (int i = _list.Count - 1; i >= 0; i--)
+                {
+                    if (predicate(_list[i]))
                         _list.RemoveAt(i);
                 }
             }

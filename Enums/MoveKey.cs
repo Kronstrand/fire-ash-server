@@ -16,22 +16,23 @@ namespace fire_ash_server.Enums
         e,  //equip
         g,  //grap
         i,  //investigate, look own inventory
-        j, //journal
+        j,  //journal
         l,  //lookat
         m,  //move to
-        pp, //pick pocket
+        bc, //pick pocket
         r,  //room change
-        s,  //stealth
+        h,  //stealth/hide
         sg, //save game
         lg, //load game
         sp, //speak to
         f,  //flee
         b,  //back
         bi, //buy item
-        lo,
-        d,
-        le,
-        st,
-        c, //consume
+        d,  //drop
+        le, //look effect
+        st, //show items
+        c,  //character stats
+        cs, //consume
+        s, //say
     }
 }

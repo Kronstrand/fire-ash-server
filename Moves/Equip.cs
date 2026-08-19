@@ -9,7 +9,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class Equip : Move
     {
         public InventorySlot TargetInventorySlot;

@@ -12,7 +12,6 @@ using fire_ash_server.World.BioMechWorld;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class CheckJournal : Move
     {
         public CheckJournal(Soul soul) : base(MoveKey.j.ToString(), $"Check Journal")

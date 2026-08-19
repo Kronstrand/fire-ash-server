@@ -8,7 +8,6 @@ using fire_ash_server.Enums;
 
 namespace fire_ash_server.Moves.Attacks
 {
-    [Serializable]
     internal class DuelWieldAttack : Attack
     {
         public DuelWieldAttack(Soul soul, Character characterToAttack) : base(MoveKey.aa.ToString(), $"Attack {characterToAttack.Name}. (Dual Wield)", characterToAttack, RangeType.CloseSingleTarget)

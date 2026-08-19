@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
 
 namespace fire_ash_server.Abstract_Entities
 {
-    [Serializable]
     internal class Grouping
     {
-        public  ThreadSafeList<Prop> Props = new ThreadSafeList<Prop>();
+        [JsonIgnore]
+        public ThreadSafeList<Prop> Props = new ThreadSafeList<Prop>();
+
+        [JsonPropertyName("Props")]
+        public List<Prop> PropsSerializable
+        {
+            get => Props.ToList();
+            set => Props = new ThreadSafeList<Prop>(value);
+        }
+
+        public Grouping() { }
         public Grouping(Prop prop1, Prop prop2)
         {
             Props.Add(prop1);

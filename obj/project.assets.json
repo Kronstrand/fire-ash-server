@@ -61,11 +61,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
+      "projectUniqueName": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\fire-ash-server.csproj",
       "projectName": "fire-ash-server",
-      "projectPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\fire-ash-server.csproj",
+      "projectPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\fire-ash-server.csproj",
       "packagesPath": "C:\\Users\\jkkn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server\\obj\\",
+      "outputPath": "C:\\Users\\jkkn\\Documents\\C#\\fire-ash-server-websocket\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -98,7 +98,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -121,11 +121,14 @@
         "assetTargetFallback": true,
         "warn": true,
         "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.315/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

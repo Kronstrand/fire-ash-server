@@ -67,7 +67,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                 "Kael's form collapsed, his once imposing figure now lies still."
             );
             weaponsTrader.IsTrader = true;
-            weaponsTrader.tradeModifier = 0.1;
+            weaponsTrader.TradeModifier = 0.1;
             weaponsTrader.UniqueName = true;
             weaponsTrader.HP = 21;
             weaponsTrader.AddFeat(FeatKey.MeleeAttack);
@@ -76,6 +76,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
             weaponsTrader.GoToRoom(weaponStallRoom);
             weaponStallRoom.propsInImage.Add(weaponsTrader);
 
+            /*
             weaponsTrader.AddOnAfterMoveToEvent(
                 (soul) =>
                 {
@@ -88,12 +89,13 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                     return Task.FromResult(true);
                 },
                 false);
+            */
 
             weaponsTrader.AddToInventory(WeaponList.ColtARFifteen());
             weaponsTrader.AddToInventory(WeaponList.HolographicBlade());
             weaponsTrader.AddToInventory(WeaponList.LuminarBaton());
             weaponsTrader.AddToInventory(WeaponList.Machete());
-            weaponsTrader.AddToInventory(ConsumableList.BookOfDualWield());
+            //weaponsTrader.AddToInventory(ConsumableList.BookOfDualWield());
             weaponsTrader.AddToInventory(new Coins(150, 25));
 
 
@@ -133,7 +135,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                 "His helmet, once concealing his identity, now reveals an empty gaze."
             );
             armorTrader.IsTrader = true;
-            armorTrader.tradeModifier = 0.1;
+            armorTrader.TradeModifier = 0.1;
             armorTrader.UniqueName = true;
             armorTrader.HP = 15;
             armorTrader.AddFeat(FeatKey.MeleeAttack);
@@ -141,9 +143,10 @@ namespace fire_ash_server.World.BioMechWorld.Complex
             armorTrader.GoToRoom(armorStallRoom);
 
             armorTrader.AddToInventory(ArmorList.DriftersVest());
-            armorTrader.AddToInventory(ArmorList.MetalShield());
+            armorTrader.AddToInventory(ArmorList.SteelShield());
             armorTrader.AddToInventory(new Coins(130, 30));
 
+            /*
             armorTrader.AddOnAfterMoveToEvent(
                 (soul) =>
                 {
@@ -163,6 +166,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                     return Task.FromResult(true);
                 },
                 false);
+            */
 
             Room artifactStallRoom = new Room(
                 "Cogs & Curios",
@@ -202,7 +206,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                 "His tired eyes are closed forever, and the many secrets he guarded with such care are now silent."
             );
             artifactTrader.IsTrader = true;
-            artifactTrader.tradeModifier = 0.1;
+            artifactTrader.TradeModifier = 0.1;
             artifactTrader.UniqueName = true;
             artifactTrader.HP = 16;
             artifactTrader.AddFeat(FeatKey.MeleeAttack);
@@ -211,7 +215,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
 
             artifactTrader.AddToInventory(WeaponList.FlashLight());
             artifactTrader.AddToInventory(ConsumableList.HealthPotion());
-            artifactTrader.AddToInventory(ConsumableList.ScrollOfEntanglement());
+            //artifactTrader.AddToInventory(ConsumableList.ScrollOfEntanglement());
             artifactTrader.AddToInventory(new Coins(90, 40));
 
             new MainHallRoom(bazar);

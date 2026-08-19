@@ -10,13 +10,13 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class MoveTo : Move
     {
         public MoveTo(Soul soul, Prop targetProp) : base(MoveKey.m.ToString(), CreateMoveName(soul.Character, targetProp), targetProp)
         {
             Range = RangeType.RangeSingleTarget;
             IsMovement = true;
+            MoveDuration = 2000;
 
             Action = async () =>
             {

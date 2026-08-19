@@ -9,7 +9,6 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server.World.BioMechWorld
 {
-    [Serializable]
     //Should be handled as singleton
     internal class GlobalVariables
     {

@@ -7,7 +7,9 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using fire_ash_server.Abstract_Entities;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
@@ -18,39 +20,107 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props
 {
-    [Serializable]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(Item), "item")]
+    [JsonDerivedType(typeof(Character), "character")]
+    [JsonDerivedType(typeof(Exit), "exit")]
+    [JsonDerivedType(typeof(Room), "room")]
+    [JsonDerivedType(typeof(Inventory), "inventory")]
     internal abstract class Prop
     {
-        public string Name { get; set; }
-        public string Description { get;  set; }
-        public string? ContextDescription;
-        private bool pickupable;
-        private bool hidden;
-        public Light Light { private get; set; } = Light.None;
-        public bool DarknessOverride { get; set; } = false;
-        public bool DynamicDescription = false;
-        public bool Unreachable = false;
-        public int HiddenDC { get; set; }
+        [JsonIgnore]    public Action Update;
+        [JsonInclude]   public string Id { get; set; }
+        [JsonInclude]   public bool WorldProp {  get; set; }
+        [JsonInclude]   public string Name { get; set; }
+        [JsonInclude]   public string Description { get;  set; }
+        [JsonInclude]   public string? ContextDescription;
+        [JsonInclude]   public string HoldsDescription = "lying on the";
+        [JsonInclude]   private bool pickupable;
+        [JsonInclude]   private bool hidden;
+        [JsonInclude]   public PropSubtype Subtype = PropSubtype.None;
+        [JsonInclude]   public Light Light { private get; set; } = Light.None;
+        [JsonInclude]   public bool DarknessOverride { get; set; } = false;
+        [JsonInclude]   public bool DynamicDescription = false;
+        [JsonInclude]   public PropState State { get; set; } = PropState.Default;
+        [JsonInclude]   public bool Unreachable = false;
+        [JsonInclude]   public int HiddenDC { get; set; }
+        [JsonInclude]   public FactionKey? BelongsToFaction;
+        [JsonInclude]   public List<ItemRespawn> ItemRespawns = new List<ItemRespawn>();
 
-        public ThreadSafeList<Item> Items = new ThreadSafeList<Item>();
-        public ThreadSafeList<Move> moves = new ThreadSafeList<Move>();
+        [JsonIgnore]    public ThreadSafeList<Item> Items = new ThreadSafeList<Item>();
+        [JsonPropertyName("Items")]
+        [JsonInclude]   public List<Item> ItemsSerializable
+                        {
+                            get => Items.ToList();
+                            set => Items = new ThreadSafeList<Item>(value);
+                        }
 
-        public ThreadSafeList<Effect> Effects = new ThreadSafeList<Effect>();
+        [JsonIgnore]    public ThreadSafeList<Effect> Effects = new ThreadSafeList<Effect>();
+        [JsonPropertyName("Effects")]
+        [JsonInclude]   public List<Effect> EffectsSerializable
+                        {
+                            get => Effects.ToList();
+                            set => Effects = new ThreadSafeList<Effect>(value);
+                        }
 
-        public Action<Soul>? OnAfterLookAt;
-
-        private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
-        private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
-
-        private ThreadSafeList<Func<Soul, Task<bool>>> OnAfterMoveToEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
-        private ThreadSafeList<Func<Soul, Task<bool>>> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
-
-        public List<Prop> propsInImage = new List<Prop>();
-
-        public Prop(string name, string description)
+        [JsonIgnore]    public ThreadSafeList<Move> moves = new ThreadSafeList<Move>();
+        [JsonIgnore]    public Action<Soul>? OnAfterLookAt;
+        [JsonIgnore]    private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEvents = new ThreadSafeList<Func<Soul, Task<bool>>>();
+        [JsonIgnore]    private ThreadSafeList<Func<Soul, Task<bool>>> OnBeforeMoveFromEventsToBeRemoved = new ThreadSafeList<Func<Soul, Task<bool>>>();
+        
+        [JsonIgnore]    private ThreadSafeList<EventKey> OnAfterPickUpEvents = new ThreadSafeList<EventKey>();
+        [JsonPropertyName("OnAfterPickUpEvents")]
+        [JsonInclude]   public List<EventKey> OnAfterPickUpEventsSerializable
         {
+                            get => OnAfterPickUpEvents.ToList();
+                            set => OnAfterPickUpEvents = new ThreadSafeList<EventKey>(value);
+        }
+        [JsonIgnore] private ThreadSafeList<EventKey> OnAfterPickUpEventsToBeRemoved = new ThreadSafeList<EventKey>();
+        [JsonPropertyName("OnAfterPickUpEventsToBeRemoved")]
+        [JsonInclude]
+        public List<EventKey> OnAfterPickUpEventsToBeRemovedSerializable
+        {
+            get => OnAfterPickUpEventsToBeRemoved.ToList();
+            set => OnAfterPickUpEventsToBeRemoved = new ThreadSafeList<EventKey>(value);
+        }
+
+
+        [JsonIgnore]    private ThreadSafeList<EventKey> OnAfterMoveToEvents = new ThreadSafeList<EventKey>();
+        [JsonPropertyName("OnAfterMoveToEvents")]
+        [JsonInclude]   public List<EventKey> OnAfterMoveToEventsSerializable
+                        {
+                            get => OnAfterMoveToEvents.ToList();
+                            set => OnAfterMoveToEvents = new ThreadSafeList<EventKey>(value);
+                        }
+
+
+
+        [JsonIgnore] private ThreadSafeList<EventKey> OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<EventKey>();
+        [JsonPropertyName("OnAfterMoveToEventsToBeRemoved")]
+        [JsonInclude]   public List<EventKey> OnAfterMoveToEventsToBeRemovedSerializable
+                        {
+                            get => OnAfterMoveToEventsToBeRemoved.ToList();
+                            set => OnAfterMoveToEventsToBeRemoved = new ThreadSafeList<EventKey>(value);
+                        }
+
+        [JsonIgnore] public ThreadSafeList<Flag> Flags = new ThreadSafeList<Flag>();
+        [JsonPropertyName("Flags")]
+        [JsonInclude]
+        public List<Flag> FlagsSerializable
+        {
+            get => Flags.ToList();
+            set => Flags = new ThreadSafeList<Flag>(value);
+        }
+
+        [JsonIgnore]    public List<Prop> propsInImage = new List<Prop>();
+
+        public Prop() { }
+
+        public Prop(string name, string description, string id)
+        {            
             Name = name;
             Description = description;
+            Id = id;
         }
 
         public void RemoveAllEffects(EffectKey effectKey)
@@ -164,6 +234,9 @@ namespace fire_ash_server.Props
                 if (lookingCharacter != null && lookingCharacter.LastRoom == exit.GoToRoom)
                     description = "Where you came from, " + ToLowerFirstChar(description);
 
+                if (!exit.State.IsOpen && exit.State.VisableClosedDiscription != "")
+                    description += $" {exit.State.VisableClosedDiscription}";
+
                 if (exit.LocatedInRoom != null)
                     exitImagePrefix = exit.LocatedInRoom.Name;
             }
@@ -205,6 +278,7 @@ namespace fire_ash_server.Props
 
         public void AddItem(Item item)
         {
+            item.LastHeldBy = item.HeldBy;
             item.ClearHeldBy();
             Items.Add(item);
             item.HeldBy = this;
@@ -280,7 +354,9 @@ namespace fire_ash_server.Props
 
         public Prop ShallowCopy()
         {
-            return (Prop)MemberwiseClone();
+            Prop copy = (Prop)MemberwiseClone();
+            copy.Id = Guid.NewGuid().ToString();
+            return copy;
         }
 
         public List<Prop> FoundItems(int result)
@@ -489,16 +565,52 @@ namespace fire_ash_server.Props
                 OnBeforeMoveFromEventsToBeRemoved.Add(action);
         }
 
-        public async Task RunOnAfterMoveToEvents(Soul soul)
+        public async Task RunOnAfterPickUpEvents(Soul soul)
         {
-            List<Func<Soul, Task<bool>>> afterMoveEventsThatRanSuccessfuly = new List<Func<Soul, Task<bool>>>();
-            foreach (Func<Soul, Task<bool>> afterMoveEvent in OnAfterMoveToEvents)
+            await Events.RunEvents(soul, this, OnAfterPickUpEvents, OnAfterPickUpEventsToBeRemoved);
+            
+            /*
+            List<EventKey> pickUpEventsThatRanSuccessfuly = new List<EventKey>();
+            foreach (EventKey eventKey in OnAfterPickUpEvents)
             {
-                if(await afterMoveEvent(soul))
-                    afterMoveEventsThatRanSuccessfuly.Add(afterMoveEvent);
+                Func<Soul, Prop, Task<bool>>? pickUpEvent;
+                string key = Description(eventKey);
+                Events.events.TryGetValue(key, out pickUpEvent);
+                if (pickUpEvent == null)
+                    continue;
+                if (await pickUpEvent(soul, this))
+                    pickUpEventsThatRanSuccessfuly.Add(eventKey);
             }
 
-            foreach(Func<Soul, Task<bool>> evnt in afterMoveEventsThatRanSuccessfuly)
+            foreach (EventKey evnt in pickUpEventsThatRanSuccessfuly)
+            {
+                if (OnAfterPickUpEventsToBeRemoved.Contains(evnt))
+                {
+                    OnAfterPickUpEvents.Remove(evnt);
+                    OnAfterPickUpEventsToBeRemoved.Remove(evnt);
+                }
+            }
+            */
+        }
+
+        public async Task RunOnAfterMoveToEvents(Soul soul)
+        {
+            await Events.RunEvents(soul, this, OnAfterMoveToEvents, OnAfterMoveToEventsToBeRemoved);
+
+            /*
+            List<EventKey> afterMoveEventsThatRanSuccessfuly = new List<EventKey>();
+            foreach (EventKey afterMoveEventKey in OnAfterMoveToEvents)
+            {
+                Func<Soul, Prop, Task<bool>>? moveToEvent;
+                string key = Description(afterMoveEventKey);
+                Events.events.TryGetValue(key, out moveToEvent);
+                if (moveToEvent == null)
+                    continue;
+                if(await moveToEvent(soul,this))
+                    afterMoveEventsThatRanSuccessfuly.Add(afterMoveEventKey);
+            }
+
+            foreach(EventKey evnt in afterMoveEventsThatRanSuccessfuly)
             {
                 if (OnAfterMoveToEventsToBeRemoved.Contains(evnt))
                 {
@@ -506,13 +618,20 @@ namespace fire_ash_server.Props
                     OnAfterMoveToEventsToBeRemoved.Remove(evnt);
                 }
             }
+            */
+        }
+        public void AddOnAfterPickUpEvent(EventKey key, bool runOnce)
+        {
+            OnAfterPickUpEvents.Add(key);
+            if (runOnce)
+                OnAfterPickUpEventsToBeRemoved.Add(key);
         }
 
-        public void AddOnAfterMoveToEvent(Func<Soul, Task<bool>> action, bool runOnce)
+        public void AddOnAfterMoveToEvent(EventKey key, bool runOnce)
         {
-            OnAfterMoveToEvents.Add(action);
+            OnAfterMoveToEvents.Add(key);
             if (runOnce)
-                OnAfterMoveToEventsToBeRemoved.Add(action);
+                OnAfterMoveToEventsToBeRemoved.Add(key);
         }
 
         public string GetLightEffectedName(string preTextWithLigh, string preTextWithDarkness, Character? lookingCharacter)
@@ -596,7 +715,7 @@ namespace fire_ash_server.Props
         public List<Effect> GetAllEfects()
         {
             if (this is Character)
-                return ((Character)this).GetAllEffectsIncludingFeats();
+                return ((Character)this).GetAllEffectsIncludingFeatsAndBuffs();
 
             return Effects.ToList();
         }
@@ -730,7 +849,7 @@ namespace fire_ash_server.Props
             foreach (Character character in characters)
             {
                 if (character.LookAt == this)
-                    foreach (Effect effect in character.GetAllEffectsIncludingFeats())
+                    foreach (Effect effect in character.GetAllEffectsIncludingFeatsAndBuffs())
                     {
                         if (effect.LightPointerModifer == Light.Bright)
                             return Light.Bright;
@@ -753,6 +872,16 @@ namespace fire_ash_server.Props
             return false;
 
         }
+
+        public void AddFlag(Flag flag)
+        {
+            Flags.RemoveAll(f => 
+                f.Type == flag.Type && 
+                f.FactionKey == flag.FactionKey && 
+                f.RoomKey == flag.RoomKey);                
+            Flags.Add(flag);
+        }
+
         public string ListItemsAsString(Character lookingCharacter)
         {
             List<string> outputStrings = new List<string>();
@@ -767,8 +896,12 @@ namespace fire_ash_server.Props
             if (lookingAtProp.GetLightState(lookingCharacter) != Light.Darkness)
             {
                 List<Item> items = lookingAtProp.Items.Where(i => i.IsPickupable() && !i.IsHidden()).ToList();
-                if (items.Any())
-                    outputStrings.Add($"{ListToString(items)} lies on the {lookingAtProp.Name}");
+                
+                if (items.Count > 0)
+                {
+                    string verb = (items.Count == 1 && !items[0].IsPlural) ? "is" : "are";
+                    outputStrings.Add($"{ListToString(items)} {verb} {lookingAtProp.HoldsDescription} {lookingAtProp.Name}");
+                }
             }
 
             for (int i = 0; i < outputStrings.Count; i++)
@@ -781,6 +914,11 @@ namespace fire_ash_server.Props
             }
 
             return output;
+        }
+
+        public Item? GetItemById(string id)
+        {
+            return Items.Where(i => i.Id == id).FirstOrDefault();
         }
     }
 }

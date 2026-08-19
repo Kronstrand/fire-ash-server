@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
-using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Armoring;
 
 namespace fire_ash_server.World.BioMechWorld.Temple
 {

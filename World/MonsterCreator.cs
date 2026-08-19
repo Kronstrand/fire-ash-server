@@ -1,20 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using fire_ash_server.Enums;
 using fire_ash_server.Props;
 using fire_ash_server.Props.Items;
+using fire_ash_server.Props.Items.Armoring;
 using fire_ash_server.Props.Items.Weapons;
-using fire_ash_server.World.BioMechWorld;
 using fire_ash_server.World.BioMechWorld.Temple;
+using fire_ash_server.World.Goldfield;
 
 namespace fire_ash_server.World
 {
-    internal static class MonsterCreator
+    static class MonsterCreator
     {
+
+        public static List<string> skeletonNames = new()
+{
+            "Cracked", "Splintered", "Shattered",
+            "Fractured", "Broken", "Jawless", "Headless",
+            "Dust covered", "Grave worn", "Tomb worn",
+            "Battle worn", "War torn", "Blade marked",
+            "Arrow pierced", "Rib broken", "Jaw broken",
+            "Skull cracked", "Spine snapped", "Pelvis shattered",
+            "Finger missing", "Handless", "Footless",
+            "Hollow eyed", "Staggering", "Slack jawed",
+            "Empty eyed", "Dark eyed", "Glowing eyed",
+            "Rattling", "Clattering", "Loose jointed",
+            "Misaligned", "Disjointed", "Reassembled",
+            "Poorly assembled", "Half formed",
+            "Mud encrusted", "Moss covered",
+            "Lichen covered", "Ash covered", "Soot stained",
+            "Burned bone", "Charred bone", "Blackened bone",
+            "Bleached bone", "Ivory white", "Yellowed bone",
+            "Ancient", "Forgotten", "Unburied",
+            "Unearthed", "Desecrated", "Rot stained",
+            "Wailing", "Silent", "Restless",
+            "Rusted chained", "Cave stained", 
+        };
+
+        public static List<string> wolfNames = new()
+        {
+            "Scarred", "Broken tailed", "One eared",
+            "Torn eared", "Crooked jawed", "Fang missing",
+            "Mottled furred", "Ragged furred", "Pale furred",
+            "Green eyed", "Amber eyed",
+            "Cloud eyed", "Bloodshot eyed",
+            "Yellow eyed", "Black eyed", "Twisted pawed",
+            "Split eared", "Eye scarred", "Muzzle scarred",
+            "Burn scarred", "Long muzzled", "Short muzzled",
+            "Thick coated", "Thin coated", "Brindled",
+            "Dark masked", "Ridge furred",
+            "Faded furred", "Patchy furred", "Uneven furred",
+            "Clumped furred", "Matt furred", "Shaggy furred",
+            "Smooth furred", "Coarse furred", "Tuft eared",
+            "Bent eared", "Folded eared", "Nicked eared",
+            "Cracked nosed", "Split nosed", "Scar lined",
+            "Grizzled muzzled", "Dust stained", "Tailless",
+            "Mud spattered", "Grime streaked", "Soot marked",
+            "White streaked", "Dark streaked", "Flecked furred",
+            "Speckled furred", "Limping", "Lean framed", "Lopsided jawed",
+            "Albino", "White furred", "Black furred", "Gray furred",
+            "Brown furred", "Red furred", "Cream furred",
+            "Golden furred", "Dark furred", "Jaw scarred"
+        };
+
         public static Character Shadecreeper()
         {
             Character shadecreeper = new Character(
@@ -86,23 +139,25 @@ namespace fire_ash_server.World
 
         public static Character Skeleton()
         {
+            var rnd = Random.Shared;
+            int i = rnd.Next(skeletonNames.Count);
+
             Character skeleton = new Character(
-                "Skeleton",
-                "A humanoid figure made entirely of bones, moving with an unnatural clatter. " +
-                "Its hollow eye sockets glow faintly with an eerie light, and it creaks with each motion, driven by a silent, unseen force.",
-                Kindred.Undead,
-                CreatureType.Humanoid, // Skeletal but retains a humanoid structure
+                $"{skeletonNames[i]} Skeleton",
+                "A humanoid figure made entirely of bones, moving with an unnatural clatter, driven by a silent, unseen force.",
+                Kindred.None,
+                CreatureType.Undead,
                 10,  // strength - average strength for an undead animated by dark forces
                 8,   // dexterity - slightly awkward, its movements stiff and jerky
                 12,  // constitution - sturdy in death, capable of withstanding minor damage
                 5,   // intelligence - limited intelligence, functioning on basic instincts
                 7,   // wisdom - not very aware, simply following basic commands
                 5,   // charisma - devoid of any personal charm or humanity
-                "The skeleton crumbles into a pile of brittle bones as the animating force leaves it. Its empty eye sockets stare into nothing, lifeless once again."
+                $"$The {skeletonNames[i]} Skeleton lies motionless, its structure reduced to a faint humanoid shape."
             );
 
-            skeleton.AddEquippedItem(InventorySlot.MainHand, WeaponList.RustedSword());
-            skeleton.AddEquippedItem(InventorySlot.OffHand, ArmorList.WornWoodenShield());
+            //skeleton.AddEquippedItem(InventorySlot.MainHand, WeaponList.RustedSword());
+            //skeleton.AddEquippedItem(InventorySlot.OffHand, ArmorList.WornWoodenShield());
 
             // Set the creature's health
             skeleton.HP = 8;
@@ -147,8 +202,8 @@ namespace fire_ash_server.World
                 "A massive serpent with shimmering scales and slit-like eyes that glow with a predatory hunger. " +
                 "Its coiled form ripples with powerful muscle, and its movements are unnervingly silent, " +
                 "as though it stalks its prey with lethal precision.",
-                Kindred.Serpentine,
-                CreatureType.Beast, // Reptilian type due to its serpentine form and cold-blooded nature
+                Kindred.None,
+                CreatureType.Beast,
                 13,  // strength - high physical power for constriction and biting
                 12,  // dexterity - above-average dexterity for swift, fluid movements
                 11,  // constitution - resilient, capable of withstanding attacks
@@ -204,7 +259,7 @@ namespace fire_ash_server.World
                 "A nightmarish fusion of man and serpent, the Serpent Devil towers with its grotesque form of scaled flesh, " +
                 "a venomous tail coiled and ready to strike. Its glowing, slitted eyes radiate malice. " +
                 "The beast moves with unnatural fluidity, blending demonic cunning with predatory instinct.",
-                Kindred.Demon,
+                Kindred.None,
                 CreatureType.Monstrosity, // Monstrous hybrid of serpent and demon
                 15,  // strength - immense physical power for crushing and ripping apart prey
                 12,  // dexterity - swift and serpentine movements, capable of quick strikes
@@ -303,6 +358,87 @@ namespace fire_ash_server.World
             }
 
             return ratrocity;
+        }
+
+        public static Character Wolf()
+        {
+            return Wolf(10);
+        }
+        public static Character Wolf(int hp)
+        {
+            var rnd = Random.Shared;
+            int i = rnd.Next(wolfNames.Count);
+
+            Character wolf = new Character(
+                $"{wolfNames[i]} Wolf",
+                $"A {wolfNames[i]} wolf, carrying the quiet tension of a wild predator. " +
+                "It moves with deliberate control, every motion precise, as if nothing is wasted.",
+                Kindred.None,
+                CreatureType.Beast,
+                12,  // strength
+                15,  // dexterity
+                10,  // constitution
+                6,   // intelligence
+                10,  // wisdom
+                7,   // charisma
+                $"The {wolfNames[i]} wolf lies motionless, eyes dulled and unresponsive. " +
+                "Even in death, the body holds the taut silence of a predator, jaws set in a final snarl."
+            );
+
+            // Set health
+            wolf.HP = hp;
+
+            // Claws
+            wolf.DefaultHand = new BeastClaw();
+
+            Head wolfSkull = new Head(
+                   Names.WolfSkull,
+                   "The skull of a wolf, a silent remnant of a fierce and untamed spirit.",
+                   10);
+            wolfSkull.SetIsBodyPart();
+            ItemPopulation.TryAddLimitedItem(wolfSkull, wolf);
+
+            //Wolf skull
+            //Head wolfSkull = new Head(Names.WolfSkull, "The skull of a wolf, a silent remnant of a fierce and untamed spirit.", 10);
+            //wolf.AddToInventory(wolfSkull);
+            //wolfSkull.SetIsBodyPart();
+
+            // Abilities
+            wolf.AddFeat(FeatKey.MeleeAttack);
+            wolf.AddFeat(FeatKey.DarkVision);
+
+            // AI
+            wolf.BehaviorKey = BehaviorKey.CaveWolf;
+
+            // Hit reactions
+            if (!Character.hitReactions.ContainsKey(wolf.Name))
+            {
+                List<Func<string, string, string>> hitDescriptions = new List<Func<string, string, string>>();
+                hitDescriptions.Add((a, r) => $"{r} snaps violently, fangs bared, a low growl of rage rumbling from its throat.");
+                hitDescriptions.Add((a, r) => $"{r} lunges forward, eyes glowing with primal fury, claws digging into the ground.");
+                hitDescriptions.Add((a, r) => $"{r} snarls fiercely, fur bristling, lips pulled back in a wicked snarl at {a}.");
+                hitDescriptions.Add((a, r) => $"{r} yelps sharply, teeth clashing together as it pivots, eyes fixed on {a} with predatory intent.");
+                hitDescriptions.Add((a, r) => $"{r} stiffens violently, hackles raised, a sharp growl vibrating through its chest.");
+                hitDescriptions.Add((a, r) => $"{r} lets out a guttural, almost feral howl, baring its teeth at {a}.");
+                hitDescriptions.Add((a, r) => $"{r} snaps its jaws dangerously, saliva flecking the air as it recoils from {a}'s attack.");
+                hitDescriptions.Add((a, r) => $"{r} shivers, fur standing on end, claws scraping the ground as it glares at {a}.");
+                hitDescriptions.Add((a, r) => $"{r} lunges and twists sharply, teeth aiming for {a}'s hand, eyes burning with malice.");
+                hitDescriptions.Add((a, r) => $"{r} growls low and threateningly, muscles tensing as it circles {a} warily.");
+                hitDescriptions.Add((a, r) => $"{r} snaps and shuffles back, hackles bristling, eyes flashing with raw aggression.");
+                hitDescriptions.Add((a, r) => $"{r} bares its teeth, letting out a harsh, chilling growl that echoes menace.");
+                hitDescriptions.Add((a, r) => $"{r} twitches its ears sharply, a predator fully alert to every move {a} makes.");
+                hitDescriptions.Add((a, r) => $"{r} crouches low for a split second, eyes narrowing, ready to strike viciously.");
+                hitDescriptions.Add((a, r) => $"{r} snarls, a wet, rattling sound escaping as it braces for {a}'s next move.");
+                hitDescriptions.Add((a, r) => $"{r} spins violently, fangs snapping inches from {a}, fur bristling in a frenzy.");
+                hitDescriptions.Add((a, r) => $"{r} growls deeply, muscles rippling under matted fur, eyes locked in feral focus.");
+                hitDescriptions.Add((a, r) => $"{r} flinches and snaps its jaws repeatedly, radiating barely contained aggression.");
+                hitDescriptions.Add((a, r) => $"{r} twists its body violently, claws raking the ground, teeth aimed at {a} in a vicious snarl.");
+                hitDescriptions.Add((a, r) => $"{r} shivers violently, a low, threatening growl vibrating from deep in its throat.");
+
+                Character.hitReactions.Add(wolf.Name, hitDescriptions);
+            }
+
+            return wolf;
         }
 
     }

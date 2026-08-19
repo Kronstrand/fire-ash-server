@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using fire_ash_server.Props;
+using System.Xml.Linq;
+using fire_ash_server.Enums;
 using fire_ash_server.Moves;
+using fire_ash_server.Props;
+using fire_ash_server.World;
 
 namespace fire_ash_server.Dialogue
 {
-    [Serializable]
     internal class DialogueManager
     {
         public DialogueNode CurrentNode;
-        public DialogueNode StartingNode { get; private set; }
+        public DialogueNode StartingNode { get; set; }
         public Character SpeakingCharacter;
         public Character? Initiater;
         public List<DialogueChoice> UsedChoices = new List<DialogueChoice>();
@@ -26,20 +28,31 @@ namespace fire_ash_server.Dialogue
 
         public void InitSpeakWith(Character SpeakToCharacter)
         {
+            
+
             UsedChoices.Clear();
             Initiater = SpeakToCharacter;
             SpeakingCharacter.SpeakingTo = SpeakToCharacter;        
             SpeakToCharacter.SpeakingTo = SpeakingCharacter;
-            
+
             CurrentNode = StartingNode;
             SpeakCurrentNode();
         }
 
         public void SpeakCurrentNode()
         {
+            CurrentNode.RunOnBeforeEvent(this);
             if (CurrentNode.Dialogue)
-                SpeakingCharacter.Speak(CurrentNode.GetText(this));
+            {
+                if (CurrentNode.Say)
+                    SpeakingCharacter.Speak(CurrentNode.GetText(this));
+                else
+                    SpeakingCharacter.BroadcastToSoulsInRoom(CurrentNode.GetText(this));
+            }
             CurrentNode.RunOnAfterEvent(this);
+
+            if (!CurrentNodeHasChoices())
+                EndSpeakWith();
         }
 
         public void EndSpeakWith()

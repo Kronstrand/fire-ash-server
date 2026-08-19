@@ -5,10 +5,12 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class VenomousSnakeBite : Weapon
     {
         public VenomousSnakeBite() : base("Venomous Snake Teeth", "Venomous Snake Teeth", new Die(1, 4), DamageType.Piercing, 1)
+        {
+        }
+        public override void InitAttackDescriptions()
         {
             SetGeneralAttackDescriptionsForType();
             SetHumanoidAttackDescriptions();

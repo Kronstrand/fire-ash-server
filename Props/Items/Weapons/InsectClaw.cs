@@ -8,10 +8,12 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class InsectClaw : Weapon
     {
         public InsectClaw() : base("Insect Claw", "Insect Claw", new Die(1, 4), DamageType.Piercing, 0.7)
+        {
+        }
+        public override void InitAttackDescriptions()
         {
             SetGeneralAttackDescriptionsForType();
             SetGeneralOffHandAttackDescriptionsForType();

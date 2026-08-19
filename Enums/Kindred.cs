@@ -14,10 +14,7 @@ namespace fire_ash_server.Enums
         Elf,
         Mecharion,
         Cyborg,
-        Feline,
-        Undead,
         Fay,
-        Serpentine,
-        Demon
+        Orc
     }
 }

@@ -10,7 +10,6 @@ using static fire_ash_server.Helpers;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class LookInventory : Move
     {
         public LookInventory(Soul soul) : this(soul, soul.Character, "Iventory")
@@ -30,7 +29,7 @@ namespace fire_ash_server.Moves
             else //is Loot
                 Prop = targetCharacter; 
 
-                Action = async () =>
+            Action = async () =>
             {
                 soul.Character.lookAtBeforeInventory = soul.Character.LookAt;
 
@@ -45,7 +44,7 @@ namespace fire_ash_server.Moves
                     if (hasEquippedItem)
                     {
                         inventory = $"{targetCharacter.Name} has the following items equipped:";
-                        foreach (KeyValuePair<InventorySlot, Item> kvp in targetCharacter.EquippedItems)
+                        foreach (KeyValuePair<InventorySlot, Item> kvp in targetCharacter.EquippedItems.Where(i => !i.Value.IsLivingBodyPart()))
                         {
                             inventory += $"\n{Description(kvp.Key)}: {kvp.Value.Name}.";
                         }
@@ -56,7 +55,7 @@ namespace fire_ash_server.Moves
                             inventory += "\n\n";
 
                         inventory += $"{targetCharacter.Name} has the following items in their inventory:";
-                        foreach (Item item in targetCharacter.Inventory.Items)
+                        foreach (Item item in targetCharacter.Inventory.Items.Where(i => !i.IsLivingBodyPart()))
                         {
                             inventory += $"\n{item.Name}";
                         }

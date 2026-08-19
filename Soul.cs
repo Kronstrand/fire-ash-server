@@ -1,28 +1,28 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Sockets;
 using System.Data;
-using static fire_ash_server.Helpers;
-using fire_ash_server.Props;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using fire_ash_server.Abstract_Entities;
+using fire_ash_server.Dialogue;
 using fire_ash_server.Enums;
 using fire_ash_server.Moves;
-using fire_ash_server.Props.Items;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using fire_ash_server.Moves.Attacks;
-using fire_ash_server.Dialogue;
+using fire_ash_server.Props;
+using fire_ash_server.Props.Items;
 using fire_ash_server.World;
-using fire_ash_server.Abstract_Entities;
-using System.Diagnostics;
-using fire_ash_server.World.BioMechWorld;
-using Newtonsoft.Json;
+using static fire_ash_server.Helpers;
 
 namespace fire_ash_server
 {
-    [Serializable]
     internal class Soul
     {
         private Character? character;
@@ -31,12 +31,18 @@ namespace fire_ash_server
         public ConcurrentDictionary<string, Move> AllPossibleMoves = new ConcurrentDictionary<string, Move>();
         public ConcurrentDictionary<string, Move> ShownPossibleMoves = new ConcurrentDictionary<string, Move>();
         public CancellationTokenSource CancelTokenSource = new CancellationTokenSource();
+        public TaskCompletionSource<string>? Tcs;
+        public bool NeedingInput = false;
         public string BufferText = "";
         public bool AddToBufferText = false;
         public int InventoryToolTip = 0;
         public bool CompletedGame = false;
+        public Consumable? PlacedInSoulstone;
 
-        public Soul(Socket soulSocket)
+        public Soul() { }
+
+        //public Soul(Socket soulSocket)
+        public Soul(WebSocket soulSocket)
         {
             
             Id = Guid.NewGuid();
@@ -52,18 +58,18 @@ namespace fire_ash_server
             AddToWorldSoul();
         }
 
-        public Socket? Socket
+        public WebSocket? Socket
         {
-            get 
+            get
             {
-                Program.Sockets.TryGetValue(Id, out Socket? socket);
+                Program.Sockets.TryGetValue(Id, out WebSocket? socket);
                 return socket;
             }
             set
             {
                 if (value == null)
-                    Program.Sockets.Remove(Id, out Socket? socket);
-                else 
+                    Program.Sockets.Remove(Id, out WebSocket? socket);
+                else
                     Program.Sockets[Id] = value;
             }
         }
@@ -79,6 +85,50 @@ namespace fire_ash_server
             {
                 character = value;
             }
+        }
+
+        public async Task ReceiveLoop()
+        {
+            try
+            {
+                while (true)
+                {
+                    string input = await ReceiveAsync();
+
+                    // Capture and clear atomically to avoid races
+                    var tcs = Interlocked.Exchange(ref Tcs, null);
+
+                    if (tcs != null)
+                    {
+                        tcs.TrySetResult(input); // signal awaiting game logic
+                    }
+                    else
+                    {
+                        _ = SendInvalidInputAsync(); // input ignored, game not waiting
+                    }
+                }
+            }
+            catch (ClientDisconnectedException ex)
+            {
+                await BanishAsync();
+            }
+        }
+
+        // Wait for the next input from the loop
+        public Task<string> ReceiveFromLoop()
+        {
+            var tcs = new TaskCompletionSource<string>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+
+            Tcs = tcs;
+            return tcs.Task;
+        }
+
+        // Stop / cancel waiting for input cleanly
+        public void StopReceiveFromLoop()
+        {
+            var tcs = Interlocked.Exchange(ref Tcs, null);
+            tcs?.TrySetCanceled(); // will throw OperationCanceledException to awaiters
         }
 
         public void InitToolTipCounters()
@@ -99,28 +149,35 @@ namespace fire_ash_server
                 Character.CurrentRoom.BroadcastToSoulsInRoom(messageToSend);
         }
 
-        public async Task SendAsync(string messageToSend)
+        /*public async Task SendAsync(string messageToSend)
         {
             await SendAsync(messageToSend, SendOption.None);
-        }
+        }*/
 
-        public async Task SendAsync(string messageToSend, SendOption sendOption)
+        /*public async Task SendAsync(string messageToSend, SendOption sendOption)
         {
-            if (Socket == null)// || Socket.Connected == false) //is probably daemon or disconnected
+            if (Socket == null) //is probably daemon or disconnected
                 return;
-
-            /*if (sendOption == SendOption.None)
-                messageToSend += " ";
-            if (sendOption == SendOption.NewLine)
-                messageToSend += "\n";
-            else if (sendOption == SendOption.NewParagraph)
-                messageToSend += "\n\n";*/
 
             messageToSend += "$[end]";
 
             byte[] buffer = Encoding.ASCII.GetBytes(messageToSend);
 
             await Socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), SocketFlags.None);
+        }*/
+
+        public async Task SendAsync(string messageToSend)
+        {
+            if (Socket == null || Socket.State != WebSocketState.Open)
+                return;
+
+            messageToSend += "$[end]";  // If you still want this custom protocol
+
+            byte[] buffer = Encoding.UTF8.GetBytes(messageToSend);
+
+            var segment = new ArraySegment<byte>(buffer);
+
+            await Socket.SendAsync(segment, WebSocketMessageType.Text, endOfMessage: true, CancellationToken.None);
         }
 
         public async Task SendPossibleMovesAsync()
@@ -133,7 +190,8 @@ namespace fire_ash_server
         {
             if (possibleMoves == "")
                 return;
-            await SendAsync("$[pm]" + possibleMoves + "$[pmend]", SendOption.None);
+            //await SendAsync("$[pm]" + possibleMoves + "$[pmend]", SendOption.None);
+            await SendAsync("$[pm]" + possibleMoves + "$[pmend]");
         }
 
         public async Task SendInvalidInputAsync()
@@ -152,7 +210,7 @@ namespace fire_ash_server
             CancelTokenSource = new CancellationTokenSource();
         }
 
-        public async Task<string> ReceiveAsync()
+        /*public async Task<string> ReceiveAsync()
         {
             if (Socket == null) throw new ArgumentNullException(nameof(Socket), "Socket cannot be null when sending to server");
             byte[] buffer = new byte[1024];
@@ -168,12 +226,39 @@ namespace fire_ash_server
             string messageReceived = Encoding.ASCII.GetString(buffer, 0, received);
             Console.WriteLine("Received: " + messageReceived);
             return messageReceived;
+        }*/
+
+        public async Task<string> ReceiveAsync()
+        {
+            if (Socket == null) throw new ArgumentNullException(nameof(Socket), "Socket cannot be null when receiving from server");
+
+            byte[] buffer = new byte[1024];
+            var bufferSegment = new ArraySegment<byte>(buffer);
+
+
+            CancelAndResetTokenSource();
+            Console.WriteLine($"WebSocket state before ReceiveAsync: {Socket.State}");
+            WebSocketReceiveResult result = await Socket.ReceiveAsync(bufferSegment, CancelTokenSource.Token);
+
+            // If 0 bytes received or connection closed
+            if (result.MessageType == WebSocketMessageType.Close)
+            {
+                Console.WriteLine("Connection closed by the remote host.");
+                throw new ClientDisconnectedException();
+            }
+
+            int received = result.Count;
+
+            string messageReceived = Encoding.ASCII.GetString(buffer, 0, received);
+            Console.WriteLine("Received: " + messageReceived);
+            return messageReceived;
         }
 
         public async Task<bool> AwaitYesNo()
         {
             await SendChoiceFlagAsync();
-            string input = await ReceiveAsync();
+            //string input = await ReceiveAsync();
+            string input = await ReceiveFromLoop();
             await SendAsync(InputOk());
             input = input.ToLower();
             return (input == "y" || input == "yes");
@@ -181,9 +266,11 @@ namespace fire_ash_server
 
         public async Task<string> AwaitInput(bool SetChoiceFlag)
         {
+            //await SendAsync($"Sending Choice flag next!");
             if (SetChoiceFlag)
                 await SendChoiceFlagAsync();
-            string input = await ReceiveAsync();
+            //string input = await ReceiveAsync();
+            string input = await ReceiveFromLoop();
             await SendAsync(InputOk());
             return input;
         }
@@ -214,6 +301,7 @@ namespace fire_ash_server
                 return;
             }
             AddPossibleHiddenLookAtMove(Character);
+            AddPossibleHiddenSayMove(Character);
 
             if (Character.LookAt != null)
             {
@@ -227,20 +315,27 @@ namespace fire_ash_server
                         bool? isInGroupWithTargert = Character.IsInGroupWith(Character.LookAt);
 
                         if (isInGroupWithTargert == false)
+                        {
                             AddPossibleMove(new MoveTo(this, lookAtCharacter));
+                        }
                         else if (lookAtCharacter.Dead && isInGroupWithTargert == true)
-                            AddPossibleMove(new LookInventory(this,lookAtCharacter));
-                        
-                        
+                        {
+                            AddPossibleMove(new LookInventory(this, lookAtCharacter));
+                            if (Character.HasItem(Names.Torch))
+                                AddPossibleMove(new BurnCorpse(this, lookAtCharacter));
+                        }
 
                         if (!Character.IsHidden() && isInGroupWithTargert == true)
                         {
-                            if (lookAtCharacter.DialogueManager != null)
-                                AddPossibleMove(new SpeakTo(this, lookAtCharacter));
-                            if (lookAtCharacter.IsTrader)
+                            if (!lookAtCharacter.Dead)
                             {
-                                AddPossibleMove(new BrowseGoods(this, lookAtCharacter));
-                                AddPossibleMove(new ShowItemsToSell(this, lookAtCharacter));
+                                if (lookAtCharacter.DialogueManager != null)
+                                    AddPossibleMove(new SpeakTo(this, lookAtCharacter));
+                                if (lookAtCharacter.IsTrader)
+                                {
+                                    AddPossibleMove(new BrowseGoods(this, lookAtCharacter));
+                                    AddPossibleMove(new ShowItemsToSell(this, lookAtCharacter));
+                                }
                             }
                         }
                     }
@@ -291,6 +386,7 @@ namespace fire_ash_server
 
                             if (item is Consumable)
                                 AddPossibleMove(new Consume(this, (Consumable)item));
+                            
                             AddPossibleMove(new DropItem(this, item));
                         }
                     }
@@ -399,32 +495,37 @@ namespace fire_ash_server
                     if (Character.LookAt == Character.CurrentRoom) // or force (todo)
                         AddPossibleMove(new LookAt(this, exit));
 
-                    if (ReferenceEquals(Character.LookAt, exit))
+                    if (exit.State.IsOpen)
                     {
-                        if (!Character.InCombat)
-                            AddPossibleMove(new RoomChange(this, exit));
-                        else
+                        if (ReferenceEquals(Character.LookAt, exit))
                         {
-                            int countedEnemies = Character.CurrentRoom.Characters.Where(c => c.InCombat && c.LookAt == Character && c.IsInHostileCombatWith(Character)).Count();
-                            int DC = 10 + countedEnemies;
+                            if (!Character.InCombat)
+                                AddPossibleMove(new RoomChange(this, exit));
+                            else
+                            {
+                                int countedEnemies = Character.CurrentRoom.Characters.Where(c => c.InCombat && c.LookAt == Character && c.IsInHostileCombatWith(Character)).Count();
+                                int DC = 10 + countedEnemies;
 
-                            AddPossibleMove(new SkillCheck(
-                                this,
-                                exit,
-                                MoveKey.f.ToString(),
-                                $"Flee combat and enter {exit.GoToRoom.Name}.",
-                                new SkillNumber(Skill.Acrobatics, DC),
-                                true, //should be a nonpersonal process?
-                                async (Soul s) =>
-                                {
-                                    RoomChange roomChange = new RoomChange(this, exit);
-                                    await roomChange.Action();
-                                    return null;
-                                },
-                                async (Soul s) =>
-                                {
-                                    return $"{Character.Name} failed to flee combat...";
-                                }));
+                                SkillCheck flee = new SkillCheck(
+                                    this,
+                                    exit,
+                                    MoveKey.f.ToString(),
+                                    $"Flee combat and enter {exit.GoToRoom.Name}.",
+                                    new SkillNumber(Skill.Acrobatics, DC),
+                                    true, //should be a nonpersonal process?
+                                    async (Soul s) =>
+                                    {
+                                        RoomChange roomChange = new RoomChange(this, exit);
+                                        await roomChange.Action();
+                                        return null;
+                                    },
+                                    async (Soul s) =>
+                                    {
+                                        return $"{Character.Name} failed to flee combat...";
+                                    });
+                                flee.MoveDuration = 2000;
+                                AddPossibleMove(flee);
+                            }
                         }
                     }
                 }
@@ -447,9 +548,12 @@ namespace fire_ash_server
             //journal
             //AddPossibleMove(new CheckJournal(this));
 
+            //char stats
+            AddPossibleMove(new LookCharacterStats(this));
+
             AddExitGameMove(true);
 
-            //AddPossibleMove(new SaveGameState(this));
+            AddPossibleMove(new SaveGameState(this));
             //AddPossibleMove(new LoadGameState(this));
         }
 
@@ -474,6 +578,13 @@ namespace fire_ash_server
             AddPossibleMove(lookAtMe);
         }
 
+        public void AddPossibleHiddenSayMove(Character character)
+        {
+            Say sayMove = new Say(this, character);
+            sayMove.Hidden = true;
+            AddPossibleMove(sayMove);
+        }
+
         private void AddPossibleSpeakChoice(int i, DialogueChoice choice, DialogueManager dialogueManager)
         {
             AddPossibleMove(
@@ -484,8 +595,6 @@ namespace fire_ash_server
                         {
                             dialogueManager.SetCurrentNodeBasedOnChoice(choice);                        
                             dialogueManager.SpeakCurrentNode();
-                            if (!dialogueManager.CurrentNodeHasChoices())
-                                dialogueManager.EndSpeakWith();
                         }
                         ));
         }
@@ -566,21 +675,43 @@ namespace fire_ash_server
             return true;
         }
 
-        public async Task<Move?> ReceiveAndHandleMoveAsync(bool execute)
+        public async Task<Move?> ReceiveAndHandleMoveAsync(bool execute, int? DelayInSeconds)
         {
             if (Socket == null)
                 return null;
 
             while (true)
             {
-                string input = await ReceiveAsync();
+                string input;
+
+                if (DelayInSeconds.HasValue)
+                {
+                    var receiveTask = ReceiveFromLoop();
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(DelayInSeconds.Value));
+
+                    var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
+
+                    if (completedTask == timeoutTask)
+                    {
+                        await SendAsync("$[cancel]");
+                        await SendAsync("The moment has passed.");
+
+                        return null;
+                    }
+
+                    input = await receiveTask;
+                }
+                else
+                {
+                    input = await ReceiveFromLoop();
+                }
+
                 input = input.ToLower();
 
                 Move? moveToExecute = GetMoveFromInput(input);
                 if (moveToExecute != null)
                 {
                     if (execute)
-                        //Execute(ref moveToExecute);
                         await moveToExecute.Execute(this);
                     await SendAsync(InputOk());
                     return moveToExecute;
@@ -593,17 +724,64 @@ namespace fire_ash_server
                 }
             }
         }
+        /*
+        public async Task<Move?> ReceiveAndHandleMoveAsync(bool execute)
+        {
+            if (Socket == null)
+                return null;
+
+            while (true)
+            {
+                //string input = await ReceiveAsync();
+                string input = await ReceiveFromLoop();
+                input = input.ToLower();
+
+                Move? moveToExecute = GetMoveFromInput(input);
+                if (moveToExecute != null)
+                {
+                    if (execute)
+                        await moveToExecute.Execute(this);
+                    await SendAsync(InputOk());
+                    return moveToExecute;
+                }
+                else
+                {
+                    if (Socket == null)
+                        return moveToExecute;
+                    await SendInvalidInputAsync();
+                }
+            }
+        }*/
 
         private Move? GetMoveFromInput(string input)
         {
+            string restOfMessage = "";
+            if (input.Length >= 3)
+            {
+                string sayCommand = input.Substring(0, 2).ToLower();
+                {
+                    if ($"{MoveKey.s.ToString()} " == sayCommand)
+                    {
+                        restOfMessage = input.Substring(2);
+                        input = sayCommand.Substring(0,1);
+                    }
+                }
+            }
+
             string loweredInput = input.ToLower();
+
+            //s Tralalal
             if (AllPossibleMoves.ContainsKey(loweredInput))
             {
-                return AllPossibleMoves[loweredInput];
+                Move move = AllPossibleMoves[loweredInput];
+                move.Payload = restOfMessage;
+                return move;
             }
             if (ShownPossibleMoves.ContainsKey(loweredInput))
             {
-                return ShownPossibleMoves[loweredInput];
+                Move move = ShownPossibleMoves[loweredInput];
+                move.Payload = restOfMessage;
+                return move;
             }
             return null;
         }
@@ -620,8 +798,9 @@ namespace fire_ash_server
             {
                 if (Character.InCombat) return;
                 await SendPossibleMovesAsync();
-                if (Character.InCombat) throw new OperationCanceledException(); //should rearly happen
-                await ReceiveAndHandleMoveAsync(true);
+                if (Character.InCombat) 
+                    throw new OperationCanceledException();
+                await ReceiveAndHandleMoveAsync(true, null);
             }
             catch (OperationCanceledException)
             {
@@ -631,7 +810,7 @@ namespace fire_ash_server
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                Banish();
+                await BanishAsync();
             }
         }
 
@@ -691,23 +870,8 @@ namespace fire_ash_server
             await MoveCharToRoomAndSendDescriptionAsync(goToRoom);
         }
         public async Task MoveCharToRoomAndSendDescriptionAsync(Room goToRoom)
-        {
-            Character.InCombat = goToRoom.InCombat;
-            
+        {         
             Character.GoToRoom(goToRoom);
-
-            if (Character.LastRoom != null && Character.LastRoom.InCombat)
-                Character.LastRoom.FlagCombatMightBeResolved();
-
-            await SendAsync(goToRoom.GetDescription(Character, true));
-
-            if (goToRoom.OnEnterEvent != null)
-                goToRoom.OnEnterEvent(this);
-
-            await SendAsync(goToRoom.GetAdditionalRoomDescription(Character));
-
-            if (goToRoom.InCombat)
-                goToRoom.EnableOrUpdateCombat(Character, null);
         }
 
         public Move? DaemonChoosesNextMove()
@@ -715,87 +879,94 @@ namespace fire_ash_server
             Random rnd = new Random();
 
             //make it choose stealth.....
-            if (!(Character.LookAt is Character && Character.IsInHostileCombatWith((Character)Character.LookAt)))
+            if (Character.LookAt is Character && !((Character)Character.LookAt).Dead && Character.IsInHostileCombatWith((Character)Character.LookAt))
             {
-                Dictionary<string, Move> relevantLookMoves = new Dictionary<string, Move>();
-
-                foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
-                {
-                    if (kvp.Value is LookAt && kvp.Value.Prop is Character)
-                    {
-                        Character caracterToLookAt = (Character)kvp.Value.Prop;
-
-                        if (caracterToLookAt.IsInHostileCombatWith(Character))
-                        {
-                            relevantLookMoves.Add(kvp.Key, kvp.Value);
-                            continue;
-                        }
-                    }
-                }
-                if (relevantLookMoves.Count > 0)
-                    return relevantLookMoves.ElementAt(rnd.Next(relevantLookMoves.Count)).Value;
-                return null;
-            }
-
-            Dictionary<string, Move> relevantAttackMoves = AllPossibleMoves.Where(x => 
-                                                                x.Value is Attack || 
+                Dictionary<string, Move> relevantAttackMoves = AllPossibleMoves.Where(x =>
+                                                                x.Value is Attack ||
                                                                 (x.Value is MoveTo && x.Value.Prop is Character && Character.IsInHostileCombatWith((Character)x.Value.Prop) ||
                                                                 x.Value is Consume)).ToDictionary();
 
-            //add all feat moves from character
-            foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
-            {
-                /*bool isCharacterFeat = Character.Feats.SelectMany(f => f.Moves).Any(m => m.Key == kvp.Value.Key);
-                if (isCharacterFeat)
+                //add all feat moves from character
+                foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
                 {
-                    relevantAttackMoves.Add(kvp.Key, kvp.Value);
-                }*/
-            }
-
-
-            if (relevantAttackMoves.Count > 0)
-            {
-                while (true)
-                {
-                    Move chosenMove = relevantAttackMoves.ElementAt(rnd.Next(relevantAttackMoves.Count)).Value;
-                    if (chosenMove is Consume)
+                    /*bool isCharacterFeat = Character.Feats.SelectMany(f => f.Moves).Any(m => m.Key == kvp.Value.Key);
+                    if (isCharacterFeat)
                     {
-                        Random rand = new Random();
-                        double roll = rand.NextDouble(); // Generates a random number between 0.0 and 1.0
+                        relevantAttackMoves.Add(kvp.Key, kvp.Value);
+                    }*/
+                }
 
-                        if (roll <= 0.75) // 75% chance to skip consumable move
-                            continue;
 
-                        if (chosenMove.Prop != null)
+                if (relevantAttackMoves.Count > 0)
+                {
+                    while (true)
+                    {
+                        Move chosenMove = relevantAttackMoves.ElementAt(rnd.Next(relevantAttackMoves.Count)).Value;
+                        if (chosenMove is Consume)
                         {
-                            if (chosenMove.Prop.Name == ConsumableList.BearTrapName)
-                            {
+                            Random rand = new Random();
+                            double roll = rand.NextDouble(); // Generates a random number between 0.0 and 1.0
+
+                            if (roll <= 0.75) // 75% chance to skip consumable move
                                 continue;
-                            }
-                            else if (chosenMove.Prop.Name == ConsumableList.HealingPotionName)
+
+                            if (chosenMove.Prop != null)
                             {
-                                if (Character.CurrentHP >= (Character.HP - Character.CurrentHP)) //only choose move if HP is below %50
-                                    continue;
-                            }
-                            else if (chosenMove.Prop.Name == ConsumableList.ScrollofEntanglementName)
-                            {
-                                if (Character.lookAtBeforeInventory is Character)
+                                if (chosenMove.Prop.Name == ConsumableList.BearTrapName)
                                 {
-                                    bool? isCloseTo = Character.IsInGroupWith(Character.lookAtBeforeInventory);
-                                    if (isCloseTo == true || isCloseTo == null)
+                                    continue;
+                                }
+                                else if (chosenMove.Prop.Name == ConsumableList.HealingPotionName)
+                                {
+                                    if (Character.CurrentHP >= (Character.HP - Character.CurrentHP)) //only choose move if HP is below %50
                                         continue;
+                                }
+                                else if (chosenMove.Prop.Name == ConsumableList.ScrollofEntanglementName)
+                                {
+                                    if (Character.lookAtBeforeInventory is Character)
+                                    {
+                                        bool? isCloseTo = Character.IsInGroupWith(Character.lookAtBeforeInventory);
+                                        if (isCloseTo == true || isCloseTo == null)
+                                            continue;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    return chosenMove;
+                        return chosenMove;
+                    }
                 }
             }
+
+            Dictionary<string, Move> relevantLookMoves = new Dictionary<string, Move>();
+
+            foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
+            {
+                if (kvp.Value is LookAt && kvp.Value.Prop is Character)
+                {
+                    Character caracterToLookAt = (Character)kvp.Value.Prop;
+
+                    if (caracterToLookAt.IsInHostileCombatWith(Character))
+                    {
+                        relevantLookMoves.Add(kvp.Key, kvp.Value);
+                        continue;
+                    }
+                }
+            }
+            if (relevantLookMoves.Count > 0)
+                return relevantLookMoves.ElementAt(rnd.Next(relevantLookMoves.Count)).Value;
+
+            //try return back as last option
+            foreach (KeyValuePair<string, Move> kvp in AllPossibleMoves)
+            {
+                if (kvp.Key == MoveKey.b.ToString())
+                    return kvp.Value;
+            }
             return null;
+
         }
 
-        public void Banish()
+        /*public void Banish()
         {
             IsDaemon = true;
 
@@ -806,6 +977,51 @@ namespace fire_ash_server
                 Socket = null;
             }
             Console.WriteLine("Soul has been banished.");
+        }*/
+        public async Task BanishAsync()
+        {
+            //IsDaemon = true;
+            if (!Character.Dead)
+            {
+                Character.Dies($"{Character.Name} collapses, their soul departing from their body, beyond the reach of this world.\n\n");
+            }
+
+            if (Socket != null)
+            {
+                
+                if (PlacedInSoulstone != null)
+                {
+                    Program.WorldSoul.SoulstonedCharacters.TryRemove(PlacedInSoulstone.CharacterId, out Character? removedCharacter);
+                    Item soulstone = PlacedInSoulstone;
+                    soulstone.ReplaceItem(ConsumableList.SoulstoneDust());
+                    PlacedInSoulstone = null;                  
+                }
+                
+
+                try
+                {
+                    // Gracefully close the WebSocket connection
+                    await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Soul banished", CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error closing WebSocket: {ex.Message}");
+                }
+                finally
+                {
+                    Socket.Dispose();
+                    Socket = null;
+                }
+            }
+            Console.WriteLine("Soul has been banished.");
+        }
+    }
+
+    public class ClientDisconnectedException : Exception
+    {
+        public ClientDisconnectedException()
+            : base("Client disconnected.")
+        {
         }
     }
 }

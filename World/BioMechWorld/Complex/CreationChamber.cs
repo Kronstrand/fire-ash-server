@@ -273,7 +273,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                         "The connection resists at first, but sheer force overpowers it. " +
                         "The tube tears free with a violent jerk, and a brief sting of pain shoots through you before a rush of relief as it detaches. " +
                         "Blood trickles from the wound left behind.");
-                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.Damage, s.Character), DamageType.None), umbilicalTube.Name); // Player takes damage regardless of success
                     incubatorRelease(s);
                     return "";
                 },
@@ -289,7 +289,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                         "The blend of organic and mechanical elements proves too resilient, " +
                         "and the effort leaves you exhausted with the tube still firmly attached. " +
                         "Blood trickles from where the tube meets your skin.");
-                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.DamageRoll, s.Character), DamageType.None), umbilicalTube.Name);
+                    s.Character.TakeDamage(new Damage(new Roll(new Die(1, 1), 0, RollType.Damage, s.Character), DamageType.None), umbilicalTube.Name);
 
                     tubeMoveUsed++;
                     if (tubeMoveUsed == 1)

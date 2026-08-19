@@ -9,13 +9,13 @@ using fire_ash_server.Props;
 
 namespace fire_ash_server
 {
-    [Serializable]
     internal class Feat
     {
         public string Name;
         public List<Move> Moves = new List<Move>();
         public List<Effect> Effects = new List<Effect>();
 
+        public Feat() { }
         public Feat(string name)
         {
             Name = name;

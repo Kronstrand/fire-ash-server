@@ -9,12 +9,11 @@ using fire_ash_server.Props;
 using static fire_ash_server.Helpers;
 using fire_ash_server.Enums;
 using fire_ash_server.Props.Items;
-using fire_ash_server.Props.Items.Armor;
+using fire_ash_server.Props.Items.Armoring;
 using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves
 {
-    [Serializable]
     internal class LookAt : Move
     {
         public LookAt(Soul soul, Prop prop) : base(MoveKey.l.ToString(), CreateDescription(soul.Character, prop), prop)
@@ -143,12 +142,6 @@ namespace fire_ash_server.Moves
                 }
 
                 await soul.SendAsync(output);
-                return;
-            }
-            else if (prop is Armor)
-            {
-                Armor armor = (Armor)prop;
-                await soul.SendAsync(prop.GetDescription(soul.Character) + "\n\n" + $"Armor Class: {armor.AC}");
                 return;
             }
             else if (prop is Item && !prop.IsPickupable())

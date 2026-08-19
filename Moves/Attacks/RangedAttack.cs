@@ -10,7 +10,6 @@ using fire_ash_server.Props.Items.Weapons;
 
 namespace fire_ash_server.Moves.Attacks
 {
-    [Serializable]
     internal class RangedAttack : Attack
     {
         public Weapon? weapon = null;

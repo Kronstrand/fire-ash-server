@@ -34,7 +34,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
                 caretakerRoom);
             nexusBridge.AddExit(toCareTakersRoomFromNexusBridge);
 
-            toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul) =>
+            /*toCareTakersRoomFromNexusBridge.AddOnAfterMoveToEvent((Soul) =>
             {
                 _ = Soul.SendAsync(
                     "A biomechanical rat scurries out from the enclosed room, " +
@@ -44,7 +44,7 @@ namespace fire_ash_server.World.BioMechWorld.Complex
 
                 return Task.FromResult(true);
             },
-            true);
+            true);*/
 
             Exit toNexusBridgeFromCaretakerRoom = new Exit(
                 "A doorway opens into a sprawling industrial expanse",

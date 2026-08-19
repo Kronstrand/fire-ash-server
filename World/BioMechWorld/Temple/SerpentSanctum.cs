@@ -56,7 +56,7 @@ namespace fire_ash_server.World.BioMechWorld.Temple
             );
             serpentSanctum.AddItem(ritualBowls);
 
-            Consumable healthPotion = ConsumableList.HealthPotion();
+            Item healthPotion = ConsumableList.HealthPotion();
             healthPotion.Hide(9);
             ritualBowls.AddItem(healthPotion);
             

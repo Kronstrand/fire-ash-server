@@ -12,15 +12,19 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace fire_ash_server.Props.Items.Weapons
 {
-    [Serializable]
     internal class AssaultRifle : Weapon
     {
+        public AssaultRifle() { }
         public AssaultRifle(string name, string description, double value) : base(name, description, new Die(1, 10), DamageType.Piercing, value)
         {
             TwoHander = true;
             CarriableByInventorySlots = new ThreadSafeList<InventorySlot>{
                                                             InventorySlot.Ranged
                                                             };
+        }
+
+        public override void InitAttackDescriptions()
+        {
             SetGeneralAttackDescriptionsForType();
             SetHumanoidAttackDescriptionsForType();
         }
